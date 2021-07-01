@@ -29,11 +29,11 @@ Add Parametric Morphism (A: Set): (ListEq(A:= A))
 Proof.
   intros eqA1 eqA2 HypSub t1 t2 Hyp.
   induction Hyp as [|a1 a2 l1 l2 e Hyp IH].
-  apply ListEq_nil.
-  apply ListEq_cons.  
-  apply HypSub.
-  assumption.
-  assumption.
+  - apply ListEq_nil.
+  - apply ListEq_cons.  
+    + apply HypSub.
+      assumption.
+    + assumption.
 Qed.
 
 (* proof that ListEq is an equivalence relation *)
@@ -42,10 +42,10 @@ Instance ListEq_refl : forall (A: Set)(eqA: relation A)`{Reflexive A eqA},
 Proof.
   intros A eqA reflA x.
   induction x as [| a la IHl].
-  apply ListEq_nil.
-  apply ListEq_cons.
-  reflexivity.
-  assumption.
+  - apply ListEq_nil.
+  - apply ListEq_cons.
+    + reflexivity.
+    + assumption.
 Qed.
 
 Instance ListEq_sym : forall (A: Set)(eqA: relation A)`{Symmetric A eqA},
@@ -53,10 +53,10 @@ Instance ListEq_sym : forall (A: Set)(eqA: relation A)`{Symmetric A eqA},
 Proof.
   intros A eqA symA x y H.
   induction H as [|a1 a2 l1 l2 e H IH].
-  apply ListEq_nil.
-  apply ListEq_cons; 
-  [symmetry|];
-  assumption.
+  - apply ListEq_nil.
+  - apply ListEq_cons; 
+      [symmetry|];
+      assumption.
 Qed.
 
 Instance ListEq_trans: forall (A: Set)(eqA: relation A)`{Transitive A eqA},
@@ -65,12 +65,12 @@ Proof.
   intros A eqA transA x y z H1 H2.
   revert z H2.
   induction H1 as [|a1 a2 x y e1 H1 IH1]; intros z H2.
-  assumption.
-  destruct z as [|a3 z] ;
-  inversion_clear H2 as [| a4 a5 l1 l2 e2 H3].
-  apply ListEq_cons.
-  apply (transA _ _ _ e1 e2).
-  apply (IH1 _ H3).
+  - assumption.
+  - destruct z as [|a3 z] ;
+      inversion_clear H2 as [| a4 a5 l1 l2 e2 H3].
+    apply ListEq_cons.
+    + apply (transA _ _ _ e1 e2).
+    + apply (IH1 _ H3).
 Qed.
 
 Add Parametric Relation (A: Set)(eqA: relation A)`{Reflexive A eqA}: 
@@ -90,10 +90,10 @@ Instance ListEqeqeq : forall(A: Set), subrelation (ListEq (@eq A)) (@eq (list A)
 Proof.
   intros A x x0 H.
   induction H as [| a1 a2 l1 l2 e1 H IH].
-  reflexivity.
-  rewrite IH.
-  rewrite e1.
-  reflexivity.
+  - reflexivity.
+  - rewrite IH.
+    rewrite e1.
+    reflexivity.
 Qed.
 
 Instance eqListEqeq : forall (A: Set), subrelation (@eq (list A)) (ListEq (@eq A)).
@@ -167,8 +167,8 @@ Lemma ListEq_map_f_g:
 Proof.
   intros A B cmpB f g l h.
   induction l as [| hd l].
-  apply ListEq_nil.
-  apply (ListEq_cons _ _ (h hd) IHl).
+  - apply ListEq_nil.
+  - apply (ListEq_cons _ _ (h hd) IHl).
 Qed.
 
 Lemma ListEq_length: forall (A: Set)(cmpA: relation A)(l1 l2: list A), 
@@ -190,10 +190,10 @@ Proof.
   intros A cmpA cmpAR ; 
   induction l1 as [|hd1 l1 IHl] ; destruct l2 as [| hd2 l2]; 
   intros n h d le; try (inversion_clear le as [| x y z t e H]).
-  reflexivity.
-  destruct n as [|n].
-  assumption.
-  apply (IHl _ _ (lt_S_n _ _ h) _ H).
+  - reflexivity.
+  - destruct n as [|n].
+  + assumption.
+  + apply (IHl _ _ (lt_S_n _ _ h) _ H).
 Qed.
 
 Lemma ListEq_eq: forall (A B: Set)
@@ -203,13 +203,13 @@ Lemma ListEq_eq: forall (A B: Set)
 Proof.
   intros A B cmpB cmpBR ; 
   induction l as [| hd l IHl]; intros f1 f2 H a Hin.
-  inversion Hin.
-  inversion_clear H as [| x y z t e h].
-  destruct Hin as [eq | Hin].
-  rewrite <- eq.
-  assumption.
-  apply IHl;
-  assumption.
+  - inversion Hin.
+  - inversion_clear H as [| x y z t e h].
+    destruct Hin as [eq | Hin].
+    + rewrite <- eq.
+      assumption.
+    + apply IHl;
+        assumption.
 Qed.
 
 End additional_functions.

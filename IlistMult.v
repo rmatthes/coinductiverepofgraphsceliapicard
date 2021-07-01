@@ -161,7 +161,7 @@ Section ilistMult_def_tools.
       apply (is_imeq cmp l1 l3 (trans_eq e1 e2)).
       intros f.
       assert (H1: rewriteFins (eq_trans e1 e2) f = rewriteFins e2 (rewriteFins e1 f)).
-      treatFinPure.
+      { treatFinPure. }
       rewrite H1.
       apply (cmp_trans _ _ _ (h1 f) (h2 _)).
     Qed.
@@ -305,8 +305,8 @@ Section Bij_ilistMult_list.
   Proof.
     intros t i f.
     assert (H: decode_Fin f < length (ilistM2list i)).
-    rewrite length_ilistM2list.
-    apply decode_Fin_inf_n.
+    { rewrite length_ilistM2list.
+      apply decode_Fin_inf_n. }
     rewrite (nth_indep (ilistM2list i) t (ffctiMult i f) H).
     apply ilistM2list_nth2.
   Qed.
@@ -336,30 +336,30 @@ Section Bij_ilistMult_list.
     intro f.
     elim (zerop (decode_Fin f)) ; intros a ;
     destruct l as [| h l].
-    inversion f.
-    left.
-    refine (match (sym_eq a) in (_ = df) return 
-      h = match df with 0 => h | S m => nth m l h end 
-      with refl_equal => _ end).
-    reflexivity.
-    inversion f.
-    right.
-    inversion a as [e | n H e].
-    refine (match e in (_ = df) return 
-      In match df with 0 => h | S m => nth m l h end l 
-      with refl_equal => _ end).
-    destruct l as [| ht l].
-    apply 
-      (lt_irrefl _ (gt_le_trans _ _ _ a (gt_S_le _ _ (decode_Fin_inf_n f)))).
-    left ; reflexivity.
-    refine (match e in (_ = df) return 
-      In match df with 0 => h | S m => nth m l h end l 
-      with refl_equal => _ end).
-    assert (H': n < (length l)).
-    apply lt_S_n.
-    rewrite e.
-    apply decode_Fin_inf_n.
-    apply (nth_In _ _ H').
+    - inversion f.
+    - left.
+      refine (match (sym_eq a) in (_ = df) return 
+        h = match df with 0 => h | S m => nth m l h end 
+        with refl_equal => _ end).
+      reflexivity.
+    - inversion f.
+    - right.
+      inversion a as [e | n H e].
+      + refine (match e in (_ = df) return 
+          In match df with 0 => h | S m => nth m l h end l 
+          with refl_equal => _ end).
+        destruct l as [| ht l].
+        * apply 
+            (lt_irrefl _ (gt_le_trans _ _ _ a (gt_S_le _ _ (decode_Fin_inf_n f)))).
+        * left ; reflexivity.
+      + refine (match e in (_ = df) return 
+          In match df with 0 => h | S m => nth m l h end l 
+          with refl_equal => _ end).
+        assert (H': n < (length l)).
+        { apply lt_S_n.
+          rewrite e.
+          apply decode_Fin_inf_n. }
+        apply (nth_In _ _ H').
   Qed.
 
   Definition inf_length_lgtiM (n: nat)(l: list T)(h: n < length l)
@@ -376,33 +376,34 @@ Section Bij_ilistMult_list.
   Proof.
     destruct n as [|n]; intros l h t p;
     destruct l as [| hd l].
-    inversion h.
-    simpl.
-    rewrite code_Fin1_Sn_0.
-    reflexivity.
-    inversion h.
-    simpl in h.
-    simpl nth.
-    assert (h':= lt_le_S _ _ (lt_S_n _ _ h)).
-    assert (H: decode_Fin (code_Fin1_Sn (lt_n_Sm_le (S n) (length l) 
-      (inf_length_lgtiM (hd :: l) h p)))=
-    S n).
-    rewrite (code_Fin1_Sn_proofirr _ h').
-    revert n h h'.
-    induction (length l) as [| ll IHll] ; intros n h h'.
-    inversion h'.
-    rewrite code_Fin1_Sn_S.
-    simpl.
-    f_equal.
-    assert (h1 := le_S_n _ _ h').
-    rewrite (code_Fin1_Sn_proofirr _ h1).
-    destruct n as [|n].
-    rewrite code_Fin1_Sn_0.
-    reflexivity.
-    apply (IHll _ (lt_S_n _ _ h)).
-    simpl.
-    rewrite H.
-    apply (nth_indep_comp _ l t hd h').
+    - inversion h.
+    - cbn.
+      rewrite code_Fin1_Sn_0.
+      reflexivity.
+    - inversion h.
+    - cbn in h.
+      simpl nth.
+      assert (h':= lt_le_S _ _ (lt_S_n _ _ h)).
+      assert (H: decode_Fin (code_Fin1_Sn (lt_n_Sm_le (S n) (length l) 
+                               (inf_length_lgtiM (hd :: l) h p)))
+                 = S n).
+      { rewrite (code_Fin1_Sn_proofirr _ h').
+        revert n h h'.
+        induction (length l) as [| ll IHll] ; intros n h h'.
+        - inversion h'.
+        - rewrite code_Fin1_Sn_S.
+          cbn.
+          f_equal.
+          assert (h1 := le_S_n _ _ h').
+          rewrite (code_Fin1_Sn_proofirr _ h1).
+          destruct n as [|n].
+          + rewrite code_Fin1_Sn_0.
+            reflexivity.
+          + apply (IHll _ (lt_S_n _ _ h)).
+      }
+      cbn.
+      rewrite H.
+      apply (nth_indep_comp _ l t hd h').
   Qed.
     
   Lemma list2ilistM_nth2: forall (l: list T)(p: PropMult _ _ _)
@@ -413,21 +414,21 @@ Section Bij_ilistMult_list.
     unfold ffctiMult.
     unfold fctin.
     destruct l as [|hd l].
-    inversion f.
-    simpl.
-    simpl in f.
-    elim (zerop (decode_Fin f)); intros a.
-    rewrite a; reflexivity.
-    inversion a as [e| n H e] ; 
-    assert (h:= decode_Fin_inf_n f).
-    destruct l as [|hhd l].
-    rewrite <- e in h.
-    apply False_rec.
-    apply (lt_irrefl _ h).
-    reflexivity.
-    apply (nth_indep_comp _ _ _ _).
-    rewrite <- e in h.
-    apply (lt_S_n _ _ h).
+    - inversion f.
+    - cbn.
+      cbn in f.
+      elim (zerop (decode_Fin f)); intros a.
+      + rewrite a; reflexivity.
+      + inversion a as [e| n H e] ; 
+          assert (h:= decode_Fin_inf_n f).
+        destruct l as [|hhd l].
+        * rewrite <- e in h.
+          apply False_rec.
+          apply (lt_irrefl _ h).
+        * reflexivity.
+        * apply (nth_indep_comp _ _ _ _).
+          rewrite <- e in h.
+          apply (lt_S_n _ _ h).
   Qed.
     
   Lemma lgtiM_list2ilistM: forall (l: list T)(p: PropMult inf sup (length l)), 
@@ -443,10 +444,10 @@ Section Bij_ilistMult_list.
   Proof.
     intros i.
     set (p := match sym_eq (length_ilistM2list _) in (_=x) return PropMult _ _ x 
-    with refl_equal => (propin (fctiMult i)) end).
+      with refl_equal => (propin (fctiMult i)) end).
     assert (h : lgtiMult (list2ilistM (ilistM2list i) p) = lgtiMult i).
-    rewrite lgtiM_list2ilistM.
-    apply length_ilistM2list.
+    { rewrite lgtiM_list2ilistM.
+      apply length_ilistM2list. }
     apply (is_imeq _ _ _ h).
     intros f.
     rewrite <- (list2ilistM_nth2 _ _ _ 
@@ -461,24 +462,24 @@ Section Bij_ilistMult_list.
     comp (list2Fin_T (a :: l) (succ x)) (list2Fin_T l x).
   Proof.
    induction l as [|hd l]; intros a f.
-   inversion f.
-   simpl.
-   elim (zerop (decode_Fin f)); intros b.
-   refine (match (sym_eq b) as b' in ( _ = df) return 
-   (comp match df with 0 => hd | S m => _ end  
-    match df with 0 => hd | S m => _ end) with refl_equal => _ end).
-   reflexivity.
-   inversion b as [e | n H e].
-   destruct l as [|hhd l].
-   apply False_rec.
-   assert (H:= decode_Fin_inf_n f) ; simpl in H.
-   rewrite e in H.
-   apply (lt_irrefl _ H).
-   reflexivity.
-   assert (H1:= decode_Fin_inf_n f); simpl in H1.
-   rewrite <- e in H1.
-   apply (lt_S_n n (length l)) in H1.
-   apply (nth_indep_comp compRel l a hd H1).
+   - inversion f.
+   - cbn.
+     elim (zerop (decode_Fin f)); intros b.
+     + refine (match (sym_eq b) as b' in ( _ = df) return 
+       (comp match df with 0 => hd | S m => _ end  
+        match df with 0 => hd | S m => _ end) with refl_equal => _ end).
+       reflexivity.
+     + inversion b as [e | n H e].
+       * destruct l as [|hhd l].
+         -- apply False_rec.
+            assert (H:= decode_Fin_inf_n f) ; cbn in H.
+            rewrite e in H.
+            apply (lt_irrefl _ H).
+         -- reflexivity.
+       * assert (H1:= decode_Fin_inf_n f); cbn in H1.
+         rewrite <- e in H1.
+         apply (lt_S_n n (length l)) in H1.
+         apply (nth_indep_comp compRel l a hd H1).
   Qed.
 
   Lemma list2Fin_T_succ_map: 
@@ -487,11 +488,11 @@ Section Bij_ilistMult_list.
        (map (fun x : Fin (length l) => list2Fin_T (a :: l) (succ x)) lf).
   Proof.
     intros l a ; induction lf as [| hd lf].
-    apply ListEq_nil.
-    apply ListEq_cons.
-    rewrite list2Fin_T_succ.
-    reflexivity.
-    apply IHlf.
+    - apply ListEq_nil.
+    - apply ListEq_cons.
+      + rewrite list2Fin_T_succ.
+        reflexivity.
+      + apply IHlf.
   Qed.
 
 
@@ -502,18 +503,18 @@ Section Bij_ilistMult_list.
     unfold ilistM2list.
     unfold ffctiMult.
     unfold fctin.
-    simpl.
+    cbn.
     clear p.
     induction l as [|hd l].
-    reflexivity.
-    simpl.
-    apply ListEq_cons.
-    reflexivity.
-    rewrite (map_map_ListEq (A:= Fin (length l))(B:= Fin (S (length l))) 
-      compRel).
-    change (ListEq comp (map (fun x => list2Fin_T (hd::l) (succ x)) (makeListFin (length l))) l).
-    rewrite <- list2Fin_T_succ_map.
-    apply IHl.
+    - reflexivity.
+    - cbn.
+      apply ListEq_cons.
+      + reflexivity.
+      + rewrite (map_map_ListEq (A:= Fin (length l))(B:= Fin (S (length l))) 
+          compRel).
+        change (ListEq comp (map (fun x => list2Fin_T (hd::l) (succ x)) (makeListFin (length l))) l).
+        rewrite <- list2Fin_T_succ_map.
+        apply IHl.
   Qed.
 
   Program Definition ilistMM (n: nat)(p: PropMult inf sup n)
@@ -539,25 +540,24 @@ Section Bij_ilistMult_list.
   Proof.
     intros T eqT eqTRel i1 i2 ; split ; intros H ;
     destruct i1 as [n1 i1]; destruct i2 as [n2 i2].
-    destruct H as [e H].
-    simpl in e.
-    revert i2 H; rewrite <- e ; simpl ; clear e n2 ; intros i2 H.
-    unfold ilistM2list ; simpl.
-    destruct n1 as [|n1].
-    reflexivity.
-    simpl.
-    apply ListEq_cons.
-    apply H.
-    apply (ListEq_map_f_g _ _ _ _ H).
-
-    assert (H1 := ListEq_length H).
-    unfold ilistM2list in H1.
-    do 2 rewrite map_length, makeListFin_nb_elem_ok in H1 ; simpl in H1.
-    revert i2 H ; rewrite <- H1 ; clear n2 H1 ; intros i2 H.
-    apply (is_imeq _ _ _ (refl_equal _ :  
-      lgtiMult (existT (fun n : nat => ilistnMult T inf sup n) n1 i1) = 
-      lgtiMult (existT (fun n : nat => ilistnMult T inf sup n) n1 i2))) ; intro f.
-    apply (ListEq_eq eqTRel _ _ _ H _ (all_Fin_n_in_makeListFin f)).
+    - destruct H as [e H].
+      cbn in e.
+      revert i2 H; rewrite <- e ; cbn ; clear e n2 ; intros i2 H.
+      unfold ilistM2list ; cbn.
+      destruct n1 as [|n1].
+      + reflexivity.
+      + cbn.
+        apply ListEq_cons.
+        * apply H.
+        * apply (ListEq_map_f_g _ _ _ _ H).
+    - assert (H1 := ListEq_length H).
+      unfold ilistM2list in H1.
+      do 2 rewrite map_length, makeListFin_nb_elem_ok in H1 ; cbn in H1.
+      revert i2 H ; rewrite <- H1 ; clear n2 H1 ; intros i2 H.
+      apply (is_imeq _ _ _ (refl_equal _ :  
+          lgtiMult (existT (fun n : nat => ilistnMult T inf sup n) n1 i1) = 
+          lgtiMult (existT (fun n : nat => ilistnMult T inf sup n) n1 i2))) ; intro f.
+      apply (ListEq_eq eqTRel _ _ _ H _ (all_Fin_n_in_makeListFin f)).
   Qed.
 
   Lemma ListEq_imeq_eq: 
@@ -603,7 +603,7 @@ Section Bij_ilistMult_list.
       rewrite map_length.
       apply (sym_eq (length_ilistM2list i)). }
     apply (is_imeq _ _ _ H); intro fi ;
-    destruct i as [[|n] i].
+      destruct i as [[|n] i].
     { inversion fi. }
     cbn in H, p.
     rewrite <- (code1_decode_Id fi) at 1.
@@ -611,7 +611,7 @@ Section Bij_ilistMult_list.
     cbn.
     rewrite <- decode_Fin_match'.
     elim (zerop (decode_Fin fi)); intros a ;
-    destruct i as [i pp].
+      destruct i as [i pp].
     - refine (match (sym_eq a) in (_ = df) return 
       compU _ match df with 0 => f (i (first n)) | S m => _ end
       with refl_equal => _ end).
@@ -619,11 +619,9 @@ Section Bij_ilistMult_list.
       rewrite code_Fin1_Sn_0.
       reflexivity.
     - inversion a as [e | m H1 e].
-
       + destruct n as [|n].
         * rewrite (Fin_first_1 fi) in e.
           inversion e.
-
         * rewrite (decode_Fin_unique fi (succ (first n)) (sym_eq e)).
           cbn.
           rewrite code_Fin1_Sn_S.
@@ -631,10 +629,8 @@ Section Bij_ilistMult_list.
           reflexivity.
       + unfold ffctiMult.
         unfold fctin.
-        simpl.
-   
+        cbn.
         do 2 rewrite map_map.
-
         refine (match e in (_ = df) return 
                       compU _ match df with 0 => _ | S m => 
           nth m (List.map (fun x : Fin n => f (i (@succ n x))) (makeListFin n)) (f (i (first n)))
@@ -643,10 +639,9 @@ Section Bij_ilistMult_list.
         rewrite (map_map_nth_comp compTRel compURel i fM).
         assert (H2 := (lt_n_Sm_le (decode_Fin fi) n (decode_Fin_inf_n fi))).
         rewrite (code_Fin1_Sn_proofirr _ H2).
-        revert H2 ; simpl ; rewrite <- e; intro H2.
+        revert H2 ; cbn ; rewrite <- e; intro H2.
         destruct n as [|n].
         * inversion H2.
-
         * rewrite (nth_indep _ (first (S n)) (succ (first n))).
           -- rewrite map_nth.
              rewrite code_Fin1_Sn_S.
@@ -670,11 +665,11 @@ Section Bij_ilistMult_list.
   Proof.
     intros T U l a lf f compT compTRel compU compURel fM.
     induction lf as [| hd lf IHlf].
-    apply ListEq_nil.
-    apply ListEq_cons.
-    rewrite (list2Fin_T_succ compTRel).
-    reflexivity.
-    apply IHlf.
+    - apply ListEq_nil.
+    - apply ListEq_cons.
+      + rewrite (list2Fin_T_succ compTRel).
+        reflexivity.
+      + apply IHlf.
   Qed.
 
   Lemma iMMap_cons: forall (T U: Set)(a: T)(l: list T)(f: T -> U)
@@ -689,9 +684,9 @@ Section Bij_ilistMult_list.
     intros T U a l f inf sup p1 p2 compT compTRel compU compURel fM .
     rewrite (map_iMMap_ilistM_list (list2ilistM _ _ (a :: l) _) _ _ fM).
     rewrite (ilistM2list_list2ilistM_id compURel).
-    simpl.
+    cbn.
     apply ListEq_cons.
-    reflexivity.
+    { reflexivity. }
     unfold ilistM2list.
     do 2 (rewrite (map_map_ListEq compURel)).
     rewrite (list2Fin_T_succ_map_f l a _ compTRel compURel fM).
@@ -709,23 +704,23 @@ Section Bij_ilistMult_list.
     unfold ilistM2list.
     unfold ffctiMult.
     unfold fctin.
-    simpl.
+    cbn.
     clear p.
     induction l as [|hd l IHl].
-    reflexivity.
-    simpl.
+    { reflexivity. }
+    cbn.
     apply ListEq_cons.
-    reflexivity.
+    { reflexivity. }
     rewrite IHl.
     rewrite map_map.
-    destruct l as [|hhd l] ; simpl.
-    reflexivity.
+    destruct l as [|hhd l] ; cbn.
+    { reflexivity. }
     apply ListEq_cons.
-    reflexivity.
+    { reflexivity. }
     do 2 (rewrite map_map).
     apply ListEq_map_f_g.
     intro a.
-    simpl.
+    cbn.
     rewrite (nth_indep l hd hhd (decode_Fin_inf_n a)).
     reflexivity.
   Qed.
@@ -777,7 +772,7 @@ Section manip_ilistMult.
   Proof.
     intros T eqT eqTR p p' t.
     assert (h: lgtiMult (singletonM p t) = lgtiMult (iMcons t (iMnil T p') p)).
-    reflexivity.
+    { reflexivity. }
     apply (is_imeq _ _ _ h).
     intro f.
     rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' f h)).
@@ -789,8 +784,8 @@ Section manip_ilistMult.
   Definition Sop (n: option nat): option nat.
   Proof.
     destruct n as [n|].
-    exact (Some (S n)).
-    exact None.
+    - exact (Some (S n)).
+    - exact None.
   Defined.
 
   Lemma Sop_Some: 
@@ -822,7 +817,7 @@ Section manip_ilistMult.
     eqT (ffctiMult i f) (ffctiMult (iMcons t i p) (succ f)).
   Proof.
     unfold ffctiMult ; unfold fctin.
-    unfold iMcons ;unfold iMconsn; unfold iconsn; unfold get_cons; simpl.
+    unfold iMcons; unfold iMconsn; unfold iconsn; unfold get_cons; cbn.
     intros T eqT eqTR t [[|n] i] f p.
     inversion f.
     reflexivity.

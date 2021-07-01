@@ -42,19 +42,19 @@ Section Ilist_Perm_occ.
   as count_occM1.
   Proof.
     intros [n1 i1] [n2 i2] [h H].
-    simpl in h, H.
+    cbn in h, H.
     assert (h' := h) ; revert i2 h H ; rewrite <- h' ; intros i2 h H ; clear h' n2.
     fold (mkilist i1); fold (mkilist i2).
     assert (e1: forall f, f = rewriteFins h f).
-    intro f.
-    apply decode_Fin_unique, decode_Fin_match'.
+    { intro f.
+      apply decode_Fin_unique, decode_Fin_match'. }
     assert (H': forall f, RelT (i1 f) (i2 f)).
-    intro f ; rewrite (e1 f) at 2 ; apply H. 
+    { intro f ; rewrite (e1 f) at 2 ; apply H. }
     clear h H e1.
-    simpl.
+    cbn.
     induction n1 as [|n IH].
-    reflexivity.
-    simpl.
+    { reflexivity. }
+    cbn.
     destruct RelTEq as [Rrefl Rsym Rtrans].
     elim (R_dec t (i1 (first n))) ; intros a ;
     elim (R_dec t (i2 (first n))) ; intros c ;
@@ -80,20 +80,20 @@ Section Ilist_Perm_occ.
      exists m, count_occn RelT R_dec (l i) l = S m.
   Proof.
     induction i.
-    simpl.
-    elim (R_dec (l (first k)) (l (first k))) ; intros a.
-    exists (count_occn RelT R_dec (l (first k)) (fun f : Fin k => l (succ f))).
-    reflexivity.
-    unfold not in a.
-    contradiction a.
-    reflexivity.
-    simpl.
-    elim (R_dec (l (succ i)) (l (first k))) ; intros a.
-    exists (count_occn RelT R_dec (l (succ i)) (fun f : Fin k => l (succ f))).
-    reflexivity.
-    destruct (IHi (fun f : Fin k => l (succ f))) as [m H].
-    exists m.
-    apply H.
+    - cbn.
+      elim (R_dec (l (first k)) (l (first k))) ; intros a.
+      + exists (count_occn RelT R_dec (l (first k)) (fun f : Fin k => l (succ f))).
+        reflexivity.
+      + unfold not in a.
+        contradiction a.
+        reflexivity.
+    - cbn.
+      elim (R_dec (l (succ i)) (l (first k))) ; intros a.
+      + exists (count_occn RelT R_dec (l (succ i)) (fun f : Fin k => l (succ f))).
+        reflexivity.
+      + destruct (IHi (fun f : Fin k => l (succ f))) as [m H].
+        exists m.
+        apply H.
   Qed.
 
   Lemma count_occn_not_exist (T: Set)(RelT: relation T)
@@ -102,15 +102,15 @@ Section Ilist_Perm_occ.
    Proof.
      intros H.
      induction n as [|n IH].
-     reflexivity.
-     simpl.
+     { reflexivity. }
+     cbn.
      elim (R_dec t (l (first n))) ; intros a.
-     destruct H.
-     exists (first n) ; assumption.
-     apply IH.
-     intros [f H'].
-     destruct H.
-     exists (succ f) ; assumption.
+     - destruct H.
+       exists (first n) ; assumption.
+     - apply IH.
+       intros [f H'].
+       destruct H.
+       exists (succ f) ; assumption.
    Qed.
 
   Lemma count_occn_exist (T: Set)(RelT: relation T)
@@ -119,13 +119,13 @@ Section Ilist_Perm_occ.
    Proof.
      intro H.
      induction n as [|n IH].
-     inversion H.
-     simpl in H.
+     { inversion H. }
+     cbn in H.
      revert H.
-     elim (R_dec t (l (first n))) ; simpl ; intros a H.
-     exists (first n) ; assumption.
-     destruct (IH (fun x => l (succ x)) H) as [f H'].
-     exists (succ f) ; assumption.
+     elim (R_dec t (l (first n))) ; cbn ; intros a H.
+     - exists (first n) ; assumption.
+     - destruct (IH (fun x => l (succ x)) H) as [f H'].
+       exists (succ f) ; assumption.
    Qed.
 
   Lemma IlistPerm_refl: forall (T: Set)(RelT: relation T)
@@ -174,10 +174,10 @@ Section Ilist_Perm_occ.
    Proof.
      intros t1 t2 H.
      destruct i as [n i].
-     simpl.
+     cbn.
      induction n as [|n IH].
-     reflexivity.
-     simpl.
+     { reflexivity. }
+     cbn.
      destruct REq as [Rrefl Rsym Rtrans].
      elim (R_dec t1 (i (first n))) ; intros a ;
      elim (R_dec t2 (i (first n))) ; intros b ;
@@ -195,25 +195,25 @@ Section Ilist_Perm_occ.
      intros T RelT [Rrefl Rsym Rtrans] R_dec [n i1] [n2 i2] [h H].
      apply is_IlistPerm.
      intros t.
-     simpl in *|-*.
+     cbn in *|-*.
      assert (h' := h) ; revert i1 i2 h H ; rewrite <- h' ; intros i1 i2 h H ; clear h' n2.
      assert (H1 : forall f, RelT (i1 f) (i2 f)).
-     intro f.
-     rewrite (decode_Fin_unique _ _ (decode_Fin_match' f h)) at 2.
-     apply (H f).
+     { intro f.
+       rewrite (decode_Fin_unique _ _ (decode_Fin_match' f h)) at 2.
+       apply (H f). }
      clear H h.
-
      induction n as [|n IH].
-     reflexivity.
-     simpl.
+     { reflexivity. }
+     cbn.
      elim (R_dec t (i1 (first n))) ; elim (R_dec t (i2 (first n))) ; intros a b.
-     f_equal ; apply IH.
-     intro f ; apply (H1 (succ f)).
-     contradiction (Rtrans _ _ _ b (H1 (first n))).
-     contradiction (Rtrans _ _ _ a (Rsym _ _ (H1 (first n)))).
-     apply IH.
-     intro f ; apply (H1 (succ f)).
+     - f_equal ; apply IH.
+       intro f ; apply (H1 (succ f)).
+     - contradiction (Rtrans _ _ _ b (H1 (first n))).
+     - contradiction (Rtrans _ _ _ a (Rsym _ _ (H1 (first n)))).
+     - apply IH.
+       intro f ; apply (H1 (succ f)).
    Qed.
+   
 End Ilist_Perm_occ.
 
 Section IlistPerm_ind.
@@ -246,7 +246,7 @@ Section IlistPerm_ind.
        match h with is_IlistPerm4 i1 i2 h1 h2 => _ end).
      clear i00 i0 h.
      apply H.
-     assumption.
+     { assumption. }
      intro f1.
      destruct (h2 f1) as [f2 [h3 h4]].
      exists f2.
@@ -272,7 +272,7 @@ Section IlistPerm_ind.
        match h with is_IlistPerm5 i1 i2 h1 h2 => _ end).
      clear i00 i0 h.
      apply H.
-     assumption.
+     { assumption. }
      intro f2.
      destruct (h2 f2) as [f1 [h3 h4]].
      exists f1.
@@ -285,7 +285,7 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT i1 i2 H.
      induction H as [i1 i2 h1 h2 | i1 i2 f1 f2 h1 h2 IH].
-     assumption.
+     { assumption. }
      apply eq_S in IH.
      do 2 rewrite <- extroduce_lgti in IH.
      assumption.
@@ -302,13 +302,13 @@ Section IlistPerm_ind.
      fold (mkilist i1) in *|-*.
      fold (mkilist i2) in *|-*.
      destruct n1 as [|n1].
-     apply IlistPerm3_nil.
-     assumption.
-     reflexivity.
-     destruct (h2 (first n1)) as [f2 [h3 [h4 h5]]] ; clear h2.
-     clear h4.
-     apply (IlistPerm3_cons _ _ (first _: Fin (lgti (mkilist _))) 
-       (f2: Fin (lgti (mkilist _)))) ; assumption.
+     - apply IlistPerm3_nil.
+       + assumption.
+       + reflexivity.
+     - destruct (h2 (first n1)) as [f2 [h3 [h4 h5]]] ; clear h2.
+       clear h4.
+       apply (IlistPerm3_cons _ _ (first _: Fin (lgti (mkilist _))) 
+         (f2: Fin (lgti (mkilist _)))) ; assumption.
      Qed.
      
    Lemma IlistPerm5_IlistPerm3_eq : forall (T: Set)(RelT: relation T)(i1 i2: ilist T), 
@@ -321,11 +321,11 @@ Section IlistPerm_ind.
      fold (mkilist i1) in *|-*.
      fold (mkilist i2) in *|-*.
      destruct n2 as [|n2].
-     apply IlistPerm3_nil ; assumption.
-     destruct (h2 (first n2)) as [f1 [h3 [h4 h5]]] ; clear h2.
-     clear h4.
-     apply (IlistPerm3_cons _ _ (f1 : Fin (lgti (mkilist _))) 
-       (first _: Fin (lgti (mkilist _)))) ; assumption.
+     - apply IlistPerm3_nil ; assumption.
+     - destruct (h2 (first n2)) as [f1 [h3 [h4 h5]]] ; clear h2.
+       clear h4.
+       apply (IlistPerm3_cons _ _ (f1 : Fin (lgti (mkilist _))) 
+         (first _: Fin (lgti (mkilist _)))) ; assumption.
     Qed.
 
    Lemma IlistPerm4_refl_refl: forall (T: Set)(RelT: relation T)(Rrefl: Reflexive RelT)(i: ilist T),
@@ -336,13 +336,13 @@ Section IlistPerm_ind.
      apply (is_IlistPerm4 _ _ (refl_equal _)) ;
      simpl lgti ; simpl fcti ;
      intro f ; exists f.
-     inversion f.
-     split.
-     reflexivity.
-     set (e := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) i) f).
-     assert (h:= extroduce_lgti_S _ _ : n = lgti e).
-     destruct e as [n' e].
-     simpl in h ; revert e ; rewrite <- h ; intro e ; apply IH.
+     - inversion f.
+     - split.
+       + reflexivity.
+       + set (e := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) i) f).
+         assert (h:= extroduce_lgti_S _ _ : n = lgti e).
+         destruct e as [n' e].
+         cbn in h ; revert e ; rewrite <- h ; intro e ; apply IH.
    Qed.
 
    Lemma IlistPerm4_refl: forall (T: Set)(RelT: relation T)(EqT: Equivalence RelT)(i: ilist T),
@@ -353,17 +353,17 @@ Section IlistPerm_ind.
      apply (is_IlistPerm4 _ _ (refl_equal _)) ;
      simpl lgti ; simpl fcti ;
      intro f ; exists f.
-     inversion f.
-     split.
-     apply Rrefl.
-     set (e := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) i) f).
-     assert (h: lgti e = n).
-     apply eq_add_S.
-     unfold e.
-     rewrite <- extroduce_lgti.
-     reflexivity.
-     destruct e as [n' e].
-     simpl in h ; revert e ; rewrite h ; intro e ; apply IH.
+     - inversion f.
+     - split.
+       + apply Rrefl.
+       + set (e := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) i) f).
+         assert (h: lgti e = n).
+         { apply eq_add_S.
+           unfold e.
+           rewrite <- extroduce_lgti.
+           reflexivity. }
+         destruct e as [n' e].
+         cbn in h ; revert e ; rewrite h ; intro e ; apply IH.
    Qed.
 
    (* Deduced from IlistPerm4_refl *)
@@ -396,8 +396,8 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT i1 i2.
      apply is_IlistPerm4.
-     reflexivity.
-     intro f1 ; inversion f1.
+     - reflexivity.
+     - intro f1 ; inversion f1.
    Qed.
 
    Lemma IlistPerm4nil_gen: forall (T: Set)(RelT: relation T)(i1 i2: ilist T), 
@@ -406,11 +406,11 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT i1 i2 Hyp1 Hyp2.
      apply is_IlistPerm4.
-     exact Hyp1.
-     intro f1.
-     apply False_rec.
-     rewrite Hyp2 in f1.
-     inversion f1.
+     - exact Hyp1.
+     - intro f1.
+       apply False_rec.
+       rewrite Hyp2 in f1.
+       inversion f1.
    Qed.
 
    Lemma IlistPerm4_lgti: forall (T: Set)(RelT: relation T)(i1 i2: ilist T), 
@@ -424,8 +424,8 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT i1 i2 ; intros h ;
      induction h as [i1 i2 e1 e2 | i1 i2 f1 f2 h1 _ IH].
-     apply (IlistPerm3_nil _ _ _ (sym_eq e1) (trans_eq (sym_eq e1) e2)).
-     apply (IlistPerm3_cons _ _ f2 f1) ; assumption.
+     - apply (IlistPerm3_nil _ _ _ (sym_eq e1) (trans_eq (sym_eq e1) e2)).
+     - apply (IlistPerm3_cons _ _ f2 f1) ; assumption.
    Qed.
 
    Lemma IlistPerm3_flip': forall (T: Set)(RelT: relation T)(i1 i2: ilist T), 
@@ -433,8 +433,8 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT i1 i2 ; intros h ;
      induction h as [i1 i2 e1 e2 | i1 i2 f1 f2 h1 h2 IH].
-     apply (IlistPerm3_nil _ _ _ (sym_eq e1) (trans_eq (sym_eq e1) e2)).
-     apply (IlistPerm3_cons _ _ f2 f1); assumption.
+     - apply (IlistPerm3_nil _ _ _ (sym_eq e1) (trans_eq (sym_eq e1) e2)).
+     - apply (IlistPerm3_cons _ _ f2 f1); assumption.
    Qed.
 
    (* using IlistPerm3_flip *)
@@ -444,10 +444,10 @@ Section IlistPerm_ind.
      intros T RelT [_ Rsym _] i1 i2 h.
      assert (h1 := IlistPerm3_flip h) ; clear h.
      induction h1 as  [i2 i1 e1 e2 | i2 i1 f2 f1 h1 _ IH].
-     apply (IlistPerm3_nil _ _ _ e1 e2).
-     apply (IlistPerm3_cons _ _ f2 f1).
-     apply (Rsym _ _ h1).
-     assumption.
+     - apply (IlistPerm3_nil _ _ _ e1 e2).
+     - apply (IlistPerm3_cons _ _ f2 f1).
+       + apply (Rsym _ _ h1).
+       + assumption.
    Qed.
 
    Lemma IlistPerm3_sym_sym: forall (T: Set)(RelT: relation T)(Rsym: Symmetric RelT)(i1 i2: ilist T), 
@@ -456,10 +456,10 @@ Section IlistPerm_ind.
      intros T RelT Rsym i1 i2 h.
      assert (h1 := IlistPerm3_flip h) ; clear h.
      induction h1 as  [i1 i2 e1 e2 | i1 i2 f1 f2 h1 h2 IH].
-     apply (IlistPerm3_nil _ _ _ e1 e2).
-     apply (IlistPerm3_cons _ _ f1 f2).
-     apply (Rsym _ _ h1).
-     assumption.
+     - apply (IlistPerm3_nil _ _ _ e1 e2).
+     - apply (IlistPerm3_cons _ _ f1 f2).
+       + apply (Rsym _ _ h1).
+       + assumption.
    Qed.
 
    Definition TransitiveAt (T: Type)(R: relation T)(t1: T): Prop :=
@@ -476,18 +476,18 @@ Section IlistPerm_ind.
     intros i1 h1 Hyp.
     destruct h1 as [i1 i2 e1 h1].
     apply is_IlistPerm4.
-    apply (trans_eq e1 e2).
-    intro f1.
-    destruct (h1 f1) as [f2 [h11 h12]] ; clear h1.
-    destruct (h2 f2) as [f3 [h21 [h22 h23]]] ; clear h2.
-    exists f3.
-    split.
-    apply (Hyp _ _ _ h11 h21).
-    apply (h23 _ h12).
-    intro f0.
-    destruct (extroduce_ok_cor i1 f1 f0).
-    rewrite H.
-    apply Hyp.
+    - apply (trans_eq e1 e2).
+    - intro f1.
+      destruct (h1 f1) as [f2 [h11 h12]] ; clear h1.
+      destruct (h2 f2) as [f3 [h21 [h22 h23]]] ; clear h2.
+      exists f3.
+      split.
+      + apply (Hyp _ _ _ h11 h21).
+      + apply (h23 _ h12).
+        intro f0.
+        destruct (extroduce_ok_cor i1 f1 f0).
+        rewrite H.
+        apply Hyp.
    Qed.
 
 (* obviously, the following lemma is just a special case *)
@@ -537,8 +537,8 @@ Section IlistPerm_ind.
      destruct (h2 f2) as [f1 [h3 [_ h4]]].
      exists f1.
      split.
-     apply (Rsym _ _ h3).
-     assumption.
+     - apply (Rsym _ _ h3).
+     - assumption.
    Qed.
 
    Lemma IlistPerm5_flip_IlistPerm4 : forall (T: Set)(RelT: relation T)(i1 i2: ilist T), 
@@ -564,8 +564,8 @@ Section IlistPerm_ind.
      destruct (h2 f2) as [f1 [h3 [_ h4]]].
      exists f1.
      split.
-     apply (Rsym _ _ h3).
-     assumption.
+     - apply (Rsym _ _ h3).
+     - assumption.
    Qed.
 
    (* deduced from IlistPerm4_refl *)
@@ -574,8 +574,8 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT EqT i.
      apply IlistPerm4_sym_IlistPerm5.
-     destruct EqT as [_ Rsym _] ; assumption.
-     apply (IlistPerm4_refl EqT).
+     - destruct EqT as [_ Rsym _] ; assumption.
+     - apply (IlistPerm4_refl EqT).
    Qed.
 
    (* Proof by induction on IlistPerm4 *)
@@ -593,31 +593,30 @@ Section IlistPerm_ind.
      destruct (h2 (rewriteFins e1 f1)) as [f3 [h3 [h4 IH]]].
      exists f3.
      split.
-     destruct EqT as [_ _ Rtrans].
-     apply (Rtrans _ _ _ (h1' f1) h3).
-     apply IH.
-     assert (h : lgti (extroduce i1' f1) = lgti (extroduce i1 (rewriteFins e1 f1))).
-     evalLgtiExtro.
-     assumption.
-     apply (is_ilist_rel _ _ _ h).
-     intro f.
-     elim (le_lt_dec (decode_Fin f1) (decode_Fin f)) ; intros a.
-     rewrite extroduce_ok3' ; try assumption.
-     rewrite extroduce_ok3' by (treatFin a).
-     assert (h5: rewriteFins (sym_eq (extroduce_lgti i1 (rewriteFins e1 f1))) (succ (rewriteFins h f)) =
-                 rewriteFins e1 (rewriteFins (sym_eq (extroduce_lgti i1' f1)) (succ f))).
-     treatFinPure.
-     rewrite h5.
-     apply h1'.
-
-     rewrite extroduce_ok2' ; try assumption.
-     rewrite extroduce_ok2' by (treatFin a).
-     assert (h5: rewriteFins (sym_eq (extroduce_lgti i1 (rewriteFins e1 f1)))
-        (weakFin (rewriteFins h f)) = rewriteFins e1
-        (rewriteFins (sym_eq (extroduce_lgti i1' f1)) (weakFin f))).
-     treatFinPure.
-     rewrite h5.
-     apply h1'.
+     - destruct EqT as [_ _ Rtrans].
+       apply (Rtrans _ _ _ (h1' f1) h3).
+     - apply IH.
+       assert (h : lgti (extroduce i1' f1) = lgti (extroduce i1 (rewriteFins e1 f1))).
+       { evalLgtiExtro.
+         assumption. }
+       apply (is_ilist_rel _ _ _ h).
+       intro f.
+       elim (le_lt_dec (decode_Fin f1) (decode_Fin f)) ; intros a.
+       + rewrite extroduce_ok3' ; try assumption.
+         rewrite extroduce_ok3' by (treatFin a).
+         assert (h5: rewriteFins (sym_eq (extroduce_lgti i1 (rewriteFins e1 f1))) (succ (rewriteFins h f)) =
+                     rewriteFins e1 (rewriteFins (sym_eq (extroduce_lgti i1' f1)) (succ f))).
+         { treatFinPure. }
+         rewrite h5.
+         apply h1'.
+       + rewrite extroduce_ok2' ; try assumption.
+         rewrite extroduce_ok2' by (treatFin a).
+         assert (h5: rewriteFins (sym_eq (extroduce_lgti i1 (rewriteFins e1 f1)))
+            (weakFin (rewriteFins h f)) = rewriteFins e1
+            (rewriteFins (sym_eq (extroduce_lgti i1' f1)) (weakFin f))).
+         * treatFinPure.
+         * rewrite h5.
+           apply h1'.
    Qed.
 
    (* Proof with induction on IlistPerm3 *)
@@ -627,34 +626,33 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT EqT i1 i1' i2 h1 h2.
      revert i1' h1 ; induction h2 as [i1 i2 e2 e3 | i1 i2 f1 f2 e2 h2 IH] ; intros i1' [e1 h1].
-     apply (IlistPerm3_nil _ _ _ (trans_eq (sym_eq e1) e2) (trans_eq (sym_eq e1) e3)).
-     apply (IlistPerm3_cons _ _ (rewriteFins e1 f1) f2).
-     destruct EqT as [_ Rsym Rtrans].
-     apply (Rtrans _ _ _ (Rsym _ _ (h1 f1)) e2).
-     apply IH.
-     assert (h3: lgti (extroduce i1 f1) = lgti (extroduce i1' (rewriteFins e1 f1))).
-     evalLgtiExtro.
-     assumption.
-     apply (is_ilist_rel _ _ _ h3).
-     intro f.
-     elim (le_lt_dec (decode_Fin f1) (decode_Fin f)) ; intros a.
-(* continue as for IlistPerm4_ilist_rel (only variable names have changed) *)
-     rewrite extroduce_ok3' ; try assumption.
-     rewrite extroduce_ok3' by (treatFin a).
-     assert (h4: rewriteFins (sym_eq (extroduce_lgti i1' (rewriteFins e1 f1))) (succ (rewriteFins h3 f)) =
-                 rewriteFins e1 (rewriteFins (sym_eq (extroduce_lgti i1 f1)) (succ f))).
-     treatFinPure.
-     rewrite h4.
-     apply h1.
-
-     rewrite extroduce_ok2' ; try assumption.
-     rewrite extroduce_ok2' by (treatFin a).
-     assert (h5: rewriteFins (sym_eq (extroduce_lgti i1' (rewriteFins e1 f1)))
-        (weakFin (rewriteFins h3 f)) = rewriteFins e1
-        (rewriteFins (sym_eq (extroduce_lgti i1 f1)) (weakFin f))).
-     treatFinPure.
-     rewrite h5.
-     apply h1.
+     - apply (IlistPerm3_nil _ _ _ (trans_eq (sym_eq e1) e2) (trans_eq (sym_eq e1) e3)).
+     - apply (IlistPerm3_cons _ _ (rewriteFins e1 f1) f2).
+       + destruct EqT as [_ Rsym Rtrans].
+         apply (Rtrans _ _ _ (Rsym _ _ (h1 f1)) e2).
+       + apply IH.
+         assert (h3: lgti (extroduce i1 f1) = lgti (extroduce i1' (rewriteFins e1 f1))).
+         { evalLgtiExtro.
+           assumption. }
+         apply (is_ilist_rel _ _ _ h3).
+         intro f.
+         elim (le_lt_dec (decode_Fin f1) (decode_Fin f)) ; intros a.
+         (* continue as for IlistPerm4_ilist_rel (only variable names have changed) *)
+         * rewrite extroduce_ok3' ; try assumption.
+           rewrite extroduce_ok3' by (treatFin a).
+           assert (h4: rewriteFins (sym_eq (extroduce_lgti i1' (rewriteFins e1 f1))) (succ (rewriteFins h3 f)) =
+                       rewriteFins e1 (rewriteFins (sym_eq (extroduce_lgti i1 f1)) (succ f))).
+           { treatFinPure. }
+           rewrite h4.
+           apply h1.
+         * rewrite extroduce_ok2' ; try assumption.
+           rewrite extroduce_ok2' by (treatFin a).
+           assert (h5: rewriteFins (sym_eq (extroduce_lgti i1' (rewriteFins e1 f1)))
+              (weakFin (rewriteFins h3 f)) = rewriteFins e1
+              (rewriteFins (sym_eq (extroduce_lgti i1 f1)) (weakFin f))).
+           { treatFinPure. }
+           rewrite h5.
+           apply h1.
    Qed.
 
    Lemma IlistPerm3_ilist_rel_eq: forall (T: Set)(RelT: relation T)(l1 l1' l2 : ilist T)
@@ -663,13 +661,13 @@ Section IlistPerm_ind.
      intros T RelT l1 l1' l2 h1 h2.
      revert l1' h1 ; induction h2 as [l1 l2 e2 e3 | l1 l2 i1 i2 e2 h2 IH] ; intros l1' h1 ;
      inversion h1 as [e1 h1'].
-     apply (IlistPerm3_nil _ _ _ (trans_eq (sym_eq e1) e2) (trans_eq (sym_eq e1) e3)).
-     apply (IlistPerm3_cons _ _ (rewriteFins e1 i1) i2).
-     rewrite <- (h1' i1).
-     assumption.
-     apply IH.
-     apply extroduce_ilist_rel_bis.
-     assumption.
+     - apply (IlistPerm3_nil _ _ _ (trans_eq (sym_eq e1) e2) (trans_eq (sym_eq e1) e3)).
+     - apply (IlistPerm3_cons _ _ (rewriteFins e1 i1) i2).
+       + rewrite <- (h1' i1).
+         assumption.
+       + apply IH.
+         apply extroduce_ilist_rel_bis.
+         assumption.
    Qed.
 
 (* just a dual proof for the changes in the second argument *)
@@ -721,37 +719,37 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT [n l1] [n2 l2] H.
      inversion H as [h2 _].
-     simpl in h2.
+     cbn in h2.
      revert l2 H ; rewrite <- h2 ; intros l2 H ; clear n2 h2.
      induction n as [|n IH].
-     destruct H as [h H] ; simpl in *|-*.
-     apply IlistPerm3_nil ; reflexivity.
-     assert (i := first n).
-     apply (IlistPerm3_cons _ _ (i: Fin (lgti (existT (fun n0 : nat => ilistn T n0) (S n) l1))) 
-       (i: Fin (lgti (existT (fun n0 : nat => ilistn T n0) (S n) l2)))).
-     destruct H as [h H].
-     assert (H1: forall i, RelT (l1 i) (l2 i)).
-     intro i'. 
-     assert (h' : i' = rewriteFins h i').
-     unfold rewriteFins; apply decode_Fin_unique, decode_Fin_match.
-     rewrite h' at 2 ; apply (H i').
-     clear h H.
-     apply H1.
-     assert (H1 := extroduce_ilist_rel i H).
-     revert H1 ; unfold mkilist.
-     set (l1' := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) l1) i).
-     set (l2' := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) l2) i).
-     intro H1.
-     assert (h: lgti l1' = n).
-     unfold l1' ; apply eq_add_S.
-     rewrite <- extroduce_lgti.
-     reflexivity.
-     destruct l1' as [n' l1'] ; destruct l2' as [n2 l2'].
-     inversion H1 as [h1 _].
-     simpl in *|-*.
-     revert l1' l2' H1.
-     rewrite <- h1, h.
-     apply IH.
+     - destruct H as [h H] ; cbn in *|-*.
+       apply IlistPerm3_nil ; reflexivity.
+     - assert (i := first n).
+       apply (IlistPerm3_cons _ _ (i: Fin (lgti (existT (fun n0 : nat => ilistn T n0) (S n) l1))) 
+         (i: Fin (lgti (existT (fun n0 : nat => ilistn T n0) (S n) l2)))).
+       + destruct H as [h H].
+         assert (H1: forall i, RelT (l1 i) (l2 i)).
+         { intro i'. 
+           assert (h' : i' = rewriteFins h i').
+           unfold rewriteFins; apply decode_Fin_unique, decode_Fin_match.
+           rewrite h' at 2 ; apply (H i'). }
+         clear h H.
+         apply H1.
+       + assert (H1 := extroduce_ilist_rel i H).
+         revert H1 ; unfold mkilist.
+         set (l1' := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) l1) i).
+         set (l2' := extroduce (existT (fun n0 : nat => ilistn T n0) (S n) l2) i).
+         intro H1.
+         assert (h: lgti l1' = n).
+         { unfold l1' ; apply eq_add_S.
+           rewrite <- extroduce_lgti.
+           reflexivity. }
+         destruct l1' as [n' l1'] ; destruct l2' as [n2 l2'].
+         inversion H1 as [h1 _].
+         cbn in *|-*.
+         revert l1' l2' H1.
+         rewrite <- h1, h.
+         apply IH.
    Qed.
   
    Lemma ilist_rel_finer_IlistPerm4: forall (T: Set)(RelT: relation T)
@@ -759,27 +757,27 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT [n l1] [n2 l2] h.
      inversion h as [h2 _].
-     simpl in h2.
+     cbn in h2.
      revert l2 h ; rewrite <- h2 ; intros l2 h ; clear n2 h2.
      fold (mkilist l1) (mkilist l2).
      induction n as [|n IH].
-     apply IlistPerm4nil.
+     { apply IlistPerm4nil. }
      apply (is_IlistPerm4 _ _ (refl_equal _ : lgti (mkilist l1) = lgti (mkilist l2))).
      intro i.
      inversion h as [e h'].
      simpl lgti in *|-* ; simpl fcti in *|-*.
      exists i.
      split.
-     rewrite (decode_Fin_unique _ _ (decode_Fin_match' i e)) at 2.
-     apply h'.
-     assert (hex := extroduce_ilist_rel i h).
-     revert hex.
-     set (l1' := extroduce (mkilist l1) i) ; set (l2' := extroduce (mkilist l2) i) ; 
-     assert (h1 := extroduce_lgti_S l1 i :n = lgti l1') ; assert (h2 := extroduce_lgti_S l2 i :n = lgti l2').
-     destruct l1' as [n1 l1'] ; destruct l2' as [n2 l2'].
-     simpl in h1, h2.
-     revert l1' l2' ; rewrite <- h1, <- h2 ; clear n1 n2 h1 h2.
-     apply IH.
+     - rewrite (decode_Fin_unique _ _ (decode_Fin_match' i e)) at 2.
+       apply h'.
+     - assert (hex := extroduce_ilist_rel i h).
+       revert hex.
+       set (l1' := extroduce (mkilist l1) i) ; set (l2' := extroduce (mkilist l2) i) ; 
+         assert (h1 := extroduce_lgti_S l1 i :n = lgti l1') ; assert (h2 := extroduce_lgti_S l2 i :n = lgti l2').
+       destruct l1' as [n1 l1'] ; destruct l2' as [n2 l2'].
+       cbn in h1, h2.
+       revert l1' l2' ; rewrite <- h1, <- h2 ; clear n1 n2 h1 h2.
+       apply IH.
    Qed.
 
    Lemma IlistPerm3_imap (T U: Set)(RelT: relation T)(RelU: relation U)
@@ -787,13 +785,13 @@ Section IlistPerm_ind.
      IlistPerm3 RelT l1 l2 -> IlistPerm3 RelU (imap f l1) (imap f l2).
    Proof.
      intro H ; induction H as [[n1 l1] [n2 l2] e1 e2 | l1 l2 i1 i2 h2 H IH].
-     apply IlistPerm3_nil ; assumption.
+     { apply IlistPerm3_nil ; assumption. }
      apply (IlistPerm3_cons _ _ (i1 : Fin (lgti(imap f l1))) (i2: Fin (lgti (imap f l2)))).
-     simpl.
-     apply fM, h2.
-     apply (IlistPerm3_ilist_rel_eq (ilist_rel_sym _ (extroduce_imap f l1 i1))).
-     apply (IlistPerm3_ilist_rel_eq_snd (ilist_rel_sym _ (extroduce_imap f l2 i2))).
-     apply IH.
+     - cbn.
+       apply fM, h2.
+     - apply (IlistPerm3_ilist_rel_eq (ilist_rel_sym _ (extroduce_imap f l1 i1))).
+       apply (IlistPerm3_ilist_rel_eq_snd (ilist_rel_sym _ (extroduce_imap f l2 i2))).
+       apply IH.
    Qed.
 
   Lemma IlistPerm3_imap_bis (A B: Set)(Rel: relation B)(f1 f2: A -> B)(l1 l2: ilist A):
@@ -801,17 +799,17 @@ Section IlistPerm_ind.
    Proof.
      intro Hyp.
      induction Hyp as [l1 l2 Hyp1 Hyp2 | l1 l2 i1 i2 H1 _ IH].
-     apply IlistPerm3_nil ; assumption.
+     { apply IlistPerm3_nil ; assumption. }
      apply (IlistPerm3_cons _ _ (i1 : Fin (lgti (imap f1 l1))) (i2 : Fin (lgti (imap f2 l2)))).
-     assumption.
-     assert (H7 := extroduce_imap f1 l1 i1).
-     apply ilist_rel_sym in H7 ; try apply eq_equivalence.
-     apply (IlistPerm3_ilist_rel_eq H7).
-     clear H7.
-     assert (H7 := extroduce_imap f2 l2 i2).
-     apply ilist_rel_sym in H7 ; try apply eq_equivalence.
-     apply (IlistPerm3_ilist_rel_eq_snd H7).
-     assumption.
+     - assumption.
+     - assert (H7 := extroduce_imap f1 l1 i1).
+      apply ilist_rel_sym in H7 ; try apply eq_equivalence.
+      apply (IlistPerm3_ilist_rel_eq H7).
+      clear H7.
+      assert (H7 := extroduce_imap f2 l2 i2).
+      apply ilist_rel_sym in H7 ; try apply eq_equivalence.
+      apply (IlistPerm3_ilist_rel_eq_snd H7).
+      assumption.
    Qed.
 
    Lemma IlistPerm3_imap_back (A B: Set)(Rel: relation B)
@@ -820,21 +818,21 @@ Section IlistPerm_ind.
    Proof.
      remember (lgti l1) as n.
      revert l1 l2 Heqn ; induction n as [|n IH] ; intros l1 l2 H H1. 
-     apply IlistPerm3_nil.
-     apply (IlistPerm3_lgti H1).
-     symmetry ; assumption.
-     inversion_clear H1 as [H2 H3 | i1 i2 H2 H3].
-     simpl in H3 ; rewrite <- H in H3.
-     inversion H3.
-     simpl in i1, i2, H2.
-     apply (IlistPerm3_cons _ _ i1 i2).
-     assumption.
-     apply IH.
-     evalLgtiExtro.
-     apply H.
-     assert (H4 := extroduce_imap f1 l1 i1).
-     assert (H5 := extroduce_imap f2 l2 i2).
-     apply (IlistPerm3_ilist_rel_eq H4), (IlistPerm3_ilist_rel_eq_snd H5), H3.
+     - apply IlistPerm3_nil.
+       + apply (IlistPerm3_lgti H1).
+       + symmetry ; assumption.
+     - inversion_clear H1 as [H2 H3 | i1 i2 H2 H3].
+       + cbn in H3 ; rewrite <- H in H3.
+         inversion H3.
+       + cbn in i1, i2, H2.
+         apply (IlistPerm3_cons _ _ i1 i2).
+         * assumption.
+         * apply IH.
+           -- evalLgtiExtro.
+              apply H.
+           -- assert (H4 := extroduce_imap f1 l1 i1).
+              assert (H5 := extroduce_imap f2 l2 i2).
+              apply (IlistPerm3_ilist_rel_eq H4), (IlistPerm3_ilist_rel_eq_snd H5), H3.
    Qed.
 
   Lemma IlistPerm3_exists_rec: forall (T: Set)(RelT: relation T)
@@ -843,79 +841,76 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT l1 l2 H.
      induction H as [l1 l2 _ e2 | l1 l2 i1 i2 h2 H IH].
-     (* empty list *)
-     intros i1.
-     apply False_rec.
-     rewrite e2 in i1.
-     inversion i1.
-     (* non-empty list *)
-     assert (h1:= eq_S _ _ (IlistPerm3_lgti H)).
-     do 2 rewrite <- extroduce_lgti in h1.
-
-     destruct l1 as [n l1] ; destruct l2 as [n2 l2];
-     simpl in i1, i2, h1, h2 ;
-     fold (mkilist l1) in *|-*;
-     fold (mkilist l2) in *|-*.
-     revert l2 i2 h2 H IH ; rewrite <- h1 ; intros l2 i2 h2 H IH ; clear n2 h1.
-     change (forall i1', exists i2', RelT (l1 i1') (l2 i2') /\ 
+     - (* empty list *)
+       intros i1.
+       apply False_rec.
+       rewrite e2 in i1.
+       inversion i1.
+     - (* non-empty list *)
+       assert (h1:= eq_S _ _ (IlistPerm3_lgti H)).
+       do 2 rewrite <- extroduce_lgti in h1.
+       destruct l1 as [n l1] ; destruct l2 as [n2 l2];
+       cbn in i1, i2, h1, h2 ;
+       fold (mkilist l1) in *|-*;
+       fold (mkilist l2) in *|-*.
+       revert l2 i2 h2 H IH ; rewrite <- h1 ; intros l2 i2 h2 H IH ; clear n2 h1.
+       change (forall i1', exists i2', RelT (l1 i1') (l2 i2') /\ 
                          IlistPerm3 RelT (extroduce (mkilist l1) i1') (extroduce (mkilist l2) i2')).
-     intros i1'. 
-     (* is there something to do renaming? *)
-     elim (eq_nat_dec (decode_Fin i1) (decode_Fin i1')) ; intros a.
-     (* f1 = f1' *)
-     rewrite <- (decode_Fin_unique _ _ a).
-     exists i2.
-     split; assumption.
-     (* f1 <> f1' *)
-     destruct n as [|n].
-     (* exclude zero case *)
-     inversion i1.
-     (* main case *)    
-     set (i1'new := index_in_extroduce i1 i1' a).
-     destruct (IH (rewriteFins (extroduce_lgti_S _ i1) i1'new)) as [i2IH [IH1 IH2]].
-     set (i2IH' := rewriteFins (sym_eq (extroduce_lgti_S _ i2)) i2IH).
-     set (i2' := extroduce_Fin i2 i2IH').
-     exists i2'.
-     split.
-     assert (h3: l1 i1' = fcti (extroduce (mkilist l1) i1) (rewriteFins (extroduce_lgti_S l1 i1) i1'new)) by
-       apply index_in_extroduce_ok_cor.
-     assert (h4: l2 i2' = fcti (extroduce (mkilist l2) i2) i2IH).
-     unfold i2', i2IH'.
-     rewrite extroduce_Fin_ok_cor.
-     f_equal.
-     treatFinPure.
-     rewrite h3, h4.
-     assumption.
-     
-     set (i1new := index_in_extroduce i1' i1 (not_eq_sym a)).
-     assert (a2:  decode_Fin i2' <> decode_Fin i2).
-     unfold i2'.
-     intro Hyp.
-     apply decode_Fin_unique in Hyp.
-     apply (extroduce_Fin_not_fex _ Hyp).
-     set (i2new := index_in_extroduce i2' i2 a2).
-     apply (IlistPerm3_cons _ _ (rewriteFins (extroduce_lgti_S l1 i1') i1new) 
-                                (rewriteFins (extroduce_lgti_S l2 i2') i2new)).
-     unfold i1new.
-     rewrite <- index_in_extroduce_ok_cor.
-     unfold i2new.
-     rewrite <- index_in_extroduce_ok_cor.
-     exact h2.
-
-     assert (H1:= extroduce_interchange_eq l1 i1' i1 (not_eq_sym a) a).
-     fold i1new i1'new in H1.
-     assert (H2:= extroduce_interchange_eq l2 i2' i2 a2 (not_eq_sym a2)).
-     fold i2new in H2.
-     apply ilist_rel_sym in H1 ; apply ilist_rel_sym in H2 ; try apply eq_equivalence.
-     apply (IlistPerm3_ilist_rel_eq H1), (IlistPerm3_ilist_rel_eq_snd H2).
-     assert (H3 : i2IH = rewriteFins (extroduce_lgti_S l2 i2) (index_in_extroduce i2 i2' (not_eq_sym a2))).
-     unfold i2', i2IH'.
-     rewrite index_in_from_extroduce.
-     apply decode_Fin_unique.
-     do 2 rewrite <- decode_Fin_match'.
-     reflexivity.
-     rewrite <- H3.
-     assumption.
+       intros i1'. 
+       (* is there something to do renaming? *)
+       elim (eq_nat_dec (decode_Fin i1) (decode_Fin i1')) ; intros a.
+       + (* f1 = f1' *)
+         rewrite <- (decode_Fin_unique _ _ a).
+         exists i2.
+         split; assumption.
+       + (* f1 <> f1' *)
+         destruct n as [|n].
+         * (* exclude zero case *)
+           inversion i1.
+     * (* main case *)    
+       set (i1'new := index_in_extroduce i1 i1' a).
+       destruct (IH (rewriteFins (extroduce_lgti_S _ i1) i1'new)) as [i2IH [IH1 IH2]].
+       set (i2IH' := rewriteFins (sym_eq (extroduce_lgti_S _ i2)) i2IH).
+       set (i2' := extroduce_Fin i2 i2IH').
+       exists i2'.
+       split.
+       -- assert (h3: l1 i1' = fcti (extroduce (mkilist l1) i1) (rewriteFins (extroduce_lgti_S l1 i1) i1'new)) by
+             apply index_in_extroduce_ok_cor.
+          assert (h4: l2 i2' = fcti (extroduce (mkilist l2) i2) i2IH).
+          { unfold i2', i2IH'.
+            rewrite extroduce_Fin_ok_cor.
+            f_equal.
+            treatFinPure. }
+          rewrite h3, h4.
+          assumption.
+       -- set (i1new := index_in_extroduce i1' i1 (not_eq_sym a)).
+          assert (a2:  decode_Fin i2' <> decode_Fin i2).
+          { unfold i2'.
+            intro Hyp.
+            apply decode_Fin_unique in Hyp.
+            apply (extroduce_Fin_not_fex _ Hyp). }
+          set (i2new := index_in_extroduce i2' i2 a2).
+          apply (IlistPerm3_cons _ _ (rewriteFins (extroduce_lgti_S l1 i1') i1new) 
+                                         (rewriteFins (extroduce_lgti_S l2 i2') i2new)).
+          ++ unfold i1new.
+             rewrite <- index_in_extroduce_ok_cor.
+             unfold i2new.
+             rewrite <- index_in_extroduce_ok_cor.
+             exact h2.
+          ++ assert (H1:= extroduce_interchange_eq l1 i1' i1 (not_eq_sym a) a).
+             fold i1new i1'new in H1.
+             assert (H2:= extroduce_interchange_eq l2 i2' i2 a2 (not_eq_sym a2)).
+             fold i2new in H2.
+             apply ilist_rel_sym in H1 ; apply ilist_rel_sym in H2 ; try apply eq_equivalence.
+             apply (IlistPerm3_ilist_rel_eq H1), (IlistPerm3_ilist_rel_eq_snd H2).
+             assert (H3 : i2IH = rewriteFins (extroduce_lgti_S l2 i2) (index_in_extroduce i2 i2' (not_eq_sym a2))).
+             { unfold i2', i2IH'.
+               rewrite index_in_from_extroduce.
+               apply decode_Fin_unique.
+               do 2 rewrite <- decode_Fin_match'.
+               reflexivity. }
+             rewrite <- H3.
+             assumption.
    Qed.
 
    (* from the Coq tutorial at POPL'08 *)
@@ -929,22 +924,21 @@ Section IlistPerm_ind.
    Proof.
      intros T RelT l1 l2 H.
      remember (lgti l1) as n in |-.
-     revert l1 l2 H Heqn ; induction n as [|n IH]; intros l1 l2 H Heqn ; simpl in *|-*.
-     apply IlistPerm4nil_gen.
-     apply (IlistPerm3_lgti H).
-     symmetry; assumption.
-
-     apply is_IlistPerm4.
-     apply (IlistPerm3_lgti H).
-     intro i1.
-     destruct (IlistPerm3_exists_rec H i1) as [i2 [Hyp1 Hyp2]].
-     exists i2.
-     split.
-     exact Hyp1.
-     apply IH.
-     apply Hyp2.
-     evalLgtiExtro.
-     apply Heqn.
+     revert l1 l2 H Heqn ; induction n as [|n IH]; intros l1 l2 H Heqn ; cbn in *|-*.
+     - apply IlistPerm4nil_gen.
+       + apply (IlistPerm3_lgti H).
+       + symmetry; assumption.
+     - apply is_IlistPerm4.
+       + apply (IlistPerm3_lgti H).
+       + intro i1.
+         destruct (IlistPerm3_exists_rec H i1) as [i2 [Hyp1 Hyp2]].
+         exists i2.
+         split.
+         * exact Hyp1.
+         * apply IH.
+           -- apply Hyp2.
+           -- evalLgtiExtro.
+              apply Heqn.
    Qed.
 
    Lemma IlistPerm3_extroduce : forall (T: Set)(RelT: relation T)
@@ -1025,15 +1019,15 @@ Section IlistPerm_ind.
      intros l3 Hyp.
      inversion_clear Hyp as [x y H2 H3].
      apply is_IlistPerm4.
-     transitivity (lgti l2); assumption.
-     intro i1.
-     destruct (IH i1) as [i2 [HypR1 [_ H5]]].
-     destruct (H3 i2) as [i3 [HypR2 H2']].
-     exists i3.
-     split.
-     exists (fcti l2 i2).
-     split; assumption.
-     apply H5, H2'.
+     - transitivity (lgti l2); assumption.
+     - intro i1.
+       destruct (IH i1) as [i2 [HypR1 [_ H5]]].
+       destruct (H3 i2) as [i3 [HypR2 H2']].
+       exists i3.
+       split.
+       + exists (fcti l2 i2).
+         split; assumption.
+       + apply H5, H2'.
    Qed.
  
    Corollary IlistPerm3_trans_special (A: Set)(R1 R2: relation A)(i1 i2 i3: ilist A):
@@ -1051,11 +1045,11 @@ Section IlistPerm_ind.
    Proof.
      intros.
      induction H0.
-     apply IlistPerm3_nil; assumption.
-     apply (IlistPerm3_cons _ _ f1 f2).
-     apply H.
-     assumption.
-     assumption.
+     - apply IlistPerm3_nil; assumption.
+     - apply (IlistPerm3_cons _ _ f1 f2).
+       + apply H.
+         assumption.
+       + assumption.
    Qed.
 
   Section IlistPerm34_dec.
@@ -1075,9 +1069,9 @@ Section IlistPerm_ind.
         fix Hr 5.
         intros H1 H2 l1 l2 H3.
         destruct H3 as [H3 H4 | [i1 [i2 [H3 H4]]]].
-        apply H1 ; assumption.
-        apply (H2 l1 l2 i1 i2 H3 H4).
-        apply Hr ; try assumption.
+        - apply H1 ; assumption.
+        - apply (H2 l1 l2 i1 i2 H3 H4).
+          apply Hr ; try assumption.
       Qed.
 
       Lemma IlistPerm6_lgti (T: Set)(RelT: relation T)(l1 l2: ilist T): IlistPerm6 RelT l1 l2 -> 
@@ -1086,20 +1080,20 @@ Section IlistPerm_ind.
         revert l1 l2.
         fix Hr 3.
         intros l1 l2 [H1 H2 | [i1 [i2 [H1 H2]]]].
-        assumption.
-        assert (H3 := Hr _ _ H2).
-        apply eq_S in H3.
-        do 2 rewrite <- extroduce_lgti in H3.
-        assumption.
+        - assumption.
+        - assert (H3 := Hr _ _ H2).
+          apply eq_S in H3.
+          do 2 rewrite <- extroduce_lgti in H3.
+          assumption.
       Qed.
 
       Lemma IlistPerm3_IlistPerm6_eq (T: Set)(RelT: relation T)(l1 l2: ilist T): 
         IlistPerm3 RelT l1 l2 -> IlistPerm6 RelT l1 l2.
       Proof.
         intros H ; induction H as [l1 l2 H1 H2 | l1 l2 i1 i2 H1 H2 IH].
-        apply IlistPerm6_nil; assumption.
-        apply IlistPerm6_cons.
-        exists i1, i2 ; split; assumption.
+        - apply IlistPerm6_nil; assumption.
+        - apply IlistPerm6_cons.
+          exists i1, i2 ; split; assumption.
       Qed.
 
       Lemma IlistPerm6_IlistPerm3_eq (T: Set)(RelT: relation T)(l1 l2: ilist T): 
@@ -1107,8 +1101,8 @@ Section IlistPerm_ind.
       Proof.
         intros H.
         induction H using IlistPerm6_ind_better.
-        apply IlistPerm3_nil ; assumption.
-        apply (IlistPerm3_cons _ _ i1 i2); assumption.
+        - apply IlistPerm3_nil ; assumption.
+        - apply (IlistPerm3_cons _ _ i1 i2); assumption.
       Qed.
 
       Lemma IlistPerm4_IlistPerm6_eq (T: Set)(RelT: relation T)(l1 l2: ilist T): 
@@ -1135,16 +1129,15 @@ Section IlistPerm_ind.
       intros i1 i2 H.
       apply IlistPerm4_IlistPerm6_eq in H.
       induction H  as [l1 l2 H1 H2| l1 l2 i1' i2' H1 H2 IH] using IlistPerm6_ind_better.
-      apply False_rec; rewrite H2 in i1 ; inversion i1.
+      { apply False_rec; rewrite H2 in i1 ; inversion i1. }
       destruct l1 as [n l1] ; destruct l2 as [n2 l2] ; assert (H4 := IlistPerm6_lgti H2) ; 
-      simpl in H1, i1', i2'; fold (mkilist l1) (mkilist l2) in *|-*.
-      apply eq_S in H4 ; do 2 rewrite <- extroduce_lgti in H4 ; simpl in H4.
+      cbn in H1, i1', i2'; fold (mkilist l1) (mkilist l2) in *|-*.
+      apply eq_S in H4 ; do 2 rewrite <- extroduce_lgti in H4 ; cbn in H4.
       revert l2 i2' H1 H2 IH i2; rewrite <- H4 ; clear n2 H4 ; intros l2 i2' H1 H2 IH i2 H3 ; 
-      simpl in i1, i2, H3.
+      cbn in i1, i2, H3.
       destruct n as [|n].
-      inversion i1.
+      { inversion i1. }
       apply IlistPerm6_IlistPerm4_eq.
-      
       elim (eq_nat_dec (decode_Fin i1') (decode_Fin i1)) ; intros a ; 
       (* case i1 = i1'*) 
       try (revert H3 ; rewrite <- (decode_Fin_unique _ _ a) ; clear i1 a; intros H3) ; 
@@ -1155,40 +1148,37 @@ Section IlistPerm_ind.
       try apply H2 ; 
       (* all other cases *)
       apply IlistPerm6_cons ; apply IlistPerm6_IlistPerm4_eq in H2.
-      
-      (* case i1 = i1' /\ i2 <> i2' *)
-      apply IlistPerm4_sym_IlistPerm5, (IlistPerm5_sym Req) in H2; try (destruct Req ; assumption).
-      inversion_clear H2 as [i3 i4 H9 H4 H10 H11] ; clear H9.
-      destruct (H4 (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i2' i2 b))) as [i1 [H5 H6]].
-      exists i1, (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i2 i2' (not_eq_sym b))).
-      split.
-      rewrite H5, <- index_in_extroduce_ok_cor, <- index_in_extroduce_ok_cor, <- H3.
-      assumption.
-      apply IlistPerm3_IlistPerm6_eq, (IlistPerm3_ilist_rel_eq_snd (extroduce_interchange_eq l2 _ _ b _)).
-      apply IlistPerm5_IlistPerm3_eq, H6.
-      
-      (* cas i1 <> i1' /\ i2 = i2' *)
-      inversion_clear H2 as [i3 i4 H9 H4 H10 H11] ; clear H9.
-      destruct (H4 (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i1' i1 a))) as [i2 [H5 H6]].
-      exists (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i1 i1' (not_eq_sym a))), i2.
-      split.
-      rewrite <- H5, <- index_in_extroduce_ok_cor, <- index_in_extroduce_ok_cor, H3.
-      assumption.
-      apply IlistPerm3_IlistPerm6_eq, 
-      (IlistPerm3_ilist_rel_eq (extroduce_interchange_eq l1 _ _ a (not_eq_sym a))).
-      apply IlistPerm4_IlistPerm3_eq, H6.
-      
-      (* cas i1 <> i1' /\ i2 <> i2' *) 
-      exists (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce _ _ (not_eq_sym a))), 
+      - (* case i1 = i1' /\ i2 <> i2' *)
+        apply IlistPerm4_sym_IlistPerm5, (IlistPerm5_sym Req) in H2; try (destruct Req ; assumption).
+        inversion_clear H2 as [i3 i4 H9 H4 H10 H11] ; clear H9.
+        destruct (H4 (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i2' i2 b))) as [i1 [H5 H6]].
+        exists i1, (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i2 i2' (not_eq_sym b))).
+        split.
+        + rewrite H5, <- index_in_extroduce_ok_cor, <- index_in_extroduce_ok_cor, <- H3.
+          assumption.
+        + apply IlistPerm3_IlistPerm6_eq, (IlistPerm3_ilist_rel_eq_snd (extroduce_interchange_eq l2 _ _ b _)).
+          apply IlistPerm5_IlistPerm3_eq, H6.
+      - (* cas i1 <> i1' /\ i2 = i2' *)
+        inversion_clear H2 as [i3 i4 H9 H4 H10 H11] ; clear H9.
+        destruct (H4 (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i1' i1 a))) as [i2 [H5 H6]].
+        exists (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce i1 i1' (not_eq_sym a))), i2.
+        split.
+        + rewrite <- H5, <- index_in_extroduce_ok_cor, <- index_in_extroduce_ok_cor, H3.
+          assumption.
+        + apply IlistPerm3_IlistPerm6_eq, 
+          (IlistPerm3_ilist_rel_eq (extroduce_interchange_eq l1 _ _ a (not_eq_sym a))).
+          apply IlistPerm4_IlistPerm3_eq, H6.
+      - (* cas i1 <> i1' /\ i2 <> i2' *) 
+        exists (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce _ _ (not_eq_sym a))), 
       (rewriteFins (extroduce_lgti_S _ _) (index_in_extroduce _ _ (not_eq_sym b))).
-      split.
-      do 2 rewrite <- index_in_extroduce_ok_cor.
-      assumption.
-      apply IlistPerm3_IlistPerm6_eq, (IlistPerm3_ilist_rel_eq (extroduce_interchange_eq l1 _ _ a _)).
-      apply (IlistPerm3_ilist_rel_eq_snd (extroduce_interchange_eq l2 _ _ b _)), IlistPerm4_IlistPerm3_eq.
-      apply IH.
-      do 2 rewrite <- index_in_extroduce_ok_cor.
-      assumption.
+        split.
+        + do 2 rewrite <- index_in_extroduce_ok_cor.
+          assumption.
+        + apply IlistPerm3_IlistPerm6_eq, (IlistPerm3_ilist_rel_eq (extroduce_interchange_eq l1 _ _ a _)).
+          apply (IlistPerm3_ilist_rel_eq_snd (extroduce_interchange_eq l2 _ _ b _)), IlistPerm4_IlistPerm3_eq.
+          apply IH.
+          do 2 rewrite <- index_in_extroduce_ok_cor.
+          assumption.
     Qed.
 
     Lemma exists_eq_Ilist (T: Set)(RelT: relation T)
@@ -1196,27 +1186,24 @@ Section IlistPerm_ind.
       { i | RelT t (l i)} + {not (exists i, RelT t (l i))}.
     Proof.
       induction n as [|n IH].
-      right.
-      intros [i _] ; inversion i.
-      
-      elim (Rdec t (l (first n))) ; intros H.
-      left.
-      exists (first n) ; assumption.
-      
-      destruct (IH (fun x => l (succ x))) as [[i H1] | H1].
-      left.
-      exists (succ i) ; assumption.
-      right.
-      
-      intros [i H2].
-      elim (zerop (decode_Fin i)) ; intros a.
-      rewrite (decode_Fin_0_first _ a) in H2.
-      contradiction.
-      apply H1.
-      exists (get_cons _ a).
-      rewrite <- (decode_Fin_unique _ _ (decode_Fin_get_cons _ _ : 
-        decode_Fin i = decode_Fin (succ (get_cons i a)))).
-      assumption.
+      - right.
+        intros [i _] ; inversion i.
+      - elim (Rdec t (l (first n))) ; intros H.
+        + left.
+          exists (first n) ; assumption.
+        + destruct (IH (fun x => l (succ x))) as [[i H1] | H1].
+          * left.
+            exists (succ i) ; assumption.
+          * right.
+            intros [i H2].
+            elim (zerop (decode_Fin i)) ; intros a.
+            -- rewrite (decode_Fin_0_first _ a) in H2.
+               contradiction.
+            -- apply H1.
+               exists (get_cons _ a).
+               rewrite <- (decode_Fin_unique _ _ (decode_Fin_get_cons _ _ : 
+                   decode_Fin i = decode_Fin (succ (get_cons i a)))).
+               assumption.
     Qed.
     
     Lemma IlistPerm4_dec (T: Set)(RelT: relation T)(Req : Equivalence RelT)
@@ -1226,63 +1213,55 @@ Section IlistPerm_ind.
       intros [n1 l1] [n2 l2].
       (* comparison between n1 and n2 *)
       elim (eq_nat_dec n1 n2) ; intros H.
-      (* case n1 = n2 --> suppression of n2 *)
-      revert l2.
-      rewrite <- H.
-      intros l2 ; clear n2 H.
-      
-      (* induction on n1 *)
-      induction n1 as [|n1 IH].
-      
-      (* case 0 *)
-      left.
-      apply IlistPerm4nil.
-      
-      (* case S n1 *)
-      (* Does an element in l2 "equal" to l1 (first n1) exists ? *)
-      elim (exists_eq_Ilist RelT Rdec (l1 (first n1)) l2) ; intros H1.
-      
-      (* yes : i *)
-      destruct H1 as [i H1].
-      (* trick to use IH *)
-      set (e1 := extroduce (mkilist l1) (first n1)).
-      set (e2 := extroduce (mkilist l2) i).
-      assert (H2 : n1 = lgti e1) by apply extroduce_lgti_S.
-      assert (H3 : n1 = lgti e2) by apply extroduce_lgti_S.
-      assert (H4 := refl_equal _ : e1 = extroduce (mkilist l1) (first n1)).
-      assert (H5 := refl_equal _ : e2 = extroduce (mkilist l2) i).
-      destruct e1 as [n1' e1] ; destruct e2 as [n2' e2] ; simpl in H2, H3.
-      revert e1 e2 H4 H5 ; rewrite <- H2, <- H3 ; clear n1' n2' H2 H3 ; intros e1 e2 H2 H3.
-      elim (IH e1 e2) ; clear IH ; intros H4 ; 
-      rewrite H2, H3 in H4 ; clear e1 e2 H2 H3.
-      
-      (* here we prove the ilists are equivalent *)
-      left.
-      apply IlistPerm3_IlistPerm4_eq.
-      apply (IlistPerm3_cons _ _ (first n1 : Fin (lgti (mkilist l1))) (i : Fin (lgti (mkilist l2))) H1).
-      apply (IlistPerm4_IlistPerm3_eq H4).
-      
-      (* here we prove the ilists are not equivalent *)
-      right.
-      intros H5.
-      assert (H6 := extroduce_IlistPerm4 _ (first n1: Fin (lgti (mkilist l1))) 
-        (i: Fin (lgti (mkilist l2))) H5 H1).
-      contradiction.
-      
-      (* no *)
-      right.
-      intro H.
-      inversion H.
-      clear H0 H3 H4 i1 i2.
-      destruct (H2 (first n1)) as [i [H3 _]].
-      apply H1.
-      exists i ; assumption.
-      
-      (* cas n1 <> n2 *)
-      right.
-      intro H1.
-      apply IlistPerm4_lgti in H1.
-      contradiction.
+      - (* case n1 = n2 --> suppression of n2 *)
+        revert l2.
+        rewrite <- H.
+        intros l2 ; clear n2 H.
+        (* induction on n1 *)
+        induction n1 as [|n1 IH].
+        + (* case 0 *)
+          left.
+          apply IlistPerm4nil.
+        + (* case S n1 *)
+          (* Does an element in l2 "equal" to l1 (first n1) exists ? *)
+          elim (exists_eq_Ilist RelT Rdec (l1 (first n1)) l2) ; intros H1.
+          * (* yes : i *)
+            destruct H1 as [i H1].
+            (* trick to use IH *)
+            set (e1 := extroduce (mkilist l1) (first n1)).
+            set (e2 := extroduce (mkilist l2) i).
+            assert (H2 : n1 = lgti e1) by apply extroduce_lgti_S.
+            assert (H3 : n1 = lgti e2) by apply extroduce_lgti_S.
+            assert (H4 := refl_equal _ : e1 = extroduce (mkilist l1) (first n1)).
+            assert (H5 := refl_equal _ : e2 = extroduce (mkilist l2) i).
+            destruct e1 as [n1' e1] ; destruct e2 as [n2' e2] ; cbn in H2, H3.
+            revert e1 e2 H4 H5 ; rewrite <- H2, <- H3 ; clear n1' n2' H2 H3 ; intros e1 e2 H2 H3.
+            elim (IH e1 e2) ; clear IH ; intros H4 ; 
+              rewrite H2, H3 in H4 ; clear e1 e2 H2 H3.
+            -- (* here we prove the ilists are equivalent *)
+              left.
+              apply IlistPerm3_IlistPerm4_eq.
+              apply (IlistPerm3_cons _ _ (first n1 : Fin (lgti (mkilist l1))) (i : Fin (lgti (mkilist l2))) H1).
+              apply (IlistPerm4_IlistPerm3_eq H4).
+            -- (* here we prove the ilists are not equivalent *)
+              right.
+              intros H5.
+              assert (H6 := extroduce_IlistPerm4 _ (first n1: Fin (lgti (mkilist l1))) 
+                 (i: Fin (lgti (mkilist l2))) H5 H1).
+              contradiction.
+          * (* no *)
+            right.
+            intro H.
+            inversion H.
+            clear H0 H3 H4 i1 i2.
+            destruct (H2 (first n1)) as [i [H3 _]].
+            apply H1.
+            exists i ; assumption.
+      - (* cas n1 <> n2 *)
+        right.
+        intro H1.
+        apply IlistPerm4_lgti in H1.
+        contradiction.
     Qed.
       
     Lemma IlistPerm4_dec_IlistPerm3_dec (T: Set)(RelT: relation T):
@@ -1291,8 +1270,8 @@ Section IlistPerm_ind.
     Proof.
       intros H l1 l2.
       destruct (H l1 l2) as [H1 | H1].
-      left ; apply IlistPerm4_IlistPerm3_eq, H1.
-      right ; intro H2 ; apply H1, IlistPerm3_IlistPerm4_eq, H2.
+      - left ; apply IlistPerm4_IlistPerm3_eq, H1.
+      - right ; intro H2 ; apply H1, IlistPerm3_IlistPerm4_eq, H2.
     Qed.
   
     Lemma IlistPerm3_dec (T: Set)(RelT: relation T)(Req : Equivalence RelT)
@@ -1324,63 +1303,63 @@ Section IlistPerm_ind.
       IlistPerm3Cert_list n2.
     Proof.
       revert n2 H ; induction n1 as [|n1 IH] ; intros [|n2] H.
-      exact tt.
-      inversion H.
-      inversion H.
-      destruct f as [[i1 i2] f].
-      fold (IlistPerm3Cert_list n1) in f.
-      split.
-      exact (rewriteFins H i1, rewriteFins H i2).
-      apply (IH f).
-      apply eq_add_S, H.
+      - exact tt.
+      - inversion H.
+      - inversion H.
+      - destruct f as [[i1 i2] f].
+        fold (IlistPerm3Cert_list n1) in f.
+        split.
+        + exact (rewriteFins H i1, rewriteFins H i2).
+        + apply (IH f).
+          apply eq_add_S, H.
     Defined.
 
     Definition IlistPerm3Cert_aux3 (A: Set)(l1 l2: ilist A)(Hyp : lgti l1 = lgti l2)(i1: Fin(lgti l1))
       (i2 : Fin (lgti l2))(c: IlistPerm3Cert_list (lgti (extroduce l1 i1))): IlistPerm3Cert_list (lgti l1).
     Proof.
       destruct l1 as [[|n1] l1].
-      inversion i1.
-      exact (i1, (rewriteFins (sym_eq Hyp) i2), (rewriteIlistPerm3Cert_list (sym_eq (extroduce_lgti_S _ _)) c)).
+      - inversion i1.
+      - exact (i1, (rewriteFins (sym_eq Hyp) i2), (rewriteIlistPerm3Cert_list (sym_eq (extroduce_lgti_S _ _)) c)).
     Defined.
 
     Lemma IlistPerm3Cert_list_eq (n: nat)(c: IlistPerm3Cert_list n)(H: n = n) : 
       c = rewriteIlistPerm3Cert_list H c.
     Proof.
-      induction n as [|n IH] ; destruct c as [[i1 i2] c].
-      reflexivity.
-      simpl.
-      f_equal ; try f_equal ; try treatFinPure.
-      apply IH.
+      induction n as [|n IH]. 
+      - destruct c; reflexivity.
+      - destruct c as [[i1 i2] c]. cbn.
+        f_equal ; try f_equal ; try treatFinPure.
+        apply IH.
     Qed.
 
     Lemma rewriteIlistPerm3Cert_list_proofirr: forall (n1 n2: nat)(e1 e2: n1 = n2)
       (f: IlistPerm3Cert_list n1), rewriteIlistPerm3Cert_list e1 f = rewriteIlistPerm3Cert_list e2 f.
     Proof.
       induction n1 as [|n1 IH]; intros [|n2] e1 e2 f.
-      reflexivity.
-      inversion e1.
-      inversion e1.
-      destruct f as [[i1 i2] f].
-      simpl.
-      f_equal.
-      f_equal ; treatFinPure.
-      apply IH.
+      - reflexivity.
+      - inversion e1.
+      - inversion e1.
+      - destruct f as [[i1 i2] f].
+        cbn.
+        f_equal.
+        f_equal ; treatFinPure.
+        apply IH.
     Qed.
     
     Lemma rewriteIlistPerm3Cert_list_sym: forall (n1 n2: nat)(e: n1 = n2)(f: IlistPerm3Cert_list n2),
       rewriteIlistPerm3Cert_list e (rewriteIlistPerm3Cert_list (sym_eq e) f) = f.
     Proof.
       induction n1 as [|n1 IH]; intros [|n2] e f.
-      destruct f.
-      reflexivity.
-      inversion e.
-      inversion e.
-      destruct f as [[i1 i2] f].
-      simpl.
-      f_equal.
-      f_equal ; treatFinPure.
-      rewrite (rewriteIlistPerm3Cert_list_proofirr _ (eq_sym (eq_add_S _ _ e))).
-      apply IH.
+      - destruct f.
+        reflexivity.
+      - inversion e.
+      - inversion e.
+      - destruct f as [[i1 i2] f].
+        simpl.
+        f_equal.
+        f_equal ; treatFinPure.
+        rewrite (rewriteIlistPerm3Cert_list_proofirr _ (eq_sym (eq_add_S _ _ e))).
+        apply IH.
     Qed.
 
     Lemma IlistPerm3Cert_aux3_ok1(A: Set)(n: nat)(l1 l2: ilistn A (S n))(Hyp : lgti (mkilist l1) = lgti (mkilist l2))
@@ -1389,7 +1368,7 @@ Section IlistPerm_ind.
       IlistPerm3Cert_aux3 (mkilist l1) (mkilist l2) Hyp i1 i2 c = 
       (((i1, i2: Fin (lgti (mkilist l1))), rewriteIlistPerm3Cert_list (sym_eq (extroduce_lgti_S l1 i1)) c)).
     Proof.
-      simpl.
+      cbn.
       repeat f_equal.
       apply decode_Fin_unique, sym_eq, decode_Fin_match.
     Qed.
@@ -1399,13 +1378,13 @@ Section IlistPerm_ind.
       IlistPerm3Cert_aux3 l1 l2 H1 i1 i2 c = IlistPerm3Cert_aux3 l1 l2 H2 i1 i2 c.
     Proof.
       destruct l1 as [n1 l1] ; destruct l2 as [n2 l2].
-      simpl in H1, H2, i1, i2.
+      cbn in H1, H2, i1, i2.
       revert l2 H2 i2 c ; rewrite <- H1 ; clear n2 H1 ; intros l2 H2 i2 c.
       destruct n1 as [|n1].
-      inversion i1.
-      simpl.
-      do 2 f_equal.
-      treatFinPure.
+      - inversion i1.
+      - cbn.
+        do 2 f_equal.
+        treatFinPure.
     Qed.
 
     Inductive IlistPerm3Cert (A: Set)(RA: relation A)(l1 l2: ilist A)(Hyp: lgti l1 = lgti l2)
@@ -1423,8 +1402,8 @@ Section IlistPerm_ind.
     Proof.
       intro H.
       induction H.
-      apply IlistPerm3_nil; assumption.
-      apply (IlistPerm3_cons _ _ i1 i2); assumption.
+      - apply IlistPerm3_nil; assumption.
+      - apply (IlistPerm3_cons _ _ i1 i2); assumption.
     Qed.
 
     Lemma IlistPerm3_IlistPerm3Cert (A: Set)(RA: relation A)(i1 i2: ilist A)(Hyp: lgti i1 = lgti i2): 
@@ -1432,12 +1411,12 @@ Section IlistPerm_ind.
     Proof.
       intro H.
       induction H as [l1 l2 H1 H2 |l1 l2 i1 i2 H1 H2 IH ].
-      exists (rewriteIlistPerm3Cert_list (sym_eq H2) tt).
-      apply IlistPerm3Cert_nil.
-      assumption.
-      destruct (IH (IlistPerm3Cert_aux2 l1 l2 Hyp i1 i2)) as [c Hypf].
-      exists (IlistPerm3Cert_aux3 l1 l2 Hyp i1 i2 c).
-      apply (@IlistPerm3Cert_cons _ _ _ _  _ _  _ i2 c H1 (refl_equal _) Hypf).
+      - exists (rewriteIlistPerm3Cert_list (sym_eq H2) tt).
+        apply IlistPerm3Cert_nil.
+        assumption.
+      - destruct (IH (IlistPerm3Cert_aux2 l1 l2 Hyp i1 i2)) as [c Hypf].
+        exists (IlistPerm3Cert_aux3 l1 l2 Hyp i1 i2 c).
+        apply (@IlistPerm3Cert_cons _ _ _ _  _ _  _ i2 c H1 (refl_equal _) Hypf).
     Qed.
 
     Lemma IlistPerm3Cert_mon (A: Set)(RA1 RA2: relation A)(HypR: subrelation RA1 RA2)(i1 i2: ilist A)
@@ -1446,9 +1425,9 @@ Section IlistPerm_ind.
     Proof.
       intro H.
       induction H.
-      apply IlistPerm3Cert_nil, H.
-      apply (@IlistPerm3Cert_cons _ _ _ _ _ _ _ i2 c') ; try assumption.
-      apply HypR, H.
+      - apply IlistPerm3Cert_nil, H.
+      - apply (@IlistPerm3Cert_cons _ _ _ _ _ _ _ i2 c') ; try assumption.
+        apply HypR, H.
     Qed.
 
     Lemma IlistPerm3Cert_proofirr(T: Set)(R: relation T)(l1 l2: ilist T)(H1 H2: lgti l1 = lgti l2)
@@ -1456,11 +1435,11 @@ Section IlistPerm_ind.
     Proof.
       intros H3.
       induction H3 as [l1 l2 H1 c H3 |l1 l2 H1 c i1 i2 c' H3 H4 _ IH].
-      apply IlistPerm3Cert_nil, H3.
-      apply (@IlistPerm3Cert_cons _ _ _ _ _ _ i1 i2 c' H3).
-      rewrite H4.
-      apply IlistPerm3Cert_aux3_proofirr.
-      apply IH.
+      - apply IlistPerm3Cert_nil, H3.
+      - apply (@IlistPerm3Cert_cons _ _ _ _ _ _ i1 i2 c' H3).
+        + rewrite H4.
+          apply IlistPerm3Cert_aux3_proofirr.
+        + apply IH.
     Qed.
 
     Lemma IlistPerm3Cert_inter (A: Set)(l1 l2: ilist A)(Hyp: lgti l1 = lgti l2)
@@ -1469,81 +1448,78 @@ Section IlistPerm_ind.
       IlistPerm3Cert (fun a1 a2 => forall i, R i a1 a2) l1 l2 Hyp c.
     Proof.
       destruct l1 as [n1 l1] ; destruct l2 as [n2 l2]. 
-      simpl in Hyp.
+      cbn in Hyp.
       revert l2 c HypR ; rewrite <- Hyp ; intros l2 c H1.
-      simpl in *|-*.
+      cbn in *|-*.
       fold (mkilist l1) (mkilist l2) in *|-*.
       clear Hyp n2.
       induction n1 as [|n1 IH].
-      apply IlistPerm3Cert_nil.
-      reflexivity.
-      
-      destruct c as [[i1 i2] c] ; fold (IlistPerm3Cert_list n1) in c.
-      apply (@IlistPerm3Cert_cons _ _ _ _ _ _ (i1: Fin (lgti (mkilist l1))) 
-      (i2: Fin (lgti (mkilist l2))) (rewriteIlistPerm3Cert_list (extroduce_lgti_S _ _) c)).
-      intros i.
-      destruct (H1 i) as [H | i1' i2' c'' H5 H6 H7].
-      inversion H.
-      simpl in H6.
-      inversion H6.
-      assumption.
-      simpl.
-      rewrite (rewriteIlistPerm3Cert_list_proofirr _ (eq_sym (eq_sym (extroduce_lgti_S l1 i1)))), 
-      rewriteIlistPerm3Cert_list_sym.
-      reflexivity.
-      
-      set (l1' := extroduce (mkilist l1) i1).
-      set (l2' := extroduce (mkilist l2) i2).
-      assert(H4 := extroduce_lgti_S l1 i1 : n1 = lgti l1').
-      rewrite (rewriteIlistPerm3Cert_list_proofirr _ H4).
-      assert (H5 := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) (eq_refl (S n1)) i1 i2 : 
-      lgti l1' = lgti l2').
-      apply (@IlistPerm3Cert_proofirr _ _ _ _ H5 _ (rewriteIlistPerm3Cert_list H4 c)).
-      
-      assert (H2 := refl_equal _ : l1' = extroduce (mkilist l1) i1) ;
-      assert (H3 := refl_equal _ : l2' = extroduce (mkilist l2) i2).
-      destruct l1' as [n1' l1'] ; destruct l2' as [n2' l2'].
-      simpl in H4, H5.
-      revert l1' l2' H2 H3 ; rewrite <- H5, <- H4 ; clear n1' n2' H4 H5 ; intros l1' l2' H2 H3.
-      fold (mkilist l1') (mkilist l2') in *|-*.
-      apply IH ; clear IH.
-      rewrite <- IlistPerm3Cert_list_eq.
-      intros i.
-      destruct (H1 i) as [H4 | i1' i2' c'' _ H4 H5].
-      inversion H4.
-      simpl in H4.
-      inversion H4.
-      revert H2 H3 ; rewrite H0, H6 ; intros H2 H3 ; clear i1 i2 H1 H0 H4 H6 H7 c.
-      assert (H6 := eq_sym (extroduce_lgti_S l1 i1')).
-      rewrite (rewriteIlistPerm3Cert_list_proofirr _ H6).
-      assert (H7 := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) (eq_refl (S n1)) i1' i2').
-      apply (IlistPerm3Cert_proofirr H7) in H5.
-      revert H5.
-      revert H6 H7 c''.
-      rewrite <- H2, <- H3.
-      simpl.
-      intros H6 H7 c''.
-      rewrite <- IlistPerm3Cert_list_eq.
-      apply IlistPerm3Cert_proofirr.
+      - apply IlistPerm3Cert_nil.
+        reflexivity.
+      - destruct c as [[i1 i2] c] ; fold (IlistPerm3Cert_list n1) in c.
+        apply (@IlistPerm3Cert_cons _ _ _ _ _ _ (i1: Fin (lgti (mkilist l1))) 
+          (i2: Fin (lgti (mkilist l2))) (rewriteIlistPerm3Cert_list (extroduce_lgti_S _ _) c)).
+        + intros i.
+          destruct (H1 i) as [H | i1' i2' c'' H5 H6 H7].
+          * inversion H.
+          * cbn in H6.
+            inversion H6.
+            assumption.
+        + cbn.
+          rewrite (rewriteIlistPerm3Cert_list_proofirr _ (eq_sym (eq_sym (extroduce_lgti_S l1 i1)))), 
+          rewriteIlistPerm3Cert_list_sym.
+          reflexivity.
+        + set (l1' := extroduce (mkilist l1) i1).
+          set (l2' := extroduce (mkilist l2) i2).
+          assert(H4 := extroduce_lgti_S l1 i1 : n1 = lgti l1').
+          rewrite (rewriteIlistPerm3Cert_list_proofirr _ H4).
+          assert (H5 := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) (eq_refl (S n1)) i1 i2 : 
+            lgti l1' = lgti l2').
+          apply (@IlistPerm3Cert_proofirr _ _ _ _ H5 _ (rewriteIlistPerm3Cert_list H4 c)).
+          assert (H2 := refl_equal _ : l1' = extroduce (mkilist l1) i1) ;
+            assert (H3 := refl_equal _ : l2' = extroduce (mkilist l2) i2).
+          destruct l1' as [n1' l1'] ; destruct l2' as [n2' l2'].
+          cbn in H4, H5.
+          revert l1' l2' H2 H3 ; rewrite <- H5, <- H4 ; clear n1' n2' H4 H5 ; intros l1' l2' H2 H3.
+          fold (mkilist l1') (mkilist l2') in *|-*.
+          apply IH ; clear IH.
+          rewrite <- IlistPerm3Cert_list_eq.
+          intros i.
+          destruct (H1 i) as [H4 | i1' i2' c'' _ H4 H5].
+          * inversion H4.
+          * cbn in H4.
+            inversion H4.
+            revert H2 H3 ; rewrite H0, H6 ; intros H2 H3 ; clear i1 i2 H1 H0 H4 H6 H7 c.
+            assert (H6 := eq_sym (extroduce_lgti_S l1 i1')).
+            rewrite (rewriteIlistPerm3Cert_list_proofirr _ H6).
+            assert (H7 := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) (eq_refl (S n1)) i1' i2').
+            apply (IlistPerm3Cert_proofirr H7) in H5.
+            revert H5.
+            revert H6 H7 c''.
+            rewrite <- H2, <- H3.
+            simpl.
+            intros H6 H7 c''.
+            rewrite <- IlistPerm3Cert_list_eq.
+            apply IlistPerm3Cert_proofirr.
     Qed.
     
     Definition IlistPerm3Cert_list_function (n: nat)(c: IlistPerm3Cert_list n) : Fin n -> Fin n.
     Proof.
       induction n as [|n IH] ; intro i.
-      inversion i.
-      destruct c as [[i1 i2] c].
-      fold (IlistPerm3Cert_list n) in c.
-      elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)); intros a.
-      exact i2.
-      exact (extroduce_Fin i2 (IH c (index_in_extroduce _ _ a))).
+      - inversion i.
+      - destruct c as [[i1 i2] c].
+        fold (IlistPerm3Cert_list n) in c.
+        elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)); intros a.
+        + exact i2.
+        + exact (extroduce_Fin i2 (IH c (index_in_extroduce _ _ a))).
     Defined.
 
     Definition IlistPerm3Cert_list_inv (n: nat)(c: IlistPerm3Cert_list n) : IlistPerm3Cert_list n.
     Proof.
       induction n as [|n IH].
-      apply c.
-      destruct c as [[i1 i2] c].
-      exact ((i2, i1), (IH c)).
+      - apply c.
+      - destruct c as [[i1 i2] c].
+        exact ((i2, i1), (IH c)).
     Defined.
 
     Definition IlistPerm3Cert_list_function_inv (n: nat)(c: IlistPerm3Cert_list n):= 
@@ -1553,10 +1529,10 @@ Section IlistPerm_ind.
       IlistPerm3Cert_list_inv _ (IlistPerm3Cert_list_inv _ c) = c.
     Proof.
       induction n as [|n IH].
-      reflexivity.
-      destruct c as [[i1 i2] c].
-      simpl.
-      rewrite IH ; reflexivity.
+      - reflexivity.
+      - destruct c as [[i1 i2] c].
+        cbn.
+        rewrite IH ; reflexivity.
     Qed.
 
     Lemma IP3Cl_function_ok1 (n: nat)(i1 i2 : Fin (S n))(c: IlistPerm3Cert_list n)(i: Fin (S n)) : 
@@ -1564,11 +1540,11 @@ Section IlistPerm_ind.
     Proof.
       intros H.
       rewrite (decode_Fin_unique _ _ H).
-      simpl.
+      cbn.
       unfold sumbool_rec, sumbool_rect.
       elim (eq_nat_dec (decode_Fin i) (decode_Fin i)) ; intros a.
-      reflexivity.
-      apply False_rec, a, eq_refl.
+      - reflexivity.
+      - apply False_rec, a, eq_refl.
     Qed.
 
     Lemma IP3Cl_function_ok2 (n: nat)(i1 i2 : Fin (S n))(c: IlistPerm3Cert_list n)(i: Fin (S n))
@@ -1578,13 +1554,13 @@ Section IlistPerm_ind.
       succ (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)).
     Proof.
       intros H.
-      simpl.
+      cbn.
       unfold sumbool_rec, sumbool_rect.
       elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)) ; intros a.
-      contradiction a.
-      rewrite (index_in_extroduce_proofirr _ _ a h).
-      apply extroduce_Fin_ok1.
-      assumption.
+      - contradiction a.
+      - rewrite (index_in_extroduce_proofirr _ _ a h).
+        apply extroduce_Fin_ok1.
+        assumption.
     Qed.
     
     Lemma IP3Cl_function_ok3 (n: nat)(i1 i2 : Fin (S n))(c: IlistPerm3Cert_list n)(i: Fin (S n))
@@ -1594,13 +1570,13 @@ Section IlistPerm_ind.
         weakFin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)).
     Proof.
       intros H.
-      simpl.
+      cbn.
       unfold sumbool_rec, sumbool_rect.
       elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)) ; intros a.
-      contradiction a.
-      rewrite (index_in_extroduce_proofirr _ _ a h).
-      apply extroduce_Fin_ok2.
-      assumption.
+      - contradiction a.
+      - rewrite (index_in_extroduce_proofirr _ _ a h).
+        apply extroduce_Fin_ok2.
+        assumption.
     Qed.
 
     Lemma IP3Cl_function_ok4 (n: nat)(i1 i2 : Fin (S n))(c: IlistPerm3Cert_list n)(i: Fin (S n))
@@ -1608,88 +1584,75 @@ Section IlistPerm_ind.
       IlistPerm3Cert_list_function (((i1, i2), c): IlistPerm3Cert_list (S n)) i = 
       extroduce_Fin i2 (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)).
     Proof.
-      simpl.
+      cbn.
       unfold sumbool_rec, sumbool_rect.
       elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)) ; intros a.
-      contradiction a.
-      rewrite (index_in_extroduce_proofirr _ _ a h).
-      reflexivity.
+      - contradiction a.
+      - rewrite (index_in_extroduce_proofirr _ _ a h).
+        reflexivity.
     Qed.
 
     Lemma IP3Cl_function_function_inv_inv (n: nat)(c: IlistPerm3Cert_list n) : 
       forall i, (IlistPerm3Cert_list_function c) (IlistPerm3Cert_list_function_inv c i) = i.
     Proof.
       intros i ; induction n as [|n IH].
-      inversion i.
-      
+      { inversion i. }      
       destruct c as [[i1 i2] c].
       fold (IlistPerm3Cert_list n) in c.
       unfold IlistPerm3Cert_list_function_inv.
       change (IlistPerm3Cert_list_inv (S n) (i1, i2, c)) with ((i2, i1, (IlistPerm3Cert_list_inv n c))).
-
       elim (eq_nat_dec (decode_Fin i2) (decode_Fin i)) ; intros a.
-      rewrite (IP3Cl_function_ok1 i2 i1 _ i) ; try assumption.
-      rewrite IP3Cl_function_ok1 ; try reflexivity.
-      apply decode_Fin_unique, a.
-      
-      elim (le_lt_dec (decode_Fin i1) 
-      (decode_Fin (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a)))); intros b.
-      rewrite (IP3Cl_function_ok2 _ _ _ _ a b).
-      
-      assert (h : decode_Fin i1 <> (decode_Fin (succ
-      (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
-      intros h.
-      rewrite h in b.
-      apply (le_Sn_n _ b).
-      
-      apply le_lt_n_Sm in b.
-      change (S (decode_Fin _)) with (decode_Fin (succ  (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c)
+      - rewrite (IP3Cl_function_ok1 i2 i1 _ i) ; try assumption.
+        rewrite IP3Cl_function_ok1 ; try reflexivity.
+        apply decode_Fin_unique, a.
+      - elim (le_lt_dec (decode_Fin i1) 
+        (decode_Fin (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a)))); intros b.
+        + rewrite (IP3Cl_function_ok2 _ _ _ _ a b).
+          assert (h : decode_Fin i1 <> (decode_Fin (succ
+          (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
+          * intros h.
+            rewrite h in b.
+            apply (le_Sn_n _ b).
+          * apply le_lt_n_Sm in b.
+            change (S (decode_Fin _)) with (decode_Fin (succ  (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c)
         (index_in_extroduce i2 i a)))) in b.
-      fold (IlistPerm3Cert_list_function_inv c) in *|-*.
-      
-
-      elim (le_lt_dec (decode_Fin i2) (decode_Fin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)))); 
+            fold (IlistPerm3Cert_list_function_inv c) in *|-*.
+            elim (le_lt_dec (decode_Fin i2) (decode_Fin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)))); 
       intros d.
-      rewrite (IP3Cl_function_ok2 _ _ _ _ h) ; try assumption.
-      revert d.
-      rewrite index_in_extroduce_succ2 ; try assumption.
-      rewrite IH.
+            -- rewrite (IP3Cl_function_ok2 _ _ _ _ h) ; try assumption.
+               revert d.
+               rewrite index_in_extroduce_succ2 ; try assumption.
+               rewrite IH.
+               intros d.
+               apply index_in_extroduce_succ ; try assumption.
+            -- rewrite (IP3Cl_function_ok3 _ _ _ _ h) ; try assumption.
+               revert d.
+               rewrite index_in_extroduce_succ2 ; try assumption.
+               rewrite IH.
+               intros d.
+               apply index_in_extroduce_weakFin2 ; try assumption.
+        + rewrite (IP3Cl_function_ok3 _ _ _ _ a b).
+          rewrite <- weakFin_ok in b.
+          assert (h : decode_Fin i1 <> (decode_Fin (weakFin
+            (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
+          { intros h.
+            rewrite h in b.
+            apply (le_Sn_n _ b). }      
+          fold (IlistPerm3Cert_list_function_inv c) in *|-*.
+          elim (le_lt_dec (decode_Fin i2) (decode_Fin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)))); 
       intros d.
-      apply index_in_extroduce_succ ; try assumption.
-      
-      rewrite (IP3Cl_function_ok3 _ _ _ _ h) ; try assumption.
-      revert d.
-      rewrite index_in_extroduce_succ2 ; try assumption.
-      rewrite IH.
-      intros d.
-      apply index_in_extroduce_weakFin2 ; try assumption.
-      
-      rewrite (IP3Cl_function_ok3 _ _ _ _ a b).
-      rewrite <- weakFin_ok in b.
-      
-      assert (h : decode_Fin i1 <> (decode_Fin (weakFin
-      (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
-      intros h.
-      rewrite h in b.
-      apply (le_Sn_n _ b).
-      
-      fold (IlistPerm3Cert_list_function_inv c) in *|-*.
-      
-      elim (le_lt_dec (decode_Fin i2) (decode_Fin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)))); 
-      intros d.
-      rewrite (IP3Cl_function_ok2 _ _ _ _ h) ; try assumption.
-      revert d.
-      rewrite index_in_extroduce_weakFin ; try assumption.
-      rewrite IH.
-      intros d.
-      apply index_in_extroduce_succ ; try assumption.
-      
-      rewrite (IP3Cl_function_ok3 _ _ _ _ h) ; try assumption.
-      revert d.
-      rewrite index_in_extroduce_weakFin ; try assumption.
-      rewrite IH.
-      intros d.
-      apply index_in_extroduce_weakFin2 ; try assumption.
+          * rewrite (IP3Cl_function_ok2 _ _ _ _ h) ; try assumption.
+            revert d.
+            rewrite index_in_extroduce_weakFin ; try assumption.
+            rewrite IH.
+            intros d.
+            apply index_in_extroduce_succ ; try assumption.
+          * rewrite (IP3Cl_function_ok3 _ _ _ _ h) ; try assumption.
+            revert d.
+            rewrite index_in_extroduce_weakFin ; try assumption.
+            rewrite IH.
+            intros d.
+            apply index_in_extroduce_weakFin2 ; try assumption.
     Qed.
 
     Lemma IP3Cl_function_inv_function_inv (n: nat)(c: IlistPerm3Cert_list n) : 
@@ -1707,49 +1670,45 @@ Section IlistPerm_ind.
     Proof.
       intros h1 i.
       induction n as [|n IH].
-      inversion i.
+      {inversion i. }
       destruct h1 as [h1 |i1 i2 c' h1 h2 h3].
-      inversion h1.
-      simpl in i1, i2, h1.
-      rewrite h2.
-      
-      rewrite IlistPerm3Cert_aux3_ok1.
-      
-      elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)) ; intros a.
-      rewrite IP3Cl_function_ok1 ; try assumption.
-      rewrite <- (decode_Fin_unique _ _ a).
-      assumption.
-      
-      rewrite (IP3Cl_function_ok4 _ _ _ _ a).
-      set (i2' := IlistPerm3Cert_list_function (rewriteIlistPerm3Cert_list (eq_sym (extroduce_lgti_S l1 i1)) c') 
-      (index_in_extroduce _ _ a)).
-      change (R (l1 i) (l2 (extroduce_Fin i2 i2'))).
-      
-      assert (h4 : decode_Fin i2 <> decode_Fin (extroduce_Fin i2 i2')).
-      intro H.
-      apply decode_Fin_unique, sym_eq in H.
-      apply (extroduce_Fin_not_fex _ H).
-      rewrite (index_in_extroduce_ok_cor l1 _ _ a), (index_in_extroduce_ok_cor l2 _ _ h4).
-      clear h2.
-      rewrite index_in_from_extroduce.
-      revert c' h3 i2' h4.
-      set (h3' := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) h i1 i2).
-      set (h5 := extroduce_lgti_S l1 i1) ; set (h6 := extroduce_lgti_S l2 i2).
-      generalize h3' h5 h6 ; clear h3' h5 h6.
-      set (l1' := extroduce (mkilist l1) i1) ; set (l2' := extroduce (mkilist l2) i2) ;
-      assert (h7 := refl_equal _ : extroduce (mkilist l1) i1 = l1') ; 
-      assert (h8 := refl_equal _ : l2' = extroduce (mkilist l2) i2).
-      destruct l1' as [n1' l1'] ; destruct l2' as [n2' l2'].
-      simpl lgti.
-      intros h3' h5 h6; revert h3' l1' l2' h7 h8.
-      rewrite <- h5, <- h6.
-      clear n1' n2' h5 h6.
-      intros h3' l1' l2' h5 h6 c' h3.
-      fold (mkilist l1') (mkilist l2') in *|-*.
-      rewrite <- IlistPerm3Cert_list_eq.
-      intros i2' h4.
-      do 2 rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' _ _)).
-      apply (IH _ _ _ h3'), h3.
+      - inversion h1.
+      - cbn in i1, i2, h1.
+        rewrite h2.
+        rewrite IlistPerm3Cert_aux3_ok1.
+        elim (eq_nat_dec (decode_Fin i1) (decode_Fin i)) ; intros a.
+        + rewrite IP3Cl_function_ok1 ; try assumption.
+          rewrite <- (decode_Fin_unique _ _ a).
+          assumption.
+        + rewrite (IP3Cl_function_ok4 _ _ _ _ a).
+          set (i2' := IlistPerm3Cert_list_function (rewriteIlistPerm3Cert_list (eq_sym (extroduce_lgti_S l1 i1)) c') 
+            (index_in_extroduce _ _ a)).
+          change (R (l1 i) (l2 (extroduce_Fin i2 i2'))).
+          assert (h4 : decode_Fin i2 <> decode_Fin (extroduce_Fin i2 i2')).
+          { intro H.
+            apply decode_Fin_unique, sym_eq in H.
+            apply (extroduce_Fin_not_fex _ H). }
+          rewrite (index_in_extroduce_ok_cor l1 _ _ a), (index_in_extroduce_ok_cor l2 _ _ h4).
+          clear h2.
+          rewrite index_in_from_extroduce.
+          revert c' h3 i2' h4.
+          set (h3' := IlistPerm3Cert_aux2 (mkilist l1) (mkilist l2) h i1 i2).
+          set (h5 := extroduce_lgti_S l1 i1) ; set (h6 := extroduce_lgti_S l2 i2).
+          generalize h3' h5 h6 ; clear h3' h5 h6.
+          set (l1' := extroduce (mkilist l1) i1) ; set (l2' := extroduce (mkilist l2) i2) ;
+            assert (h7 := refl_equal _ : extroduce (mkilist l1) i1 = l1') ; 
+            assert (h8 := refl_equal _ : l2' = extroduce (mkilist l2) i2).
+          destruct l1' as [n1' l1'] ; destruct l2' as [n2' l2'].
+          simpl lgti.
+          intros h3' h5 h6; revert h3' l1' l2' h7 h8.
+          rewrite <- h5, <- h6.
+          clear n1' n2' h5 h6.
+          intros h3' l1' l2' h5 h6 c' h3.
+          fold (mkilist l1') (mkilist l2') in *|-*.
+          rewrite <- IlistPerm3Cert_list_eq.
+          intros i2' h4.
+          do 2 rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' _ _)).
+          apply (IH _ _ _ h3'), h3.
     Qed.
 
     Lemma IlistPerm3Cert_list_function_ok (T: Set)(R: relation T)(l1 l2 : ilist T)(c: IlistPerm3Cert_list (lgti l1)) 
@@ -1757,7 +1716,7 @@ Section IlistPerm_ind.
       forall i, R (fcti l1 i) (fcti l2 (rewriteFins h (IlistPerm3Cert_list_function c i))).
     Proof.
       intros h1 i.
-      destruct l1 as [n l1] ; destruct l2 as [n2 l2] ; simpl in *|-*.
+      destruct l1 as [n l1] ; destruct l2 as [n2 l2] ; cbn in *|-*.
       revert l2 h1 ; rewrite <- h ; intros l2 h1 ; clear n2 h.
       rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' _ _)).
       apply (IlistPerm3Cert_list_function_ok_n h1).
@@ -1770,7 +1729,7 @@ Section IlistPerm_ind.
       intros h1 i.
       assert (h3 : IlistPerm3Cert_list_function c i = rewriteFins 
         (eq_refl _ : lgti (mkilist l1) = lgti (mkilist l2)) (IlistPerm3Cert_list_function c i)).
-      treatFinPure.
+      { treatFinPure. }
       rewrite h3.
       apply (IlistPerm3Cert_list_function_ok h1).
     Qed.
@@ -1805,11 +1764,10 @@ Section IlistPerm_bij.
    Proof.
      intros [f1 g1 h1 h2] [f2 g2 h3 h4].
      apply (perm7  _ _ _ (Bij_trans h1 h3)).
-     
      intro i.
      transitivity (fcti l2 (f1 i)).
-     apply h2.
-     apply h4.
+     - apply h2.
+     - apply h4.
    Qed.
 
    Add Parametric Relation (T: Set)(RelT: relation T)(EqT: Equivalence RelT) : (ilist T)(IlistPerm7 RelT) 
@@ -1837,15 +1795,15 @@ Section IlistPerm_bij.
      Bijective (IlistPerm3Cert_list_function c) (IlistPerm3Cert_list_function_inv c).
    Proof.
      split.
-     apply IP3Cl_function_inv_function_inv.
-     apply IP3Cl_function_function_inv_inv.
+     - apply IP3Cl_function_inv_function_inv.
+     - apply IP3Cl_function_function_inv_inv.
    Qed.
 
    Lemma IlistPerm3_IlistPerm7 (T: Set)(R: relation T)(l1 l2 : ilist T) : 
      IlistPerm3 R l1 l2 -> IlistPerm7 R l1 l2.
    Proof.
      destruct l1 as [n l1] ; destruct l2 as [n2 l2].
-     intros h1 ; assert (h2 := IlistPerm3_lgti h1) ; simpl in *|-* ; revert l1 l2 h1 ; rewrite <- h2 ; clear n2 h2;
+     intros h1 ; assert (h2 := IlistPerm3_lgti h1) ; cbn in *|-* ; revert l1 l2 h1 ; rewrite <- h2 ; clear n2 h2;
      intros l1 l2 h1.
      destruct (IlistPerm3_IlistPerm3Cert (refl_equal _ : lgti (existT _ _ l1) = lgti (existT _ _ l2)) h1) as [c h2].
      fold (mkilist l1) (mkilist l2) in *|-*.
@@ -1857,159 +1815,144 @@ Section IlistPerm_bij.
      IlistPerm7 R l1 l2 -> IlistPerm3 R l1 l2.
    Proof.
      intros h1 ; assert (h := IlistPerm7_lgti h1).
-     destruct l1 as [n l1] ; destruct l2 as [n2 l2] ; simpl in *|-* ; revert l1 l2 h1 ; rewrite <- h ;
-     intros l1 l2 [f g [h1 h2] h3]; clear n2 h ; simpl in *|-*.
-     
+     destruct l1 as [n l1] ; destruct l2 as [n2 l2] ; cbn in *|-* ; revert l1 l2 h1 ; rewrite <- h ;
+     intros l1 l2 [f g [h1 h2] h3]; clear n2 h ; cbn in *|-*.
      induction n as [|n IH].
-     apply IlistPerm3_nil ; reflexivity.
+     { apply IlistPerm3_nil ; reflexivity. }
      apply (IlistPerm3_cons _ _ (first n : Fin (lgti (existT _ _ l1))) (f (first n) :  Fin (lgti (existT _ _ l2)))).
-     apply h3.
-     
+     { apply h3. }     
      assert (hex1_aux := extroduce_lgti (existT _ _ l1) (first n)).
      assert (hex1 : forall i, fcti (extroduce (existT _ _ l1) (first n)) i = fcti (existT _ _ l1)
-     (rewriteFins (eq_sym hex1_aux) (succ i))).
-     intro i.
-     rewrite extroduce_ok3'.
-     f_equal.
-     treatFinPure.
-     apply le_0_n.
-     
+         (rewriteFins (eq_sym hex1_aux) (succ i))).
+     { intro i.
+       rewrite extroduce_ok3'.
+       - f_equal.
+         treatFinPure.
+       - apply le_0_n.
+     }     
      assert (hex2_aux := extroduce_lgti (existT _ _ l2) (f (first n))).
      assert (hex21 : forall i, decode_Fin i < decode_Fin (f (first n)) -> 
-     fcti (extroduce (existT _ _ l2) (f (first n))) i = 
-     fcti (existT _ _ l2) (rewriteFins (eq_sym hex2_aux) (weakFin i))).
-     intros i h4.
-     rewrite extroduce_ok2' ; try assumption.
-     f_equal.
-     treatFinPure.
-     
+         fcti (extroduce (existT _ _ l2) (f (first n))) i = 
+         fcti (existT _ _ l2) (rewriteFins (eq_sym hex2_aux) (weakFin i))).
+     { intros i h4.
+       rewrite extroduce_ok2' ; try assumption.
+       f_equal.
+       treatFinPure. }     
      assert (hex22 : forall i, decode_Fin (f (first n)) <=  decode_Fin i -> 
-     fcti (extroduce (existT _ _ l2) (f (first n))) i = 
-     fcti (existT _ _ l2) (rewriteFins (eq_sym hex2_aux) (succ i))).
-     intros i h4.
-     rewrite extroduce_ok3' ; try assumption.
-     f_equal.
-     treatFinPure.
-     
+         fcti (extroduce (existT _ _ l2) (f (first n))) i = 
+         fcti (existT _ _ l2) (rewriteFins (eq_sym hex2_aux) (succ i))).
+     { intros i h4.
+       rewrite extroduce_ok3' ; try assumption.
+       f_equal.
+       treatFinPure. }     
      revert hex1_aux hex1 hex2_aux hex21 hex22.
      set (l1' := extroduce (existT _ _ l1) (first n)) ; set (l2' := extroduce (existT _ _ l2) (f (first n))).
      assert (h4 := refl_equal _ : l1' =  extroduce (existT _ _ l1) (first n)) ; 
-     assert (h5 := refl_equal _ : l2' =  extroduce (existT _ _ l2) (f (first n))).
+       assert (h5 := refl_equal _ : l2' =  extroduce (existT _ _ l2) (f (first n))).
      destruct l1' as [n' l1'] ; destruct l2' as [n2' l2'].
      assert (h6 : n' = n2').
-     change (lgti (existT (fun n : nat => ilistn T n) _ l1') = lgti (existT (fun n : nat => ilistn T n) _ l2')).
-     rewrite h4, h5.
-     apply extroduce_lgti_S.
+     { change (lgti (existT (fun n : nat => ilistn T n) _ l1') = lgti (existT (fun n : nat => ilistn T n) _ l2')).
+       rewrite h4, h5.
+       apply extroduce_lgti_S. }
      assert (h7 : n' = n).
-     change (lgti (existT (fun n : nat => ilistn T n) _ l1') = n).
-     apply eq_add_S.
-     rewrite h4, <- extroduce_lgti.
-     reflexivity.
+     { change (lgti (existT (fun n : nat => ilistn T n) _ l1') = n).
+       apply eq_add_S.
+       rewrite h4, <- extroduce_lgti.
+       reflexivity. }
      revert l1' l2' h4 h5 ; rewrite <- h6, h7 ; intros l1' l2' h4 h5.
-     simpl.
+     cbn.
      intros hex1_aux hex1 hex2_aux hex21 hex22; 
-     clear n' n2' h6 h7.
-     
+       clear n' n2' h6 h7.
      assert (hex1' : forall i, l1' i = l1 (succ i)).
-     intro i.
-     assert (h6 : succ i = rewriteFins (eq_sym hex1_aux) (succ i)) by treatFinPure.
-     rewrite h6 ; apply hex1.
+     { intro i.
+       assert (h6 : succ i = rewriteFins (eq_sym hex1_aux) (succ i)) by treatFinPure.
+       rewrite h6 ; apply hex1. }
      assert (hex21' : forall i, decode_Fin i < decode_Fin (f (first n)) -> l2' i = l2 (weakFin i)).
-     intros i h6.
-     assert (h7 : weakFin i = rewriteFins (eq_sym hex2_aux) (weakFin i)) by treatFinPure.
-     rewrite h7 ; apply hex21, h6.
+     { intros i h6.
+       assert (h7 : weakFin i = rewriteFins (eq_sym hex2_aux) (weakFin i)) by treatFinPure.
+       rewrite h7 ; apply hex21, h6. }
      assert (hex22' : forall i, decode_Fin (f (first n)) <= decode_Fin i -> l2' i = l2 (succ i)).
-     intros i h6.
-     assert (h7 : succ i = rewriteFins (eq_sym hex2_aux) (succ i)) by treatFinPure.
-     rewrite h7 ; apply hex22, h6.
+     { intros i h6.
+       assert (h7 : succ i = rewriteFins (eq_sym hex2_aux) (succ i)) by treatFinPure.
+       rewrite h7 ; apply hex22, h6. }
      clear hex1_aux hex2_aux hex1 hex21 hex22.
-     
      fold (mkilist l1') (mkilist l2') in *|-*.
-     
      assert (h6 : forall i, decode_Fin (f (first n)) <> decode_Fin (f (@succ n i))).
-     intros i h6.
-     apply decode_Fin_unique, (f_equal g) in h6.
-     do 2 rewrite h1 in h6.
-     inversion h6.
+     { intros i h6.
+       apply decode_Fin_unique, (f_equal g) in h6.
+       do 2 rewrite h1 in h6.
+       inversion h6. }
      set (f' := fun i => index_in_extroduce _ _ (h6 i)).
-     
      assert (h7 : forall i, decode_Fin (first n) <> decode_Fin (g (extroduce_Fin (f (first n)) i))).
-     intro i.
-     unfold extroduce_Fin, sumbool_rec, sumbool_rect.
-     elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros a h7 ;
-     apply decode_Fin_unique, (f_equal f) in h7 ; rewrite h2 in h7 ; rewrite h7 in a.
-     apply (le_Sn_n _ a).
-     rewrite weakFin_ok in a.
-     apply (lt_irrefl _ a).
+     { intro i.
+       unfold extroduce_Fin, sumbool_rec, sumbool_rect.
+       elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros a h7 ;
+         apply decode_Fin_unique, (f_equal f) in h7 ; rewrite h2 in h7 ; rewrite h7 in a.
+       - apply (le_Sn_n _ a).
+       - rewrite weakFin_ok in a.
+         apply (lt_irrefl _ a).
+     }
      set (g' := fun i => index_in_extroduce _ _ (h7 i)).
-     
      apply (IH _ _ f' g') ; intros i; unfold f', g' ; clear f' g'.
-     assert (h8 : decode_Fin (first n) < decode_Fin (g (extroduce_Fin (f (first n))
-     (index_in_extroduce (f (first n)) (f (succ i)) (h6 i))))).
-     rewrite (index_from_in_extroduce _ _ (h6 i)), h1. 
-     apply lt_0_Sn.
-     apply decode_Fin_unique, eq_add_S.
-     rewrite index_in_extroduce_decode1, (index_from_in_extroduce _ _ (h6 i)), h1 ; try assumption.
-     reflexivity.
-     
-     elim (lt_eq_lt_dec (decode_Fin (f (first n))) (decode_Fin (f (succ (index_in_extroduce (first n)
-       (g (extroduce_Fin (f (first n)) i)) (h7 i)))))) ; try intros [a|a] ; try intros a ; 
-     apply decode_Fin_unique.
-     apply eq_add_S.
-     rewrite index_in_extroduce_decode1 ; try assumption.
-     
-     elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (extroduce_Fin (f (first n)) i)))) ; 
-     try intros [b|b] ; try intros b.
-     rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ (h7 _) b : decode_Fin (succ _) = _)), h2.
-     elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros c.
-     rewrite extroduce_Fin_ok1 ; try assumption.
-     reflexivity.
-     apply False_rec.
-     rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ (h7 _) b : decode_Fin (succ _) = _)), h2 in a.
-     rewrite extroduce_Fin_ok2, weakFin_ok in a ; try assumption.
-     apply (lt_irrefl _ (lt_trans _ _ _ a c)).
-     contradiction (h7 i).
-     inversion b.
-     
-     apply decode_Fin_unique, (f_equal g) in a.
-     do 2 rewrite h1 in a.
-     inversion a.
-     
-     rewrite index_in_extroduce_decode2 ; try assumption.
-     revert a ; set (h8 := h7 i) ; generalize h8 ; clear h8.
-     elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros b.
-     rewrite extroduce_Fin_ok1 ; try assumption.
-     intros h8 a.
-     elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (succ i)))) ; try intros [c|c] ; try intros c.
-     rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ h8 c : decode_Fin (succ _) = _)), h2 in a.
-     apply False_rec, (le_Sn_n _ (lt_le_weak _ _ (lt_le_trans _ _ _ a b))).
-     contradiction c.
-     inversion c.
-     
-     rewrite extroduce_Fin_ok2 ; try assumption.
-     intros h8 a.
-     elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (weakFin i)))) ; try intros [c|c] ; try intros c.
-     rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ h8 c : decode_Fin (succ _) = _)), h2.
-     apply weakFin_ok.
-     contradiction c.
-     inversion c.
-     
-     set (h8 := h6 i) ; generalize h8 ; clear h8 ; intros h8.
-     rewrite hex1'.
-     
-     assert (h9 : l2' (index_in_extroduce (f (first n)) (f (succ i)) h8) = l2 (f (succ i))).
-     rewrite (index_in_extroduce_ok_cor l2 _ _ h8).
-     set (h9 := extroduce_lgti_S l2 (f (first n))).
-     generalize h9 ; clear h9.
-     change (mkilist l2' = extroduce (mkilist l2) (f (first n))) in h5.
-     rewrite <- h5.
-     intros h9.
-     simpl.
-     f_equal.
-     treatFinPure.
-     
-     rewrite h9.
-     apply h3.
+     - assert (h8 : decode_Fin (first n) < decode_Fin (g (extroduce_Fin (f (first n))
+         (index_in_extroduce (f (first n)) (f (succ i)) (h6 i))))).
+       { rewrite (index_from_in_extroduce _ _ (h6 i)), h1. 
+         apply lt_0_Sn. }
+       apply decode_Fin_unique, eq_add_S.
+       rewrite index_in_extroduce_decode1, (index_from_in_extroduce _ _ (h6 i)), h1 ; try assumption.
+       reflexivity.
+     - elim (lt_eq_lt_dec (decode_Fin (f (first n))) (decode_Fin (f (succ (index_in_extroduce (first n)
+           (g (extroduce_Fin (f (first n)) i)) (h7 i)))))) ; try intros [a|a] ; try intros a ; 
+           apply decode_Fin_unique.
+       + apply eq_add_S.
+         rewrite index_in_extroduce_decode1 ; try assumption.
+         elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (extroduce_Fin (f (first n)) i)))) ; 
+           try intros [b|b] ; try intros b.
+         * rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ (h7 _) b : decode_Fin (succ _) = _)), h2.
+           elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros c.
+           -- rewrite extroduce_Fin_ok1 ; try assumption.
+              reflexivity.
+           -- apply False_rec.
+              rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ (h7 _) b : decode_Fin (succ _) = _)), h2 in a.
+              rewrite extroduce_Fin_ok2, weakFin_ok in a ; try assumption.
+              apply (lt_irrefl _ (lt_trans _ _ _ a c)).
+         * contradiction (h7 i).
+         * inversion b.
+       + apply decode_Fin_unique, (f_equal g) in a.
+         do 2 rewrite h1 in a.
+         inversion a.
+       + rewrite index_in_extroduce_decode2 ; try assumption.
+         revert a ; set (h8 := h7 i) ; generalize h8 ; clear h8.
+         elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros b.
+         * rewrite extroduce_Fin_ok1 ; try assumption.
+           intros h8 a.
+           elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (succ i)))) ; try intros [c|c] ; try intros c.
+           -- rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ h8 c : decode_Fin (succ _) = _)), h2 in a.
+              apply False_rec, (le_Sn_n _ (lt_le_weak _ _ (lt_le_trans _ _ _ a b))).
+           -- contradiction c.
+           -- inversion c.
+         * rewrite extroduce_Fin_ok2 ; try assumption.
+           intros h8 a.
+           elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (weakFin i)))) ; try intros [c|c] ; try intros c.
+           -- rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ h8 c : decode_Fin (succ _) = _)), h2.
+              apply weakFin_ok.
+           -- contradiction c.
+           -- inversion c.
+     - set (h8 := h6 i) ; generalize h8 ; clear h8 ; intros h8.
+       rewrite hex1'.
+       assert (h9 : l2' (index_in_extroduce (f (first n)) (f (succ i)) h8) = l2 (f (succ i))).
+       { rewrite (index_in_extroduce_ok_cor l2 _ _ h8).
+         set (h9 := extroduce_lgti_S l2 (f (first n))).
+         generalize h9 ; clear h9.
+         change (mkilist l2' = extroduce (mkilist l2) (f (first n))) in h5.
+         rewrite <- h5.
+         intros h9.
+         cbn.
+         f_equal.
+         treatFinPure.
+       }
+       rewrite h9.
+       apply h3.
    Qed.
      
   End IlistPerm_bij.

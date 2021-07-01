@@ -30,11 +30,11 @@ Section GeqPerm2.
   Proof.
     cofix Hc ; intros g.
     apply GeqPerm2_intro.
-    reflexivity.
-    apply (@perm7 _ _ _ _ (fun x => x) (fun x => x)).
-    split ; reflexivity.
-    intro i.
-    apply Hc.
+    - reflexivity.
+    - apply (@perm7 _ _ _ _ (fun x => x) (fun x => x)).
+      + split ; reflexivity.
+      + intro i.
+        apply Hc.
   Qed.
   
   Lemma GeqPerm2_sym(Rsym : Symmetric RelT): forall g1 g2, GeqPerm2 g1 g2 -> GeqPerm2 g2 g1.
@@ -42,13 +42,13 @@ Section GeqPerm2.
     cofix Hc.
     intros _ _ [g1 g2 h1 [f g h2 h3]].
     apply GeqPerm2_intro ; simpl in *|-*.
-    symmetry ; assumption.
-    apply (perm7 _ _ _ (Bij_sym h2)).
-    intro i.
-    apply Hc.
-    destruct h2 as [_ h2].
-    rewrite <- (h2 i) at 2.
-    apply h3.
+    - symmetry ; assumption.
+    - apply (perm7 _ _ _ (Bij_sym h2)).
+      intro i.
+      apply Hc.
+      destruct h2 as [_ h2].
+      rewrite <- (h2 i) at 2.
+      apply h3.
   Qed.
 
   Lemma GeqPerm2_trans(Rtrans : Transitive RelT): 
@@ -59,11 +59,10 @@ Section GeqPerm2.
     destruct h1 as [g1 g2 h1 [f1 gg1 h3 h4]].
     destruct h2 as [g2 g3 h2 [f2 gg2 h5 h6]].
     apply GeqPerm2_intro ; simpl in *|-*.
-    transitivity (label g2) ; assumption.
-    
-    apply (perm7 _ _ _ (Bij_trans h3 h5)).
-    intros i.
-    apply (Hc _ (fcti (sons g2) (f1 i)) _ (h4 _) (h6 _)).
+    - transitivity (label g2) ; assumption.
+    - apply (perm7 _ _ _ (Bij_trans h3 h5)).
+      intros i.
+      apply (Hc _ (fcti (sons g2) (f1 i)) _ (h4 _) (h6 _)).
   Qed.
   
   Add Parametric Relation (Req: Equivalence RelT): (Graph T)(GeqPerm2) 
@@ -89,10 +88,10 @@ Section GeqPerm2.
     cofix Hc.
     intros _ _ [g1 g2 R h1 h2 [f g h3 h4]].
     apply GeqPerm2_intro.
-    assumption.
-    apply (perm7 _ _ _ h3).
-    intro i.
-    apply Hc, h1, h4.
+    - assumption.
+    - apply (perm7 _ _ _ h3).
+      intro i.
+      apply Hc, h1, h4.
   Qed.
   
   Lemma GeqPerm2_GeqPerm1': subrelation GeqPerm2 GeqPerm1'.
@@ -107,8 +106,8 @@ Section GeqPerm2.
     cofix Hc.
     intros _ _ [g1 g2 h1 h2] .
     apply (GeqPerm1'_intro _ _ Hc).
-    assumption.
-    apply IlistPerm3_IlistPerm7, h2.
+    - assumption.
+    - apply IlistPerm3_IlistPerm7, h2.
   Qed.
 
   Lemma GeqPerm0_GeqPerm2: subrelation (GeqPerm0 RelT) GeqPerm2.
@@ -121,9 +120,9 @@ Section GeqPerm2.
     cofix Hc.
     intros _ _ [g1 g2 R h1 h2 h3] .
     apply (GeqPerm1_intro _ _ Hc).
-    assumption.
-    apply IlistPerm7_IlistPerm3.
-    apply (IlistPerm7_mon h1), h3.
+    - assumption.
+    - apply IlistPerm7_IlistPerm3.
+      apply (IlistPerm7_mon h1), h3.
   Qed.
   
   Lemma GeqPerm1_GeqPerm1': subrelation (GeqPerm1 RelT) GeqPerm1'.
@@ -131,9 +130,9 @@ Section GeqPerm2.
     cofix Hc.
     intros _ _ [g1 g2 R h1 h2 h3] .
     apply (GeqPerm1'_intro _ _ Hc).
-    assumption.
-    apply IlistPerm3_IlistPerm7.
-    apply (IlistPerm3_mon h1), h3.
+    - assumption.
+    - apply IlistPerm3_IlistPerm7.
+      apply (IlistPerm3_mon h1), h3.
   Qed.
   
   Lemma GeqPerm_GeqPerm2: subrelation (GeqPerm RelT) GeqPerm2.
