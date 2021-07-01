@@ -19,7 +19,7 @@ Require Import GPerm.
 
 Set Implicit Arguments.
 
-Section AllGraphs_def_tools. 
+Section AllGraphs_def_tools.
 
   Variable T: Set.
   (* Definition of coinductive graphs *)
@@ -119,57 +119,54 @@ Lemma two_roots_ForestGr_two_roots_AllGraph :
   Geq (RelOp eq) two_roots_AllGraph (FG2AG two_roots_ForestGr).
 Proof.
   apply Geq_intro.
-  
-  simpl.
-  trivial.
-  
+  { cbn.
+    trivial. }
   assert (h1 := refl_equal _: lgti (sons two_roots_AllGraph) = lgti (sons (FG2AG two_roots_ForestGr))).
   apply (is_ilist_rel _ _ _ h1).
   intro i.
-  simpl in *|-*.
+  cbn in *|-*.
   rewrite <- decode_Fin_match'.
   elim (zerop (decode_Fin i)) ; intros a.
-  rewrite (decode_Fin_0_first _ a).
-  apply Geq_intro.
-  reflexivity.
-  simpl.
-  assert (h2 := refl_equal _ : 
-  lgti (icons (mk_Graph (Some 0) (inil (AllGraph nat))) (inil (AllGraph nat))) = 
-  lgti (imap (@G2AG _)(icons (mk_Graph 0 (inil (Graph nat))) (inil (Graph nat))))).
-  apply (is_ilist_rel _ _ _ h2).
-  simpl in *|-*.
-  intro i'.
-  rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' i' h2)).
-  rewrite (Fin_first_1 i').
-  apply Geq_intro.
-  reflexivity.
-  simpl.
-  assert (h3 := refl_equal _ : lgti (inil (AllGraph nat)) = lgti (imap (@G2AG _) (inil (Graph nat)))).
-  apply (is_ilist_rel _ _ _ h3).
-  intro i'' ; inversion i''.
-  
-  assert (h2 : i = succ (first 0)).
-  apply decode_Fin_unique.
-  apply symmetry, (le_antisym _ _ (lt_le_S _ _ a) (lt_n_Sm_le _ _ (decode_Fin_inf_n i))).
-  rewrite h2 ; clear h2.
-  simpl.
-  apply Geq_intro.
-  reflexivity.
-  simpl.
-  assert (h2 := refl_equal _ : 
-  lgti (icons (mk_Graph (Some 0) (inil (AllGraph nat))) (inil (AllGraph nat))) = 
-  lgti (imap (@G2AG _)(icons (mk_Graph 0 (inil (Graph nat))) (inil (Graph nat))))).
-  apply (is_ilist_rel _ _ _ h2).
-  simpl in *|-*.
-  intro i'.
-  rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' i' h2)).
-  rewrite (Fin_first_1 i').
-  apply Geq_intro.
-  reflexivity.
-  simpl.
-  assert (h3 := refl_equal _ : lgti (inil (AllGraph nat)) = lgti (imap (@G2AG _) (inil (Graph nat)))).
-  apply (is_ilist_rel _ _ _ h3).
-  intro i'' ; inversion i''.
+  - rewrite (decode_Fin_0_first _ a).
+    apply Geq_intro.
+    + reflexivity.
+    + cbn.
+      assert (h2 := refl_equal _ : 
+      lgti (icons (mk_Graph (Some 0) (inil (AllGraph nat))) (inil (AllGraph nat))) = 
+      lgti (imap (@G2AG _)(icons (mk_Graph 0 (inil (Graph nat))) (inil (Graph nat))))).
+      apply (is_ilist_rel _ _ _ h2).
+      cbn in *|-*.
+      intro i'.
+      rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' i' h2)).
+      rewrite (Fin_first_1 i').
+      apply Geq_intro.
+      * reflexivity.
+      * cbn.
+        assert (h3 := refl_equal _ : lgti (inil (AllGraph nat)) = lgti (imap (@G2AG _) (inil (Graph nat)))).
+        apply (is_ilist_rel _ _ _ h3).
+        intro i'' ; inversion i''.
+  - assert (h2 : i = succ (first 0)).
+    { apply decode_Fin_unique.
+      apply symmetry, (le_antisym _ _ (lt_le_S _ _ a) (lt_n_Sm_le _ _ (decode_Fin_inf_n i))). }
+    rewrite h2 ; clear h2.
+    cbn.
+    apply Geq_intro.
+    + reflexivity.
+    + cbn.
+      assert (h2 := refl_equal _ : 
+      lgti (icons (mk_Graph (Some 0) (inil (AllGraph nat))) (inil (AllGraph nat))) = 
+      lgti (imap (@G2AG _)(icons (mk_Graph 0 (inil (Graph nat))) (inil (Graph nat))))).
+      apply (is_ilist_rel _ _ _ h2).
+      cbn in *|-*.
+      intro i'.
+      rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' i' h2)).
+      rewrite (Fin_first_1 i').
+      apply Geq_intro.
+      * reflexivity.
+      * cbn.
+        assert (h3 := refl_equal _ : lgti (inil (AllGraph nat)) = lgti (imap (@G2AG _) (inil (Graph nat)))).
+        apply (is_ilist_rel _ _ _ h3).
+        intro i'' ; inversion i''.
 Qed.
 
 

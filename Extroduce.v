@@ -18,24 +18,24 @@ Set Implicit Arguments.
    Proof.
      intros T [n i] f.
      induction n as [|n IH].
-     inversion f.
-     elim (zerop (decode_Fin f)) ; intros a.
-     exact (mkilist (fun x => i (succ x))).
-     exact (icons (i (first n)) (IH (fun x => (i (succ x))) (get_cons _ a))).
+     - inversion f.
+     - elim (zerop (decode_Fin f)) ; intros a.
+       + exact (mkilist (fun x => i (succ x))).
+       + exact (icons (i (first n)) (IH (fun x => (i (succ x))) (get_cons _ a))).
    Defined.
    
    Lemma extroduce_lgti: forall (T: Set)(i: ilist T)(f: Fin (lgti i)),
      lgti i = S (lgti (extroduce i f)).
    Proof.
      intros T [n i] f.
-     simpl in *|-*.
+     cbn in *|-*.
      unfold nat_rec, nat_rect, sumbool_rec, sumbool_rect, icons, mkilist.
      induction n as [|n IH].
-     inversion f.
-     apply eq_S.
-     elim (zerop (decode_Fin f)) ; intros a.
-     reflexivity.
-     apply IH.
+     - inversion f.
+     - apply eq_S.
+       elim (zerop (decode_Fin f)) ; intros a.
+       + reflexivity.
+       + apply IH.
    Defined.
 
    Hint Rewrite <- extroduce_lgti: evalLgti.
@@ -52,13 +52,13 @@ Set Implicit Arguments.
      RelT (ihead (extroduce i f) (fcti i f)) (ihead i (fcti i f)).
    Proof.
      intros T RelT [Rrefl _ _] [n i] f h.
-     simpl in *|-*.
+     cbn in *|-*.
      unfold nat_rec, nat_rect, sumbool_rec, sumbool_rect, iconsn.
      destruct n as [|n].
-     inversion f.
-     elim (zerop (decode_Fin f)) ; intros a.
-     apply False_rec ; rewrite <- a in h ; apply (lt_irrefl _ h).
-     apply Rrefl.
+     - inversion f.
+     - elim (zerop (decode_Fin f)) ; intros a.
+       + apply False_rec ; rewrite <- a in h ; apply (lt_irrefl _ h).
+       + apply Rrefl.
    Qed.
 
    Lemma extroduce_ok2: forall (T: Set)
@@ -69,8 +69,7 @@ Set Implicit Arguments.
    Proof.
      intros T [n i] f f' h.
      fold (mkilist i) in *|-*.
-     simpl in f.
-
+     cbn in f.
      assert (e:= lt_S _ _ (decode_Fin_inf_n f')).
      rewrite (code_Fin1_proofirr _ e).
      assert (e1 := sym_eq (extroduce_lgti (mkilist i) f)).
@@ -80,41 +79,38 @@ Set Implicit Arguments.
      rewrite e3 ; clear e3.
      change (fcti (mkilist i)) with (i).
      assert (e3 : decode_Fin f' < n).
-     rewrite <- e1.
-     assumption.
+     { rewrite <- e1.
+       assumption. }
      assert (e4: rewriteFins e1 (code_Fin1 e) = code_Fin1 e3) by treatFinPure.
      rewrite e4 ; clear e4 e1 e.
      induction n as [|n IH].
-     inversion f.
-
+     { inversion f. }
      revert f' h e3.
-     simpl.
+     cbn.
      unfold sumbool_rec, sumbool_rect.
-     elim (zerop (decode_Fin f)) ; simpl ; intros a f' e1 e2.
-     rewrite a in e1.
-     inversion e1.
-     
-     elim (zerop (decode_Fin f')) ; intros b.
-     revert e2 ; rewrite b ; intro e2.
-     rewrite code_Fin1_Sn_0, (decode_Fin_0_first _ b).
-     reflexivity.
-
-     assert (h1 : f' = succ (get_cons f' b)) by treatFinPure.
-     revert e1 e2 ; rewrite h1 ; intros e1 e2 ; clear h1.
-     simpl.
-     change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
+     elim (zerop (decode_Fin f)) ; cbn ; intros a f' e1 e2.
+     - rewrite a in e1.
+       inversion e1.
+     - elim (zerop (decode_Fin f')) ; intros b.
+       + revert e2 ; rewrite b ; intro e2.
+         rewrite code_Fin1_Sn_0, (decode_Fin_0_first _ b).
+         reflexivity.
+       + assert (h1 : f' = succ (get_cons f' b)) by treatFinPure.
+         revert e1 e2 ; rewrite h1 ; intros e1 e2 ; clear h1.
+         cbn.
+         change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
                   (i (code_Fin1_Sn (lt_n_Sm_le _ _ e2)))).
-     assert (e3: decode_Fin (get_cons f' b) < decode_Fin (get_cons f a)).
-     apply lt_S_n.
-     rewrite <- (decode_Fin_get_cons f a).
-     assumption.
-     assert (e4 : decode_Fin (get_cons f' b) < n).
-     apply (lt_S_n _ _ e2).
-     rewrite (IH _ _ _ e3 e4).
-     f_equal.
-     change (succ (code_Fin1 e4) = code_Fin1 e2).
-     apply decode_Fin_unique.
-     treatFinPure.
+         assert (e3: decode_Fin (get_cons f' b) < decode_Fin (get_cons f a)).
+         { apply lt_S_n.
+           rewrite <- (decode_Fin_get_cons f a).
+           assumption. }
+         assert (e4 : decode_Fin (get_cons f' b) < n).
+         { apply (lt_S_n _ _ e2). }
+         rewrite (IH _ _ _ e3 e4).
+         f_equal.
+         change (succ (code_Fin1 e4) = code_Fin1 e2).
+         apply decode_Fin_unique.
+         treatFinPure.
    Qed.
 
    Lemma extroduce_ok3 : forall (T: Set)(i: ilist T)(f: Fin (lgti i))(f': Fin (lgti (extroduce i f)))
@@ -127,45 +123,40 @@ Set Implicit Arguments.
      assert (e1:= decode_Fin_inf_n (succ f')).
      rewrite <- extroduce_lgti in e1.
      assert (e2: rewriteFins (sym_eq (extroduce_lgti i f))(succ f') = code_Fin1 e1).
-     treatFinPure.
+     { treatFinPure. }
      rewrite e2 ; clear e2.
      destruct i as [n i].
      fold (mkilist i) in *|-*.
      simpl fcti at 2.
      simpl in f, e1.
-     
      induction n as [|n IH].
-     inversion e1.
-     
+     { inversion e1. }
      revert f' h e1.
-     simpl.
+     cbn.
      unfold sumbool_rec, sumbool_rect.
-     elim (zerop (decode_Fin f)) ; simpl ; intros a f' h e1.
-     fold (code_Fin1 e1).
-     f_equal.
-     treatFinPure.
-     
-     elim (zerop (decode_Fin f')) ; intros b;
-     change (Fin (S (lgti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a))))) in f'.
-     rewrite b in h.
-     apply False_rec.
-     apply (lt_irrefl _ (lt_le_trans _ _ _ a h)).
-
-     assert (h1 : f' = succ (get_cons f' b)) by treatFinPure.
-     revert e1 ; rewrite h1 ; intros e1 ; clear h1.
-     
-     (* by looking closely: *)
-     change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
-                  (i (code_Fin1_Sn (lt_n_Sm_le _ _ e1)))).
-     assert (e3: decode_Fin (get_cons f a) <= decode_Fin (get_cons f' b)).
-     treatFinAss.
-     assert (e4 : S (decode_Fin (get_cons f' b)) < n).
-     apply (lt_S_n _ _ e1).
-     change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
-       (i (code_Fin1 e1))).
-     rewrite (IH (fun x : Fin n => i (succ x)) _ _ e3 e4).
-     f_equal.
-     treatFinPure.
+     elim (zerop (decode_Fin f)) ; cbn ; intros a f' h e1.
+     - fold (code_Fin1 e1).
+       f_equal.
+       treatFinPure.
+     - elim (zerop (decode_Fin f')) ; intros b;
+         change (Fin (S (lgti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a))))) in f'.
+       + rewrite b in h.
+         apply False_rec.
+         apply (lt_irrefl _ (lt_le_trans _ _ _ a h)).
+       + assert (h1 : f' = succ (get_cons f' b)) by treatFinPure.
+         revert e1 ; rewrite h1 ; intros e1 ; clear h1.
+         (* by looking closely: *)
+         change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
+                 (i (code_Fin1_Sn (lt_n_Sm_le _ _ e1)))).
+         assert (e3: decode_Fin (get_cons f a) <= decode_Fin (get_cons f' b)).
+         { treatFinAss. }
+         assert (e4 : S (decode_Fin (get_cons f' b)) < n).
+         { apply (lt_S_n _ _ e1). }
+         change ((fcti (extroduce (mkilist (fun x : Fin n => i (succ x))) (get_cons f a)) (get_cons f' b)) =
+                 (i (code_Fin1 e1))).
+         rewrite (IH (fun x : Fin n => i (succ x)) _ _ e3 e4).
+         f_equal.
+         treatFinPure.
    Qed.
 
 (* we want to understand better aux_extroduce_ok2 by help of the following definition *)
@@ -179,10 +170,10 @@ Set Implicit Arguments.
    Proof.
      intros n f.
      induction f as [k|k f IH].
-     reflexivity.
-     simpl.
-     rewrite IH.
-     reflexivity.
+     - reflexivity.
+     - cbn.
+       rewrite IH.
+       reflexivity.
    Qed.
   
    Hint Rewrite weakFin_ok: evalDecode_FinDb.
@@ -234,10 +225,10 @@ Set Implicit Arguments.
      exists f1': Fin (lgti i1), fcti (extroduce i1 f1) f0 = fcti i1 f1'.
    Proof.
     elim (le_lt_dec (decode_Fin f1) (decode_Fin f0)) ; intros a.
-    exists (rewriteFins (eq_sym (extroduce_lgti i1 f1)) (succ f0)).
-    apply extroduce_ok3', a.
-    exists (rewriteFins (eq_sym (extroduce_lgti i1 f1)) (weakFin f0)).
-    apply extroduce_ok2', a.
+    - exists (rewriteFins (eq_sym (extroduce_lgti i1 f1)) (succ f0)).
+      apply extroduce_ok3', a.
+    - exists (rewriteFins (eq_sym (extroduce_lgti i1 f1)) (weakFin f0)).
+      apply extroduce_ok2', a.
    Qed.
  
    Lemma extroduce_ilist_rel (T: Set)(RelT: relation T)(n: nat)(l1 l2 : ilistn T n)
@@ -246,43 +237,41 @@ Set Implicit Arguments.
    Proof.
      intros [h1 H1].
      assert (h2 : lgti (extroduce (mkilist l1) i) = lgti (extroduce (mkilist l2) i)).
-     apply eq_add_S.
-     do 2 rewrite <- extroduce_lgti.
-     reflexivity.
+     { apply eq_add_S.
+       do 2 rewrite <- extroduce_lgti.
+       reflexivity. }
      assert (H1' : forall i, RelT (l1 i) (l2 i)).
-     intros i'.
-     rewrite (decode_Fin_unique _ _ (decode_Fin_match' i' h1)) at 2.
-     apply H1.
+     { intros i'.
+       rewrite (decode_Fin_unique _ _ (decode_Fin_match' i' h1)) at 2.
+       apply H1. }
      clear H1.
-     
      apply (is_ilist_rel _ _ _ h2).
      intro i'.
      elim (le_lt_dec (decode_Fin i) (decode_Fin i')) ; intros a.
-     rewrite extroduce_ok3' ; try assumption.
-     rewrite (decode_Fin_match' i' h2) in a.
-     rewrite extroduce_ok3' ; try assumption.
-     assert (H4 : rewriteFins (Logic.eq_sym (extroduce_lgti (mkilist l2) i)) (succ (rewriteFins h2 i')) = 
-       rewriteFins (eq_sym (extroduce_lgti (mkilist l1) i)) (succ i')).
-     apply decode_Fin_unique.
-     do 2 rewrite <- decode_Fin_match'.
-     simpl.
-     rewrite <- decode_Fin_match'.
-     reflexivity.
-     rewrite H4.
-     apply H1'.
-     
-     rewrite extroduce_ok2' ; try assumption.
-     rewrite (decode_Fin_match' i' h2) in a.
-     rewrite extroduce_ok2' ; try assumption.
-     assert (H4 : rewriteFins (Logic.eq_sym (extroduce_lgti (mkilist l2) i)) (weakFin (rewriteFins h2 i')) = 
-       rewriteFins (eq_sym (extroduce_lgti (mkilist l1) i)) (weakFin i')).
-     apply decode_Fin_unique.
-     do 2 rewrite <- decode_Fin_match'.
-     do 2 rewrite weakFin_ok.
-     rewrite <- decode_Fin_match'.
-     reflexivity.
-     rewrite H4.
-     apply H1'.
+     - rewrite extroduce_ok3' ; try assumption.
+       rewrite (decode_Fin_match' i' h2) in a.
+       rewrite extroduce_ok3' ; try assumption.
+       assert (H4 : rewriteFins (Logic.eq_sym (extroduce_lgti (mkilist l2) i)) (succ (rewriteFins h2 i')) = 
+                    rewriteFins (eq_sym (extroduce_lgti (mkilist l1) i)) (succ i')).
+       { apply decode_Fin_unique.
+         do 2 rewrite <- decode_Fin_match'.
+         cbn.
+         rewrite <- decode_Fin_match'.
+         reflexivity. }
+       rewrite H4.
+       apply H1'.
+     - rewrite extroduce_ok2' ; try assumption.
+       rewrite (decode_Fin_match' i' h2) in a.
+       rewrite extroduce_ok2' ; try assumption.
+       assert (H4 : rewriteFins (Logic.eq_sym (extroduce_lgti (mkilist l2) i)) (weakFin (rewriteFins h2 i')) = 
+                    rewriteFins (eq_sym (extroduce_lgti (mkilist l1) i)) (weakFin i')).
+       { apply decode_Fin_unique.
+         do 2 rewrite <- decode_Fin_match'.
+         do 2 rewrite weakFin_ok.
+         rewrite <- decode_Fin_match'.
+         reflexivity. }
+       rewrite H4.
+       apply H1'.
    Qed.
 
    Lemma extroduce_ilist_rel_bis (T: Set)(RelT: relation T)(l1 l2 : ilist T)
@@ -290,7 +279,7 @@ Set Implicit Arguments.
      ilist_rel RelT (extroduce l1 i) (extroduce l2 (rewriteFins h i)).
    Proof.
      destruct l1 as [n l1] ; destruct l2 as [n2 l2].
-     simpl in i, h.
+     cbn in i, h.
      revert l2 ; rewrite <- h ; clear n2 h ; intros l2 h.
      apply extroduce_ilist_rel, h.
    Qed.
@@ -302,51 +291,49 @@ Set Implicit Arguments.
      destruct l1 as [n l1].
      destruct l2 as [n' l2].
      assert (ii := ilist_rel_lgti Hyp).
-     simpl in ii.
+     cbn in ii.
      revert l2 Hyp.
      rewrite <- ii.
      clear ii.
      intros.
      assert (rewriteFins (ilist_rel_lgti Hyp) i = i).
-     treatFinPure.
-     
-     rewrite H.
-     apply extroduce_ilist_rel.
-     assumption.
+     - treatFinPure.
+     - rewrite H.
+       apply extroduce_ilist_rel.
+       assumption.
    Qed.
 
    Lemma extroduce_imap (T U: Set)(f: T -> U)(l: ilist T)(i: Fin (lgti l)): 
      ilist_rel eq (extroduce (imap f l) i) (imap f (extroduce l i)).
    Proof.
      assert (h: lgti (extroduce (imap f l) i) =  lgti (imap f (extroduce l i))).
-     apply eq_add_S.
-     do 2 rewrite imap_lgti, <- extroduce_lgti.
-     reflexivity.
+     { apply eq_add_S.
+       do 2 rewrite imap_lgti, <- extroduce_lgti.
+       reflexivity. }
      apply (is_ilist_rel _ _ _  h).
      intro i'.
      rewrite imap_apply. 
      elim (le_lt_dec (decode_Fin i) (decode_Fin i')); intros a.
-     rewrite extroduce_ok3'; try assumption.
-     rewrite imap_apply.
-     rewrite extroduce_ok3'.
-     repeat f_equal.
-     treatFinPure.
-     rewrite <- decode_Fin_match' ; assumption.
-
-     rewrite extroduce_ok2' ; try assumption.
-     rewrite imap_apply.
-     rewrite extroduce_ok2'.
-     repeat f_equal.
-     treatFinPure.
-     rewrite <- decode_Fin_match' ; assumption.
+     - rewrite extroduce_ok3'; try assumption.
+       rewrite imap_apply.
+       rewrite extroduce_ok3'.
+       + repeat f_equal.
+         treatFinPure.
+       + rewrite <- decode_Fin_match' ; assumption.
+     - rewrite extroduce_ok2' ; try assumption.
+       rewrite imap_apply.
+       rewrite extroduce_ok2'.
+       + repeat f_equal.
+         treatFinPure.
+       + rewrite <- decode_Fin_match' ; assumption.
    Qed.
 
    Definition extroduce_Fin : forall (n: nat)(fex: Fin (S n))(f: Fin n), Fin (S n).
    Proof.
      intros n fex f.
      elim (le_lt_dec (decode_Fin fex) (decode_Fin f)) ; intros a.
-     exact (succ f).
-     exact (weakFin f).
+     - exact (succ f).
+     - exact (weakFin f).
    Defined.
 
    Lemma extroduce_Fin_not_fex (n: nat)(fex: Fin (S n))(f: Fin n):
@@ -355,16 +342,16 @@ Set Implicit Arguments.
      intros.
      unfold extroduce_Fin; unfold sumbool_rec; unfold sumbool_rect.
      elim (le_lt_dec (decode_Fin fex) (decode_Fin f)) ; intros a; intro Hyp.
-     rewrite <- Hyp in a.
-     simpl in a.
-     apply le_Sn_n in a.
-     assumption.
-     assert (H: decode_Fin (weakFin f) = decode_Fin fex).
-     rewrite Hyp.
-     reflexivity.
-     evalDecode_Fin_Ass H.
-     rewrite H in a.
-     exact (lt_irrefl _ a).
+     - rewrite <- Hyp in a.
+       cbn in a.
+       apply le_Sn_n in a.
+       assumption.
+     - assert (H: decode_Fin (weakFin f) = decode_Fin fex).
+       { rewrite Hyp.
+         reflexivity. }
+       evalDecode_Fin_Ass H.
+       rewrite H in a.
+       exact (lt_irrefl _ a).
    Qed.
 
    Lemma extroduce_lgti_S: forall (T: Set) (n: nat) (i: ilistn T (S n)) (f: Fin(S n)), 
@@ -385,16 +372,16 @@ Set Implicit Arguments.
      unfold extroduce_Fin.
      unfold sumbool_rec ; unfold sumbool_rect.
      elim (le_lt_dec (decode_Fin fex) (decode_Fin f)) ; intros a.
-     assert (h: decode_Fin fex <= 
+     - assert (h: decode_Fin fex <= 
        decode_Fin (rewriteFins (@extroduce_lgti_S T n i fex) f)).
-     treatFin a.
-     rewrite extroduce_ok3'; try assumption.
-     apply (fRel EqT).
-     treatFinPure.
-     rewrite extroduce_ok2'; try assumption.
-     apply (fRel EqT).
-     treatFinPure.
-     treatFinAss.
+       { treatFin a. }
+       rewrite extroduce_ok3'; try assumption.
+       apply (fRel EqT).
+       treatFinPure.
+     - rewrite extroduce_ok2'; try assumption.
+       + apply (fRel EqT).
+         treatFinPure.
+       + treatFinAss.
    Qed.
   
    Corollary extroduce_Fin_ok_cor (T: Set)(n: nat)(i: ilistn T (S n))(fex: Fin (S n))(f: Fin n): 
@@ -411,8 +398,8 @@ Set Implicit Arguments.
    Proof.
      unfold extroduce_Fin, sumbool_rec, sumbool_rect.
      elim (le_lt_dec (decode_Fin iex) (decode_Fin i)) ; intros a.
-     reflexivity.
-     apply False_rec, (lt_irrefl _ (lt_le_trans _ _ _ a h)).
+     - reflexivity.
+     - apply False_rec, (lt_irrefl _ (lt_le_trans _ _ _ a h)).
    Qed.
 
    Lemma extroduce_Fin_ok2  (n: nat)(iex: Fin (S n))(i: Fin n) (h: decode_Fin i < decode_Fin iex): 
@@ -420,8 +407,8 @@ Set Implicit Arguments.
    Proof.
      unfold extroduce_Fin, sumbool_rec, sumbool_rect.
      elim (le_lt_dec (decode_Fin iex) (decode_Fin i)) ; intros a.
-     apply False_rec, (lt_irrefl _ (lt_le_trans _ _ _ h a)).
-     reflexivity.
+     - apply False_rec, (lt_irrefl _ (lt_le_trans _ _ _ h a)).
+     - reflexivity.
    Qed.
 
    Definition index_in_extroduce (n: nat)(fex: Fin (S n))(f: Fin (S n)): 
@@ -429,13 +416,13 @@ Set Implicit Arguments.
    Proof.
      intros.
      elim (lt_eq_lt_dec  (decode_Fin fex) (decode_Fin f)) ; intros a.
-     destruct a as [a|a].
-     exact (get_cons f (lt_n_m_0 a)).
-     (* idea: f is a successor, hence one can take its predecessor in Fin n *)
-     apply False_rec.
-     exact (H a).
-     exact (code_Fin1 (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ (decode_Fin_inf_n fex)))).
-     (* idea: f < fex, hence f(!) can be strenghtened to be in Fin n *)
+     - destruct a as [a|a].
+       + exact (get_cons f (lt_n_m_0 a)).
+         (* idea: f is a successor, hence one can take its predecessor in Fin n *)
+       + apply False_rec.
+         exact (H a).
+     - exact (code_Fin1 (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ (decode_Fin_inf_n fex)))).
+       (* idea: f < fex, hence f(!) can be strenghtened to be in Fin n *)
    Defined.
 
    Lemma index_in_extroduce_decode1 (n: nat)(fex: Fin (S n))(f: Fin (S n))(Hyp1:
@@ -446,12 +433,12 @@ Set Implicit Arguments.
      unfold index_in_extroduce.
      unfold sumor_rec ; unfold sumor_rect.
      elim (lt_eq_lt_dec  (decode_Fin fex) (decode_Fin f)) ; intros a.
-     destruct a as [a|a].
-     treatFinPure.
-     apply False_rec.
-     apply (Hyp1 a).
-     apply False_rec.
-     apply (lt_asym _ _ a Hyp2).
+     - destruct a as [a|a].
+       + treatFinPure.
+       + apply False_rec.
+         apply (Hyp1 a).
+     - apply False_rec.
+       apply (lt_asym _ _ a Hyp2).
    Qed.
 
    Lemma index_in_extroduce_decode2 (n: nat)(fex: Fin (S n))(f: Fin (S n))(Hyp1:
@@ -462,12 +449,12 @@ Set Implicit Arguments.
      unfold index_in_extroduce.
      unfold sumor_rec ; unfold sumor_rect.
      elim (lt_eq_lt_dec  (decode_Fin fex) (decode_Fin f)) ; intros a.
-     destruct a as [a|a].
-     apply False_rec.
-     apply (lt_asym _ _ a Hyp2).
-     apply False_rec.
-     apply (Hyp1 a).
-     treatFinPure.
+     - destruct a as [a|a].
+       + apply False_rec.
+         apply (lt_asym _ _ a Hyp2).
+       + apply False_rec.
+         apply (Hyp1 a).
+     - treatFinPure.
    Qed.
     
    Lemma index_in_extroduce_decode3 (n: nat)(fex: Fin (S n))(f: Fin (S n))(Hyp1:
@@ -475,14 +462,14 @@ Set Implicit Arguments.
    Proof.
      intros.
      elim (lt_eq_lt_dec  (decode_Fin fex) (decode_Fin f)) ; intros a.
-     destruct a as [a|a].
-     rewrite <- (index_in_extroduce_decode1 fex f Hyp1 a).
-     auto.
-     apply False_rec.
-     apply (Hyp1 a).
-     rewrite index_in_extroduce_decode2.
-     auto.
-     assumption.
+     - destruct a as [a|a].
+       + rewrite <- (index_in_extroduce_decode1 fex f Hyp1 a).
+         auto.
+       + apply False_rec.
+         apply (Hyp1 a).
+     - rewrite index_in_extroduce_decode2.
+       + auto.
+       + assumption.
    Qed.
     
    Lemma index_in_extroduce_decode4 (n: nat)(fex: Fin (S n))(f: Fin (S n))(Hyp1:
@@ -509,16 +496,16 @@ Set Implicit Arguments.
      unfold index_in_extroduce.
      unfold sumor_rec ; unfold sumor_rect.
      elim (lt_eq_lt_dec  (decode_Fin fex) (decode_Fin f)) ; try intros [a|a] ; try intros a.
-     rewrite (extroduce_ok3' (mkilist i)).
-     apply (fRel EqT).
-     treatFinPure.
-     treatFinAss.
-     apply False_rec.
-     exact (H a).
-     rewrite (extroduce_ok2' (mkilist i)).
-     apply (fRel EqT).
-     treatFinAss.
-     treatFinAss.
+     - rewrite (extroduce_ok3' (mkilist i)).
+       + apply (fRel EqT).
+         treatFinPure.
+       + treatFinAss.
+     - apply False_rec.
+       exact (H a).
+     - rewrite (extroduce_ok2' (mkilist i)).
+       + apply (fRel EqT).
+         treatFinAss.
+       + treatFinAss.
    Qed.
     
    Corollary index_in_extroduce_ok_cor (T: Set)(n: nat)(i: ilistn T (S n))(fex: Fin (S n))(f: Fin (S n))
@@ -555,31 +542,31 @@ Set Implicit Arguments.
      unfold index_in_extroduce.
      unfold sumor_rec ; unfold sumor_rect.
      elim (lt_eq_lt_dec  (decode_Fin(rewriteFins (sym_eq Hyp) fex)) (decode_Fin f)) ; intros a.
-     destruct a as [a|a].
-     set (fnew := get_cons f (lt_n_m_0 a)).
-     assert (fnew_ok: decode_Fin f = S (decode_Fin fnew)).
-     unfold fnew.
-     treatFinPure.
-     rewrite (extroduce_ok3' (mkilist i)).
-     apply (fRel EqT).
-     treatFinAss.
-     evalDecode_Fin.
-     apply lt_n_Sm_le.
-     rewrite <- fnew_ok.
-     treatFin a.
-     apply False_rec.
-     exact (H a).
-     set (fnew := code_Fin1 (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ 
-       (decode_Fin_inf_n (rewriteFins (sym_eq Hyp) fex))))).
-     assert (fnew_ok: decode_Fin f = decode_Fin fnew).
-     unfold fnew.
-     treatFinPure.
-     rewrite (extroduce_ok2' (mkilist i)).
-     apply (fRel EqT).
-     treatFinAss.
-     evalDecode_Fin.
-     rewrite <- fnew_ok.
-     treatFin a.
+     - destruct a as [a|a].
+       + set (fnew := get_cons f (lt_n_m_0 a)).
+         assert (fnew_ok: decode_Fin f = S (decode_Fin fnew)).
+         { unfold fnew.
+           treatFinPure. }
+         rewrite (extroduce_ok3' (mkilist i)).
+         * apply (fRel EqT).
+           treatFinAss.
+         * evalDecode_Fin.
+           apply lt_n_Sm_le.
+           rewrite <- fnew_ok.
+           treatFin a.
+       + apply False_rec.
+         exact (H a).
+     - set (fnew := code_Fin1 (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ 
+         (decode_Fin_inf_n (rewriteFins (sym_eq Hyp) fex))))).
+       assert (fnew_ok: decode_Fin f = decode_Fin fnew).
+       { unfold fnew.
+         treatFinPure. }
+       rewrite (extroduce_ok2' (mkilist i)).
+       + apply (fRel EqT).
+         treatFinAss.
+       + evalDecode_Fin.
+         rewrite <- fnew_ok.
+         treatFin a.
    Qed.
 
    Corollary index_in_extroduce_ok'_cor (T: Set)(n: nat)(i: ilist T)(Hyp: S n = lgti i)(fex: Fin (lgti i))
@@ -598,12 +585,12 @@ Set Implicit Arguments.
    Proof. 
      apply decode_Fin_unique. 
      elim (lt_eq_lt_dec (decode_Fin i1) (decode_Fin i2)) ; try intros [d|d] ; try intros d.
-     apply eq_add_S.
-     rewrite index_in_extroduce_decode1, index_in_extroduce_decode1 ; try assumption.
-     reflexivity.
-     contradiction h1.
-     rewrite index_in_extroduce_decode2, index_in_extroduce_decode2 ; try assumption.
-     reflexivity.
+     - apply eq_add_S.
+       rewrite index_in_extroduce_decode1, index_in_extroduce_decode1 ; try assumption.
+       reflexivity.
+     - contradiction h1.
+     - rewrite index_in_extroduce_decode2, index_in_extroduce_decode2 ; try assumption.
+       reflexivity.
    Qed.
 
    Lemma index_in_extroduce_weakFin (n: nat) (i1: Fin (S n)) (i2: Fin n)(h: decode_Fin i1 <> decode_Fin (weakFin i2)): 
@@ -621,11 +608,11 @@ Set Implicit Arguments.
    Proof.
      intros h2.
      apply decode_Fin_unique.
-     simpl.
+     cbn.
      apply index_in_extroduce_decode1.
      destruct (le_lt_or_eq _ _ (le_trans _ _ _ h2 (index_in_extroduce_decode3 i1 i2 a)))  as [e|e].
-     assumption.
-     contradiction e.
+     - assumption.
+     - contradiction e.
    Qed. 
 
    Lemma index_in_extroduce_weakFin2 (n: nat)(i1 i2: Fin (S n))(a : decode_Fin i1 <> decode_Fin i2) : 
@@ -636,9 +623,9 @@ Set Implicit Arguments.
      rewrite weakFin_ok.
      apply index_in_extroduce_decode2.
      destruct (le_lt_or_eq _ _ (le_trans _ _ _ (index_in_extroduce_decode4 i1 i2 a) (lt_le_S _ _ h2)))  as [e|e].
-     assumption.
-     contradiction a.
-     symmetry ; assumption.
+     - assumption.
+     - contradiction a.
+       symmetry ; assumption.
    Qed. 
    
    Lemma index_in_extroduce_succ2 (n: nat) (i1: Fin (S n)) (i2: Fin n)(h: decode_Fin i1 <> decode_Fin (succ i2)): 
@@ -656,14 +643,13 @@ Set Implicit Arguments.
    Proof.
      apply decode_Fin_unique.
      elim (not_eq _ _ h) ; intros a.
-     rewrite extroduce_Fin_ok1.
-     apply index_in_extroduce_decode1 ; try assumption.
-     apply gt_S_le.
-     rewrite index_in_extroduce_decode1; assumption.
-     
-     rewrite extroduce_Fin_ok2, weakFin_ok.
-     apply index_in_extroduce_decode2 ; try assumption.
-     rewrite index_in_extroduce_decode2; assumption.
+     - rewrite extroduce_Fin_ok1.
+       + apply index_in_extroduce_decode1 ; try assumption.
+       + apply gt_S_le.
+         rewrite index_in_extroduce_decode1; assumption.
+     - rewrite extroduce_Fin_ok2, weakFin_ok.
+       + apply index_in_extroduce_decode2 ; try assumption.
+       + rewrite index_in_extroduce_decode2; assumption.
    Qed.
   
    Lemma decode_Fin_extroduce_Fin_neq (n: nat)(iex: Fin (S n))(i: Fin n): 
@@ -671,28 +657,27 @@ Set Implicit Arguments.
    Proof.
      unfold extroduce_Fin, sumbool_rec, sumbool_rect.
      elim (le_lt_dec (decode_Fin iex) (decode_Fin i)) ; intros a h ; rewrite h in a.
-     apply (le_Sn_n _ a).
-     rewrite weakFin_ok in a.
-     apply (lt_irrefl _ a).
+     - apply (le_Sn_n _ a).
+     - rewrite weakFin_ok in a.
+       apply (lt_irrefl _ a).
    Defined.
 
    Lemma index_in_from_extroduce (n: nat)(iex: Fin (S n))(i: Fin n)
      (h: decode_Fin iex <> decode_Fin (extroduce_Fin iex i)) : index_in_extroduce _ _ h = i.
    Proof.
      revert h ; elim (le_lt_dec (decode_Fin iex) (decode_Fin i)) ; intros a.
-     rewrite extroduce_Fin_ok1 ; try assumption.
-     intros h.
-     apply decode_Fin_unique, eq_add_S.
-     apply index_in_extroduce_decode1.
-     apply le_lt_n_Sm, a.
-     
-     rewrite extroduce_Fin_ok2 ; try assumption.
-     intros h.
-     apply decode_Fin_unique.
-     rewrite index_in_extroduce_decode2.
-     apply weakFin_ok.
-     rewrite weakFin_ok.
-     assumption.
+     - rewrite extroduce_Fin_ok1 ; try assumption.
+       intros h.
+       apply decode_Fin_unique, eq_add_S.
+       apply index_in_extroduce_decode1.
+       apply le_lt_n_Sm, a.
+     - rewrite extroduce_Fin_ok2 ; try assumption.
+       intros h.
+       apply decode_Fin_unique.
+       rewrite index_in_extroduce_decode2.
+       + apply weakFin_ok.
+       + rewrite weakFin_ok.
+         assumption.
    Qed.
 
    Lemma extroduce_interchange_aux (T : Set)(n : nat)(i : ilistn T (S n))
@@ -708,6 +693,7 @@ Set Implicit Arguments.
    Qed.
 
    Require Import Lia.
+   
    Definition extroduce_interchange_statement_eq: Prop :=
      forall (T : Set)(n : nat)(i : ilistn T (S n))
        (f f': Fin (S n))(a : decode_Fin f <> decode_Fin f')(a' : decode_Fin f' <> decode_Fin f),
@@ -787,38 +773,37 @@ Set Implicit Arguments.
       ilist_rel eq (iappend (left_sib l i) (right_sib l i)) (extroduce l i).
     Proof.
       assert (h : lgti (iappend (left_sib l i) (right_sib l i)) = lgti (extroduce l i)).
-      rewrite iappend_lgti.
-      apply eq_add_S.
-      rewrite left_sib_right_sib_lgti.
-      apply extroduce_lgti.
+      { rewrite iappend_lgti.
+        apply eq_add_S.
+        rewrite left_sib_right_sib_lgti.
+        apply extroduce_lgti. }
       apply (is_ilist_rel _ _ _ h).
       intros i'.
       elim (le_lt_dec (decode_Fin i) (decode_Fin (rewriteFins h i'))) ; intros a.
-      rewrite extroduce_ok3' ; try assumption.
-      rewrite <- (left_sib_lgti l i) in a.
-      rewrite <- decode_Fin_match', (decode_Fin_match' i' (iappend_lgti (left_sib l i) (right_sib l i))) in a.
-      rewrite (iappend_right _ _ _ a).
-      simpl .
-      f_equal.
-      apply decode_Fin_unique.
-      unfold rightFin.
-      do 2 rewrite decode_code1_Id.
-      rewrite le_plus_minus_r ; try assumption.
-      do 2 rewrite <- decode_Fin_match'.
-      simpl.
-      rewrite <- decode_Fin_match'.
-      reflexivity.
-      
-      rewrite extroduce_ok2'; try assumption.
-      rewrite <- (left_sib_lgti l i), <- decode_Fin_match' in a.
-      rewrite (iappend_left _ _ _ a).
-      simpl fcti at 1.
-      f_equal.
-      apply decode_Fin_unique.
-      do 2 rewrite decode_code1_Id.
-      rewrite <- decode_Fin_match'.
-      rewrite weakFin_ok.
-      apply decode_Fin_match'.
+      - rewrite extroduce_ok3' ; try assumption.
+        rewrite <- (left_sib_lgti l i) in a.
+        rewrite <- decode_Fin_match', (decode_Fin_match' i' (iappend_lgti (left_sib l i) (right_sib l i))) in a.
+        rewrite (iappend_right _ _ _ a).
+        cbn.
+        f_equal.
+        apply decode_Fin_unique.
+        unfold rightFin.
+        do 2 rewrite decode_code1_Id.
+        rewrite le_plus_minus_r ; try assumption.
+        do 2 rewrite <- decode_Fin_match'.
+        cbn.
+        rewrite <- decode_Fin_match'.
+        reflexivity.
+      - rewrite extroduce_ok2'; try assumption.
+        rewrite <- (left_sib_lgti l i), <- decode_Fin_match' in a.
+        rewrite (iappend_left _ _ _ a).
+        simpl fcti at 1.
+        f_equal.
+        apply decode_Fin_unique.
+        do 2 rewrite decode_code1_Id.
+        rewrite <- decode_Fin_match'.
+        rewrite weakFin_ok.
+        apply decode_Fin_match'.
     Qed.
     
     Lemma left_right_sib_extroduce_bis (T: Set)(l : ilist T)(i: Fin (lgti l)): 
@@ -829,8 +814,8 @@ Set Implicit Arguments.
       unfold ilist2list.
       assert (H3 : makeListFin (lgti (extroduce l i)) = map (rewriteFins H1) 
       (makeListFin (lgti (iappend (left_sib l i) (right_sib l i))))).
-      rewrite <- H1.
-      apply sym_eq, map_id.
+      { rewrite <- H1.
+        apply sym_eq, map_id. }
       rewrite H3.
       rewrite map_map.
       apply map_ext.
