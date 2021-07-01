@@ -1,6 +1,3 @@
-(** PermsLists.v Version 1.2 February 2012 *)
-(** runs under V8.3, tested with 8.3pl2 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
