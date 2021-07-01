@@ -1143,7 +1143,7 @@ Defined.
 
 Lemma three_nodes_graph_bis_not_hasCycle: not (hasCycle (@eq _) three_nodes_graph_bis).
 Proof.
-  intros [[f H |f H]| f H];
+  intros [[f  |f ]| f ];
   elim (zerop (decode_Fin f)) ; intros a ;
   try assert (h:= (le_antisym _ _ (gt_S_le _ _ (decode_Fin_inf_n f)) (gt_le_S _ _ a))) ;
   try assert (h := a) ; 
@@ -1152,10 +1152,10 @@ Proof.
     f = succ (first 0)) ; 
   simpl in f, H ; rewrite H2 in H; clear f h H2 a;
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e) ; 
-  try (destruct H as [f' H | f' H] ;
+  try (destruct H as [f' | f'] ;
   rewrite (Fin_first_1 f') in H ; clear f' ; 
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e)) ; 
-  try (destruct H as [[f H| f H] |f H] ; simpl in H ; rewrite (Fin_first_1 f) in H ; 
+  try (destruct H as [[f H | f H] |f H] ; simpl in H ; rewrite (Fin_first_1 f) in H ; 
     clear f) ; 
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e) ; 
   try (destruct H as [[f H| f H] | f H] ; inversion f) ; 

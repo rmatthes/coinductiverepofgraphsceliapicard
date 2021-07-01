@@ -1346,11 +1346,11 @@ Section IlistPerm_ind.
     Lemma IlistPerm3Cert_list_eq (n: nat)(c: IlistPerm3Cert_list n)(H: n = n) : 
       c = rewriteIlistPerm3Cert_list H c.
     Proof.
-      induction n as [|n IH] ; destruct c as [[i1 i2] c].
-      reflexivity.
-      simpl.
-      f_equal ; try f_equal ; try treatFinPure.
-      apply IH.
+      induction n as [|n IH]. 
+      - destruct c; reflexivity.
+      - destruct c as [[i1 i2] c]. simpl.
+        f_equal ; try f_equal ; try treatFinPure.
+        apply IH.
     Qed.
 
     Lemma rewriteIlistPerm3Cert_list_proofirr: forall (n1 n2: nat)(e1 e2: n1 = n2)

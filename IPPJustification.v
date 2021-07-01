@@ -18,7 +18,7 @@ Require Import Logic.ChoiceFacts. (* this does not assume choice axioms but only
 
 Set Implicit Arguments.
 
-Fixpoint FinIndex (n: nat)(e: Fin n): nat :=
+Definition FinIndex (n: nat)(e: Fin n): nat :=
   match e with first m => m | @succ m e' => m end.
 
 (* an interactive definition: *)

@@ -61,7 +61,7 @@ Section AllGraphs_def_tools.
   
   CoFixpoint G2AG (g: Graph T) : AllGraph := mk_Graph (Some (label g)) (imap G2AG (sons g)).
   
-  CoFixpoint FG2AG (lg : ForestGr) : AllGraph := mk_Graph None (list2ilist (map G2AG lg)).
+  Definition FG2AG (lg : ForestGr) : AllGraph := mk_Graph None (list2ilist (map G2AG lg)).
   
   Definition FGeq (R: relation T) : relation ForestGr := permut1 (GPPerm R).
   

@@ -88,7 +88,7 @@ Section Tools_lists.
       (* definition of the maximum of a list of natural numbers *)
       Definition max_list_nat (l: list nat) : nat := max_list_nat_aux 0 l.
       
-      Fixpoint max_list_nat' (l: list nat): nat := 
+      Definition max_list_nat' (l: list nat): nat := 
         fold_left max l 0.
         
       Lemma max_list_nat_max_list_nat': forall (l: list nat), max_list_nat l = max_list_nat' l.

@@ -474,7 +474,7 @@ Section GeqPerm.
    Lemma TeqPermn_antitone (g1 g2: Graph T)(m n: nat)(Hyp: m <= n):
      TeqPermn n g1 g2 -> TeqPermn m g1 g2.
    Proof. 
-     induction Hyp as [_ | n H1 IH]; intro H2.
+     induction Hyp as [| n H1 IH]; intro H2.
      assumption.
      apply IH.
      apply TeqPermn_Sn_n, H2.
