@@ -1,6 +1,3 @@
-(** Fin.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -35,22 +32,22 @@ Proof.
   apply IlistPerm3nil.
 
   assert (h: length l1 < lgti (list2ilist (l1 ++ b :: l2))).
-  simpl.
+  cbn.
   rewrite app_length.
   apply lt_plus_S.
   apply (IlistPerm3_cons _ _ (first _ : Fin (lgti (list2ilist (a :: l)))) (code_Fin1 h)).
   do 2 rewrite <- (list2ilist_nth2 _ _ b).
+  fold (length l).
   rewrite decode_code1_Id.
-  simpl decode_Fin.
-  simpl nth.
   rewrite (app_nth2 _ _ b (le_refl _)).
   rewrite minus_diag.
   assumption.
 
   assert (H3 : ilist_rel eq (list2ilist l) (extroduce (list2ilist (a :: l)) (first _))).
   simpl.
-  apply (is_ilist_rel _ _ _ (eq_refl _ : lgti (list2ilist l) = lgti (mkilist (fun x => nth (decode_Fin x) l a)))).
-  simpl in *|-*.
+  set (Hyp1 := refl_equal _ : lgti (list2ilist l) = lgti (mkilist (fun x => nth (decode_Fin x) l a))).
+  apply (is_ilist_rel eq _ _ Hyp1).
+  cbn in *|-*.
   intro i.
   symmetry. 
   apply (list2ilist_nth2 l).

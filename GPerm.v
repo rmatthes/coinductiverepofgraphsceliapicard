@@ -1,6 +1,3 @@
-(** GPerm.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -451,8 +448,7 @@ Section GeqPerm.
      simpl in *|-*.
      split.
      assumption.
-     unfold TeqPermn.
-     apply IlistPerm3_imap_back.
+     apply (IlistPerm3_imap_back(f1:=Graph2TreeG n)(f2:=Graph2TreeG n)).
      assumption.
    Qed.
 
@@ -478,7 +474,7 @@ Section GeqPerm.
    Lemma TeqPermn_antitone (g1 g2: Graph T)(m n: nat)(Hyp: m <= n):
      TeqPermn n g1 g2 -> TeqPermn m g1 g2.
    Proof. 
-     induction Hyp as [m | n H1 IH]; intro H2.
+     induction Hyp as [_ | n H1 IH]; intro H2.
      assumption.
      apply IH.
      apply TeqPermn_Sn_n, H2.

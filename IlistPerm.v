@@ -1,6 +1,3 @@
-(** IlistPerm.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -1276,8 +1273,7 @@ Section IlistPerm_ind.
       right.
       intro H.
       inversion H.
-      try(rewrite H3, H4 in H2) ; clear i1 i2 H0 H3 H4.
-      simpl lgti in H2 ; simpl fcti in H2.
+      clear H0 H3 H4 i1 i2.
       destruct (H2 (first n1)) as [i [H3 _]].
       apply H1.
       exists i ; assumption.
@@ -1753,7 +1749,6 @@ Section IlistPerm_ind.
       rewrite <- IlistPerm3Cert_list_eq.
       intros i2' h4.
       do 2 rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' _ _)).
-      inversion h.
       apply (IH _ _ _ h3'), h3.
     Qed.
 
