@@ -47,7 +47,7 @@ Section Fin_def_tools.
   Lemma Fin_S_pred : forall n: nat, n > 0 -> Fin n = Fin (S (pred n)).
   Proof.
     intros n h.
-    rewrite <-(S_pred n 0 h). 
+    rewrite <- (S_pred n 0 h). 
     reflexivity.
   Qed.    
 
@@ -61,8 +61,8 @@ Section Fin_def_tools.
   Proof.
     intros n f.
     induction f as [ n | n f IHf].
-    apply gt_Sn_O.
-    apply (gt_n_S _ _ IHf).
+    - apply gt_Sn_O.
+    - apply (gt_n_S _ _ IHf).
   Defined.
 
   Definition decode_Fin_S_gt_O: 
@@ -102,14 +102,14 @@ Section Fin_def_tools.
   Definition code_fin1_aux_def: forall n m: nat, m <= n -> 
     {f: Fin (S n) & code_Fin1_aux n m = Some f}.
   Proof.
-    induction n as [ | n IHn]; intros m H ; destruct m as [ | m]; simpl.
-    exists (first 0); reflexivity.
-    destruct (le_Sn_O m H).
-    exists (first (S n)); reflexivity.
-    destruct (IHn m (le_S_n _ _ H)) as [f0 eq].
-    exists (succ f0).
-    rewrite eq.
-    reflexivity.
+    induction n as [ | n IHn]; intros m H ; destruct m as [ | m]; cbn.
+    - exists (first 0); reflexivity.
+    - destruct (le_Sn_O m H).
+    - exists (first (S n)); reflexivity.
+    - destruct (IHn m (le_S_n _ _ H)) as [f0 eq].
+      exists (succ f0).
+      rewrite eq.
+      reflexivity.
   Defined.
 
   Definition code_Fin1_Sn (n m: nat)(h: m<=n): Fin (S n) := 
@@ -147,13 +147,13 @@ Section Fin_def_tools.
     intros n m.
     revert n.
     induction m as [ | m IHm]; intros n h1 h2.
-    do 2 rewrite code_Fin1_Sn_0.
-    reflexivity.
-    destruct n as [ | n].
-    inversion h1.
-    do 2 rewrite code_Fin1_Sn_S.
-    f_equal.
-    apply IHm.
+    - do 2 rewrite code_Fin1_Sn_0.
+      reflexivity.
+    - destruct n as [ | n].
+      + inversion h1.
+      + do 2 rewrite code_Fin1_Sn_S.
+        f_equal.
+        apply IHm.
   Qed.
 
   Lemma code_Fin1_Sn_proofirr2 : forall (n m1 m2:nat)(h1:m1<=n)(h2:m2<=n)(e: m1=m2),
@@ -162,18 +162,18 @@ Section Fin_def_tools.
     induction n as [| n IHn]; 
     intros m1 m2 h1 h2 e;
     destruct m1 as [|m1]; destruct m2 as [|m2].
-    do 2 rewrite code_Fin1_Sn_0.
-    reflexivity.
-    destruct (O_S m2 e).
-    destruct (O_S m1 (sym_eq e)).
-    inversion h1.
-    do 2 rewrite code_Fin1_Sn_0.
-    reflexivity.
-    destruct (O_S m2 e).
-    destruct (O_S m1 (sym_eq e)).
-    do 2 rewrite code_Fin1_Sn_S.
-    f_equal.
-    apply (IHn _ _ _ _ (eq_add_S m1 m2 e)).
+    - do 2 rewrite code_Fin1_Sn_0.
+      reflexivity.
+    - destruct (O_S m2 e).
+    - destruct (O_S m1 (sym_eq e)).
+    - inversion h1.
+    - do 2 rewrite code_Fin1_Sn_0.
+      reflexivity.
+    - destruct (O_S m2 e).
+    - destruct (O_S m1 (sym_eq e)).
+    - do 2 rewrite code_Fin1_Sn_S.
+      f_equal.
+      apply (IHn _ _ _ _ (eq_add_S m1 m2 e)).
   Qed.
 
   Lemma code_Fin1_0_: forall (n:nat)(h:0<S n), code_Fin1 h = first n.
@@ -187,12 +187,12 @@ Section Fin_def_tools.
   Proof.
     intros n m h.
     destruct n as [|n].
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h)).
-    simpl.
-    rewrite code_Fin1_Sn_S.
-    f_equal.
-    apply code_Fin1_Sn_proofirr.
+    - apply False_rec.
+      apply (le_Sn_O _ (gt_S_le _ _ h)).
+    - cbn.
+      rewrite code_Fin1_Sn_S.
+      f_equal.
+      apply code_Fin1_Sn_proofirr.
   Qed.
 
   Lemma code_Fin1_proofirr : forall (n m:nat)(h1 h2:m< S n),
@@ -213,15 +213,15 @@ Section Fin_def_tools.
     intros f Hyp0 HypS.
     induction n as [|n IHn]; 
     intros m h.
-    inversion h.
-    induction m as [|m IHm].
-    rewrite Hyp0.
-    rewrite code_Fin1_0_.
-    reflexivity.
-    rewrite HypS.
-    rewrite code_Fin1_S.
-    f_equal.
-    apply IHn.
+    - inversion h.
+    - induction m as [|m IHm].
+      + rewrite Hyp0.
+        rewrite code_Fin1_0_.
+        reflexivity.
+      + rewrite HypS.
+        rewrite code_Fin1_S.
+        f_equal.
+        apply IHn.
   Qed.
 
   Lemma Fin_0_empty: forall f: Fin 0, False.
@@ -235,11 +235,10 @@ Section Fin_def_tools.
   Proof.
     induction n as [|n IHn];
     intros m h.
-    apply False_rec; apply (lt_n_O _ h).
-
-    destruct m as [| m].
-    exact (first n).
-    exact (succ (IHn m (lt_S_n m n h))).
+    - apply False_rec; apply (lt_n_O _ h).
+    - destruct m as [| m].
+      + exact (first n).
+      + exact (succ (IHn m (lt_S_n m n h))).
   Defined. 
 
   (* We prove the lemmas needed to be able to apply code_Fin1_char in order
@@ -261,35 +260,34 @@ Section Fin_def_tools.
     intros n m.
     revert n.
     induction m as [|m IHm]; intros n h1 h2.
-    reflexivity.
-    destruct n as [|n].
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h1)).
-    do 2 rewrite code_Fin2_S.
-    f_equal.
-    apply IHm.
+    - reflexivity.
+    - destruct n as [|n].
+      + apply False_rec.
+        apply (le_Sn_O _ (gt_S_le _ _ h1)).
+      + do 2 rewrite code_Fin2_S.
+        f_equal.
+        apply IHm.
   Qed.
 
   (* We finally prove that code_Fin1 = code_Fin2 *)
   Lemma code1_code2_eq: forall (n m: nat)(h:m<n), code_Fin1 h = code_Fin2 h.
   Proof.
     induction n as [|n IHn].
-    inversion h.
-    destruct m as [|m]; intro h.
-    rewrite (code_Fin2_0 h).
-    simpl.
-    rewrite code_Fin1_Sn_0.
-    reflexivity.
-
-    rewrite (code_Fin2_S h).
-    simpl.
-    destruct n as [|n].
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h)).
-    rewrite code_Fin1_Sn_S.
-    f_equal.
-    rewrite <- (IHn m (lt_S_n m (S n) h)).
-    apply code_Fin1_Sn_proofirr.
+    - inversion h.
+    - destruct m as [|m]; intro h.
+      + rewrite (code_Fin2_0 h).
+        cbn.
+        rewrite code_Fin1_Sn_0.
+        reflexivity.
+      + rewrite (code_Fin2_S h).
+        cbn.
+        destruct n as [|n].
+        * apply False_rec.
+          apply (le_Sn_O _ (gt_S_le _ _ h)).
+        * rewrite code_Fin1_Sn_S.
+          f_equal.
+          rewrite <- (IHn m (lt_S_n m (S n) h)).
+          apply code_Fin1_Sn_proofirr.
   Qed.
   
   (* Alternative proof using code_Fin1_char *)
@@ -305,39 +303,38 @@ Section Fin_def_tools.
   Lemma code1_decode_Id: forall (n: nat)(f: Fin n), 
     (code_Fin1 (decode_Fin_inf_n f)) = f.
   Proof.
-    induction f as [k | k f IHf]; simpl.
-    rewrite code_Fin1_Sn_0; reflexivity.
-    destruct k as [|k].
-    inversion f.
-    rewrite code_Fin1_Sn_S.
-    f_equal.
-    transitivity (code_Fin1_Sn
+    induction f as [k | k f IHf]; cbn.
+    - rewrite code_Fin1_Sn_0; reflexivity.
+    - destruct k as [|k].
+      + inversion f.
+      + rewrite code_Fin1_Sn_S.
+        f_equal.
+        transitivity (code_Fin1_Sn
         (lt_n_Sm_le (decode_Fin f) k (decode_Fin_inf_n f))); try assumption.
-    apply code_Fin1_Sn_proofirr.
+        apply code_Fin1_Sn_proofirr.
   Qed.
 
   Lemma decode_code1_Id: forall (n m: nat)(h: m < n), 
     decode_Fin (code_Fin1 h) = m.
   Proof.
     induction n as [|n IHn].
-    inversion h.
-    unfold code_Fin1.
-    destruct m as [|m]. 
-    inversion h ; 
-    rewrite code_Fin1_Sn_0 ;
-    reflexivity.
-    
-    destruct n as [|n];
-    intro h.
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h)).
-    rewrite code_Fin1_Sn_S.
-    simpl.
-    f_equal.
-    rewrite (code_Fin1_Sn_proofirr 
-      (le_S_n m n (lt_n_Sm_le (S m) (S n) h)) 
-                  (lt_n_Sm_le m n (lt_S_n m (S n) h))).
-    apply (IHn m (lt_S_n m (S n) h)).
+    - inversion h.
+    - unfold code_Fin1.
+      destruct m as [|m]. 
+      + inversion h ; 
+          rewrite code_Fin1_Sn_0 ;
+          reflexivity.
+      + destruct n as [|n];
+          intro h.
+        * apply False_rec.
+          apply (le_Sn_O _ (gt_S_le _ _ h)).
+        * rewrite code_Fin1_Sn_S.
+          cbn.
+          f_equal.
+          rewrite (code_Fin1_Sn_proofirr 
+                     (le_S_n m n (lt_n_Sm_le (S m) (S n) h)) 
+                     (lt_n_Sm_le m n (lt_S_n m (S n) h))).
+          apply (IHn m (lt_S_n m (S n) h)).
   Qed.
 
   (* Third definition of code_Fin *)
@@ -346,21 +343,19 @@ Section Fin_def_tools.
   Proof.
     induction n as [|n IHn]; 
     intros x h.
-    apply False_rec; inversion h.
-    
-    elim (lt_eq_lt_dec x n) ; intros a.
-    clear h.
-    inversion_clear a as [H | H].
-    assert (H0 := IHn x H).
-    exact (succ H0).
-    exact (first n).
-    
-    apply False_rec.
-    inversion h as [e | y irr].
-    rewrite e in a.
-    apply (lt_irrefl _ a).
-    apply (lt_irrefl x (lt_trans x (S x) x (lt_n_Sn x)
-                                        (le_lt_trans (S x) n x irr a))).
+    - apply False_rec; inversion h.
+    - elim (lt_eq_lt_dec x n) ; intros a.
+      + clear h.
+        inversion_clear a as [H | H].
+        * assert (H0 := IHn x H).
+          exact (succ H0).
+        * exact (first n).
+      + apply False_rec.
+        inversion h as [e | y irr].
+        * rewrite e in a.
+          apply (lt_irrefl _ a).
+        * apply (lt_irrefl x (lt_trans x (S x) x (lt_n_Sn x)
+                                       (le_lt_trans (S x) n x irr a))).
   Defined.
 
   (* Proof of lemmmas on the auxiliary definition *)
@@ -372,13 +367,13 @@ Section Fin_def_tools.
     code_Fin3_aux (lt_n_Sn n) = first n.
   Proof.
     intros n.
-    simpl.
+    cbn.
     unfold sumor_rec ; unfold sumor_rect.
     elim (lt_eq_lt_dec n n); intro a.
     destruct a as [H | _].
     apply False_rec; apply (lt_irrefl n H).
-    reflexivity.
-    apply False_rec; apply (lt_irrefl n a).
+    - reflexivity.
+    - apply False_rec; apply (lt_irrefl n a).
   Qed.
 
   Lemma code_Fin3_aux_0: forall (n:nat)(h:0< S n),
@@ -386,16 +381,16 @@ Section Fin_def_tools.
   Proof.
     intros n h.
     induction n as [|n IHn].
-    reflexivity.
-    simpl.
-    simpl in IHn.
-    rewrite IHn.
-    f_equal.
-    elim n.
-    reflexivity.
-    intros n0 _.
-    f_equal.
-    apply code_Fin2_proofirr.
+    - reflexivity.
+    - cbn.
+      cbn in IHn.
+      rewrite IHn.
+      f_equal.
+      elim n.
+      + reflexivity.
+      + intros n0 _.
+        f_equal.
+        apply code_Fin2_proofirr.
   Qed.
  
   Lemma code_Fin3_aux_S : forall (m n:nat)(h: S m < S n),
@@ -404,23 +399,23 @@ Section Fin_def_tools.
   Proof.
     intros m n h.
     destruct n as [|n].
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h)).
-    simpl.
-    unfold sumor_rec ; unfold sumor_rect.
-    elim (lt_eq_lt_dec m (S n)); intros a.
-    destruct a as [H|H]; simpl.
-    f_equal.
-    elim (lt_eq_lt_dec m n); intros a.
-    destruct a as [H0|H0]; simpl;
-    reflexivity.
-    apply False_rec.
-    apply (lt_irrefl _ (le_lt_trans _ _ _ (lt_le_S _ _ a) H)).
-    apply False_rec.
-    rewrite H in h.
-    apply (lt_irrefl _ h).
-    apply False_rec.
-    apply (lt_irrefl _ (lt_trans _ _ _ (lt_n_S _ _ a) h)).
+    - apply False_rec.
+      apply (le_Sn_O _ (gt_S_le _ _ h)).
+    - simpl.
+      unfold sumor_rec ; unfold sumor_rect.
+      elim (lt_eq_lt_dec m (S n)); intros a.
+      + destruct a as [H|H]; simpl.
+        f_equal.
+        elim (lt_eq_lt_dec m n); intros a.
+        * destruct a as [H0|H0]; simpl;
+            reflexivity.
+        * apply False_rec.
+          apply (lt_irrefl _ (le_lt_trans _ _ _ (lt_le_S _ _ a) H)).
+        * apply False_rec.
+          rewrite H in h.
+          apply (lt_irrefl _ h).
+      + apply False_rec.
+        apply (lt_irrefl _ (lt_trans _ _ _ (lt_n_S _ _ a) h)).
   Qed.
 
   Lemma code_Fin3_aux_proofirr: forall (n m:nat)(h1 h2:m < S n),
@@ -428,59 +423,57 @@ Section Fin_def_tools.
   Proof.
     intros n m h1 h2.
     elim (lt_eq_lt_dec m n); intros a.
-    destruct a as [H|e].
-    destruct n as [|n].
-    inversion H.
-    simpl.
-    destruct m as [|m].
-    reflexivity.
-    elim (lt_eq_lt_dec m n); intros a.
-    destruct a as [H0|H0].
-    elim (lt_eq_lt_dec (S m) (S n)); intros a.
-    reflexivity.
-    apply False_rec.
-    apply (lt_irrefl _ (lt_trans _ _ _ a H)).
-    elim (lt_eq_lt_dec (S m) (S n)); intros a.
-    reflexivity.
-    apply False_rec.
-    apply (lt_irrefl _ (lt_trans _ _ _ a H)).
-    elim (lt_eq_lt_dec (S m) (S n)); intros b.
-    reflexivity.
-    apply False_rec.
-    apply (lt_irrefl _ (lt_trans _ _ _ b H)).
-
-    destruct n as [|n]; destruct m as [|m].
-    reflexivity.
-    inversion e.
-    inversion e.
-    simpl.
-    elim (lt_eq_lt_dec m n); intros a.
-    destruct a as [H|H].
-    apply False_rec.
-    apply lt_n_S in H.
-    rewrite e in H.
-    apply (lt_irrefl _ H).
-    reflexivity.
-    apply False_rec.
-    apply lt_n_S in a.
-    rewrite e in a.
-    apply (lt_irrefl _ a).
-
-    destruct n as [|n]; destruct m as [|m].
-    apply False_rec.
-    apply (lt_irrefl _ a).
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h2)).
-    inversion a.
-    simpl.
-    elim (lt_eq_lt_dec m n); intros b.
-    destruct b as [H|H] ; reflexivity.
-    apply False_rec.
-    inversion a as [e | x H e].
-    rewrite e in h2.
-    apply (lt_irrefl _ h2).
-    apply (lt_irrefl _ (lt_trans _ _ _ (lt_n_Sn _) 
-                                       (lt_le_trans _ _ _ h2 H))).
+    - destruct a as [H|e].
+      + destruct n as [|n].
+        * inversion H.
+        * cbn.
+          destruct m as [|m].
+          -- reflexivity.
+          -- elim (lt_eq_lt_dec m n); intros a.
+             ++ destruct a as [H0|H0].
+                ** elim (lt_eq_lt_dec (S m) (S n)); intros a.
+                   { reflexivity. }
+                   apply False_rec.
+                   apply (lt_irrefl _ (lt_trans _ _ _ a H)).
+                ** elim (lt_eq_lt_dec (S m) (S n)); intros a.
+                   { reflexivity. }
+                   apply False_rec.
+                   apply (lt_irrefl _ (lt_trans _ _ _ a H)).
+                   ++ elim (lt_eq_lt_dec (S m) (S n)); intros b.
+                      { reflexivity. }
+                      apply False_rec.
+                      apply (lt_irrefl _ (lt_trans _ _ _ b H)).
+      + destruct n as [|n]; destruct m as [|m].
+        * reflexivity.
+        * inversion e.
+        * inversion e.
+        * simpl.
+          elim (lt_eq_lt_dec m n); intros a.
+          -- destruct a as [H|H].
+             ++ apply False_rec.
+                apply lt_n_S in H.
+                rewrite e in H.
+                apply (lt_irrefl _ H).
+             ++ reflexivity.
+          -- apply False_rec.
+             apply lt_n_S in a.
+             rewrite e in a.
+             apply (lt_irrefl _ a).
+    - destruct n as [|n]; destruct m as [|m].
+      + apply False_rec.
+        apply (lt_irrefl _ a).
+      + apply False_rec.
+        apply (le_Sn_O _ (gt_S_le _ _ h2)).
+      + inversion a.
+      + simpl.
+        elim (lt_eq_lt_dec m n); intros b.
+        * destruct b as [H|H] ; reflexivity.
+        * apply False_rec.
+          inversion a as [e | x H e].
+          -- rewrite e in h2.
+             apply (lt_irrefl _ h2).
+          -- apply (lt_irrefl _ (lt_trans _ _ _ (lt_n_Sn _) 
+                                          (lt_le_trans _ _ _ h2 H))).
   Qed.
 
   (* Proof of the lemmas on code_Fin3 in order to prove the 
@@ -490,14 +483,14 @@ Section Fin_def_tools.
     intros n h.
     unfold code_Fin3; simpl.
     destruct n as [|n].
-    reflexivity.
+    { reflexivity. }
     elim (lt_eq_lt_dec (S n - 0) (S n)); intros a.
-    destruct a as [H|H].
-    apply False_rec.
-    apply (lt_irrefl _ H).
-    reflexivity.
-    apply False_rec.
-    apply (lt_irrefl _ a).
+    - destruct a as [H|H].
+      + apply False_rec.
+        apply (lt_irrefl _ H).
+      + reflexivity.
+    - apply False_rec.
+      apply (lt_irrefl _ a).
   Qed.
 
   Lemma code_Fin3_S: forall (n m:nat)(h:S m<S n),
@@ -506,36 +499,36 @@ Section Fin_def_tools.
     intros n m h.
     unfold code_Fin3.
     destruct n as [|n].
-    apply False_rec.
-    apply (le_Sn_O _ (gt_S_le _ _ h)).
-    elim (lt_eq_lt_dec (S n - S m) (S n)); intros a.
-    destruct a as [H|H].
-    simpl.
-    unfold sumor_rec; unfold sumor_rect.
-    elim (lt_eq_lt_dec (n - m) (S n)); intros a.
-    destruct a as [H0|H0].
-    elim (lt_eq_lt_dec (n - m) n); intros a;
-    [reflexivity | apply False_rec].
-    inversion H0 as [H2 | x H2 H3].
-    rewrite H2 in a.
-    apply (lt_irrefl _ a).
-    apply lt_n_S in a.
-    apply le_lt_n_Sm in H2.
-    apply (lt_irrefl _ (lt_trans _ _ _ a H2)).
-    apply False_rec.
-    rewrite <- Sn_Sm_eq_n_m in H0.
-    rewrite H0 in H.
-    apply (lt_irrefl _ H).
-    apply False_rec.
-    rewrite <- Sn_Sm_eq_n_m in a.
-    apply (lt_irrefl _ (lt_trans _ _ _ a H)).
-    apply False_rec.
-    apply (lt_n_Sm_le (S m) (S n)) in h.
-    apply (minus_reg_l h) in H.
-    inversion H.
-    apply False_rec.
-    apply (lt_irrefl _ (lt_trans _ _ _ a 
-      (lt_minus _ _ (lt_n_Sm_le (S m) (S n) h) (lt_O_Sn m)))).
+    - apply False_rec.
+      apply (le_Sn_O _ (gt_S_le _ _ h)).
+    - elim (lt_eq_lt_dec (S n - S m) (S n)); intros a.
+      + destruct a as [H|H].
+        * simpl.
+          unfold sumor_rec; unfold sumor_rect.
+          elim (lt_eq_lt_dec (n - m) (S n)); intros a.
+          -- destruct a as [H0|H0].
+             ++ elim (lt_eq_lt_dec (n - m) n); intros a;
+                  [reflexivity | apply False_rec].
+                inversion H0 as [H2 | x H2 H3].
+                ** rewrite H2 in a.
+                   apply (lt_irrefl _ a).
+                ** apply lt_n_S in a.
+                   apply le_lt_n_Sm in H2.
+                   apply (lt_irrefl _ (lt_trans _ _ _ a H2)).
+             ++ apply False_rec.
+                rewrite <- Sn_Sm_eq_n_m in H0.
+                rewrite H0 in H.
+                apply (lt_irrefl _ H).
+          -- apply False_rec.
+             rewrite <- Sn_Sm_eq_n_m in a.
+             apply (lt_irrefl _ (lt_trans _ _ _ a H)).
+        * apply False_rec.
+          apply (lt_n_Sm_le (S m) (S n)) in h.
+          apply (minus_reg_l h) in H.
+          inversion H.
+      + apply False_rec.
+        apply (lt_irrefl _ (lt_trans _ _ _ a 
+                   (lt_minus _ _ (lt_n_Sm_le (S m) (S n) h) (lt_O_Sn m)))).
   Qed.    
 
   Lemma code1_code3_eq: 
@@ -553,13 +546,13 @@ Section Fin_def_tools.
     rewrite <- (code1_decode_Id f1);
     rewrite <- (code1_decode_Id f2).
     destruct n as [|n].
-    inversion f1.
-    assert (h1 := decode_Fin_inf_n f1).
-    rewrite (code_Fin1_proofirr _ h1).
-    revert h1.
-    rewrite h.
-    intros h1.
-    apply code_Fin1_proofirr.
+    - inversion f1.
+    - assert (h1 := decode_Fin_inf_n f1).
+      rewrite (code_Fin1_proofirr _ h1).
+      revert h1.
+      rewrite h.
+      intros h1.
+      apply code_Fin1_proofirr.
   Qed.
 
   Lemma decode_Fin_0_first: 
@@ -574,31 +567,31 @@ Section Fin_def_tools.
   Definition mkFinn : forall (n: nat), Fin (S n).
   Proof.
     intros n ; induction n as [|n IH].
-    exact (first 0).
-    exact (succ IH).
+    - exact (first 0).
+    - exact (succ IH).
   Defined.
 
   Lemma decode_Fin_mkFinn_n : forall n, decode_Fin (mkFinn n) = n.
   Proof.
     induction n as [|n IH].
-    reflexivity.
-    simpl.
-    rewrite IH ; reflexivity.
+    - reflexivity.
+    - simpl.
+      rewrite IH ; reflexivity.
   Qed.
 
   Definition get_cons: forall (n: nat) (f: Fin (S n))(h: decode_Fin f > 0), Fin n.
   Proof.
     intros n f h.
     elim (O_or_S (decode_Fin f)); intro a.
-    destruct a as [x e].
-    assert (H: x < n).
-    apply lt_S_n.
-    rewrite e.
-    apply (decode_Fin_inf_n f).
-    exact (code_Fin1 H).
-    rewrite a in h.
-    apply False_rec.
-    apply (lt_irrefl _ h).
+    - destruct a as [x e].
+      assert (H: x < n).
+      { apply lt_S_n.
+        rewrite e.
+        apply (decode_Fin_inf_n f). }
+      exact (code_Fin1 H).
+    - rewrite a in h.
+      apply False_rec.
+      apply (lt_irrefl _ h).
   Defined.
 
   Lemma get_cons_ok: forall (n: nat)(f: Fin n), 
@@ -606,11 +599,11 @@ Section Fin_def_tools.
   Proof.
     intros n f.
     destruct n as [|n].
-    inversion f.
-    rewrite <- code1_decode_Id.
-    unfold get_cons.
-    simpl.
-    apply code_Fin1_proofirr.
+    - inversion f.
+    - rewrite <- code1_decode_Id.
+      unfold get_cons.
+      cbn.
+      apply code_Fin1_proofirr.
   Qed.
 
   Lemma get_cons_proofirr: forall (n: nat) (f: Fin (S n))(h h': decode_Fin f > 0), 
@@ -620,7 +613,7 @@ Section Fin_def_tools.
     apply decode_Fin_unique.
     unfold get_cons, sumor_rec, sumor_rect.
     elim (O_or_S (decode_Fin f)) ; intros b.
-    reflexivity.
+    { reflexivity. }
     apply False_rec.
     rewrite <- b in h.
     inversion h.
@@ -632,10 +625,10 @@ Section Fin_def_tools.
     rewrite <- (code1_decode_Id f).
     assert (h:= decode_Fin_inf_n f) ; rewrite (code_Fin1_proofirr _ h).
     elim (zerop (decode_Fin f)); intros a.
-    revert h ; rewrite a; intro h.
-    apply code_Fin1_0_.
-    apply False_rec. 
-    apply (lt_irrefl _ (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ h))).
+    - revert h ; rewrite a; intro h.
+      apply code_Fin1_0_.
+    - apply False_rec. 
+      apply (lt_irrefl _ (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ h))).
   Qed.
 
   Lemma decode_Fin_get_cons: forall (n: nat)(f: Fin (S n))(h: decode_Fin f > 0), 
@@ -643,15 +636,15 @@ Section Fin_def_tools.
   Proof.
     intros n f h.
     unfold get_cons.
-    simpl.
+    cbn.
     unfold sumor_rec ; unfold sumor_rect.
     elim (O_or_S (decode_Fin f)) ; [intros [m h1] | intros a].
-    rewrite decode_code1_Id.
-    rewrite h1.
-    reflexivity.
-    apply False_rec.
-    rewrite a in h.
-    apply (lt_irrefl _ h).
+    - rewrite decode_code1_Id.
+      rewrite h1.
+      reflexivity.
+    - apply False_rec.
+      rewrite a in h.
+      apply (lt_irrefl _ h).
   Qed.
 
   Lemma get_cons_ok1 (n: nat)(i: Fin (S n))(h: 0 < decode_Fin i) : 
@@ -672,8 +665,8 @@ Section Fin_def_tools.
     Proof.
       intros n.
       induction n as [|n IHn].
-      exact nil.
-      exact (cons (first n) (map (succ (k:= n)) IHn )).
+      - exact nil.
+      - exact (cons (first n) (map (succ (k:= n)) IHn )).
     Defined.
 
     Fixpoint makeListFin' (n: nat): list (Fin n):= 
@@ -692,22 +685,22 @@ Section Fin_def_tools.
     Proof.
       intros n.
       induction n as [|n IHn].
-      reflexivity.
-      rewrite <- IHn at 3.
-      simpl.
-      rewrite map_length.
-      reflexivity.
+      - reflexivity.
+      - rewrite <- IHn at 3.
+        cbn.
+        rewrite map_length.
+        reflexivity.
     Qed.
     
     Lemma all_Fin_n_in_makeListFin : forall (n: nat),
       forall f: Fin n, In f (makeListFin n).
     Proof.
       intros n f.
-      induction f as [k | k f IHf] ; simpl.
-      left; reflexivity.
-      right.
-      apply in_map.
-      apply IHf.
+      induction f as [k | k f IHf] ; cbn.
+      - left; reflexivity.
+      - right.
+        apply in_map.
+        apply IHf.
     Qed.
 	
     Lemma nth_makeListFin: forall (n m: nat)(h: m < n),
@@ -715,19 +708,19 @@ Section Fin_def_tools.
     Proof.
       induction n as [|n IHn]; 
       intros m h.
-      inversion h.
-      destruct m as [|m].
-      apply code_Fin1_Sn_0.
-      simpl.
-      destruct n as [|n].
-      apply False_rec.
-      apply (le_Sn_O _ (gt_S_le _ _ h)).
-      rewrite code_Fin1_Sn_S.
-      rewrite map_nth.
-      f_equal.
-      unfold code_Fin1 in IHn.
-      rewrite (code_Fin1_Sn_proofirr _ (lt_n_Sm_le m n (lt_S_n _ _ h))).
-      apply IHn.
+      - inversion h.
+      - destruct m as [|m].
+        + apply code_Fin1_Sn_0.
+        + cbn.
+          destruct n as [|n].
+          * apply False_rec.
+            apply (le_Sn_O _ (gt_S_le _ _ h)).
+          * rewrite code_Fin1_Sn_S.
+            rewrite map_nth.
+            f_equal.
+            unfold code_Fin1 in IHn.
+            rewrite (code_Fin1_Sn_proofirr _ (lt_n_Sm_le m n (lt_S_n _ _ h))).
+            apply IHn.
     Qed.
 
     Lemma nth_makeListFin_def: forall (n m: nat)(h: m < n)(d: Fin n),
@@ -735,9 +728,9 @@ Section Fin_def_tools.
     Proof.
       intros n m h f.
       rewrite (nth_indep (makeListFin n) f (code_Fin1 h)).
-      apply nth_makeListFin.
-      rewrite makeListFin_nb_elem_ok.
-      assumption.
+      - apply nth_makeListFin.
+      - rewrite makeListFin_nb_elem_ok.
+        assumption.
     Qed.
 
     Lemma makeListFin_S: forall n: nat, 
@@ -848,8 +841,8 @@ Section Fin_injectivity.
   Proof.
     intros i.
     elim (zerop (decode_Fin (f (succ i)))) ; intros a.
-    exact (get_cons _ (first_succ_neq H i a)).
-    exact (get_cons _ a).
+    - exact (get_cons _ (first_succ_neq H i a)).
+    - exact (get_cons _ a).
   Defined.
 
   Lemma FSnFSn'_FnFn'_ok1 (n n' : nat)(f: Fin (S n) -> Fin (S n'))
@@ -859,8 +852,8 @@ Section Fin_injectivity.
   Proof.
      unfold FSnFSn'_FnFn', sumbool_rec, sumbool_rect.
      elim (zerop (decode_Fin (f (succ i)))) ; intros a.
-     apply get_cons_proofirr.
-     apply False_rec, (lt_0_neq _ a), sym_eq, H1.
+     - apply get_cons_proofirr.
+     - apply False_rec, (lt_0_neq _ a), sym_eq, H1.
   Qed.
 
   Lemma FSnFSn'_FnFn'_ok2 (n n' : nat)(f: Fin (S n) -> Fin (S n'))
@@ -869,8 +862,8 @@ Section Fin_injectivity.
   Proof.
      unfold FSnFSn'_FnFn', sumbool_rec, sumbool_rect.
      elim (zerop (decode_Fin (f (succ i)))) ; intros a.
-     apply False_rec, (lt_0_neq _ H1), sym_eq, a.
-     apply get_cons_proofirr.
+     - apply False_rec, (lt_0_neq _ H1), sym_eq, a.
+     - apply get_cons_proofirr.
   Qed.
 
   Lemma FSnFSn'_FnFn'_proofirr (n n' : nat)(f: Fin (S n) -> Fin (S n'))
@@ -879,10 +872,10 @@ Section Fin_injectivity.
   Proof.
     intros i.
     elim (zerop (decode_Fin (f (succ i)))) ; intros a.
-    rewrite (FSnFSn'_FnFn'_ok1 H1 _ a), (FSnFSn'_FnFn'_ok1 H2 _ a).
-    apply get_cons_proofirr.
-    rewrite (FSnFSn'_FnFn'_ok2 H1 _ a), (FSnFSn'_FnFn'_ok2 H2 _ a).
-    apply get_cons_proofirr.
+    - rewrite (FSnFSn'_FnFn'_ok1 H1 _ a), (FSnFSn'_FnFn'_ok1 H2 _ a).
+      apply get_cons_proofirr.
+    - rewrite (FSnFSn'_FnFn'_ok2 H1 _ a), (FSnFSn'_FnFn'_ok2 H2 _ a).
+      apply get_cons_proofirr.
   Qed.
 
   Lemma succ_inj (n: nat)(i1 i2 : Fin n) : succ i1 = succ i2 -> i1 = i2.
@@ -900,24 +893,23 @@ Section Fin_injectivity.
   Proof.
     intros i ; destruct H1 as [H1 H3].
     elim (zerop (decode_Fin (f (succ i)))) ; intros a.
-    rewrite (FSnFSn'_FnFn'_ok1 _ _ a).
-    assert (b : decode_Fin (g (succ (get_cons (f (first n)) 
-      (first_succ_neq (conj H1 H3) i a)))) = 0).
-    rewrite get_cons_ok1, H1.
-    reflexivity.
-    rewrite (FSnFSn'_FnFn'_ok1 _ _ b).
-    apply succ_inj.
-    rewrite get_cons_ok1, <- (H1 (succ i)).
-    f_equal.
-    apply decode_Fin_unique, sym_eq, a.
-
-    rewrite (FSnFSn'_FnFn'_ok2 _ _ a).
-    assert (b : decode_Fin (g (succ (get_cons (f (succ i)) a))) > 0).
-    rewrite (get_cons_ok1 _ a), H1.
-    apply lt_0_Sn.
-    rewrite (FSnFSn'_FnFn'_ok2 _ _ b).
-    revert b ; rewrite (get_cons_ok1 _ a), H1 ; intros b.
-    apply get_cons_ok2.
+    - rewrite (FSnFSn'_FnFn'_ok1 _ _ a).
+      assert (b : decode_Fin (g (succ (get_cons (f (first n)) 
+                         (first_succ_neq (conj H1 H3) i a)))) = 0).
+      { rewrite get_cons_ok1, H1.
+        reflexivity. }
+      rewrite (FSnFSn'_FnFn'_ok1 _ _ b).
+      apply succ_inj.
+      rewrite get_cons_ok1, <- (H1 (succ i)).
+      f_equal.
+      apply decode_Fin_unique, sym_eq, a.
+    - rewrite (FSnFSn'_FnFn'_ok2 _ _ a).
+      assert (b : decode_Fin (g (succ (get_cons (f (succ i)) a))) > 0).
+      { rewrite (get_cons_ok1 _ a), H1.
+        apply lt_0_Sn. }
+      rewrite (FSnFSn'_FnFn'_ok2 _ _ b).
+      revert b ; rewrite (get_cons_ok1 _ a), H1 ; intros b.
+      apply get_cons_ok2.
   Qed.
 
   Lemma FSnFSn'_FnFn'_bij(n n' : nat)(f: Fin (S n) -> Fin (S n'))
@@ -933,15 +925,14 @@ Section Fin_injectivity.
   Bijective f g -> n = n'.
   Proof.
     induction n as [|n IH] ; intros [|n'] f g H.
-    reflexivity.
-    assert (i := g (first n')).
-    inversion i.
-    assert (i := f (first n)).
-    inversion i.
-  
-    f_equal.
-    apply (IH _ (FSnFSn'_FnFn' H) (FSnFSn'_FnFn' (Bij_sym H))).
-    apply FSnFSn'_FnFn'_bij.
+    - reflexivity.
+    - assert (i := g (first n')).
+      inversion i.
+    - assert (i := f (first n)).
+      inversion i.
+    - f_equal.
+      apply (IH _ (FSnFSn'_FnFn' H) (FSnFSn'_FnFn' (Bij_sym H))).
+      apply FSnFSn'_FnFn'_bij.
   Defined.
 
   Definition FnFn' (n n' : nat)(H : Fin n = Fin n')(i : Fin n) := 
@@ -957,7 +948,6 @@ Section Fin_injectivity.
   Lemma FnFn'_Fn'Fn_inv (n n' : nat)(H : Fin n = Fin n') : 
     forall i, FnFn' H (FnFn' (sym_eq H) i) = i.
   Proof.
-    
     unfold FnFn' ; rewrite H.
     reflexivity.
   Qed.
@@ -975,8 +965,8 @@ Section minus_Fin.
 Definition minusFin (n: nat)(i: Fin n): nat.
 Proof.
   induction i as [n|n i IH].
-  exact n.
-  exact IH.
+  - exact n.
+  - exact IH.
 Defined.
 
 Lemma minusFin1 (n: nat) : @minusFin (S n) (first n) = n.
@@ -992,16 +982,16 @@ Qed.
 Lemma minusFin3 (n: nat) : @minusFin (S n) (code_Fin1 (lt_n_Sn n)) = 0.
 Proof.
   induction n as [|n IH].
-  reflexivity.
-  assert (H1 : code_Fin1 (lt_n_Sn (S n)) = succ (code_Fin1 (lt_n_Sn n))).
-  apply decode_Fin_unique.
-  change (decode_Fin (code_Fin1 (lt_n_Sn (S n))) =
-  S (decode_Fin (code_Fin1 (lt_n_Sn n)))).
-  do 2 rewrite decode_code1_Id.
-  reflexivity.
-  rewrite H1.
-  rewrite  minusFin2.
-  assumption.
+  - reflexivity.
+  - assert (H1 : code_Fin1 (lt_n_Sn (S n)) = succ (code_Fin1 (lt_n_Sn n))).
+    { apply decode_Fin_unique.
+      change (decode_Fin (code_Fin1 (lt_n_Sn (S n))) =
+              S (decode_Fin (code_Fin1 (lt_n_Sn n)))).
+      do 2 rewrite decode_code1_Id.
+      reflexivity. }
+    rewrite H1.
+    rewrite  minusFin2.
+    assumption.
 Qed.
 
 End minus_Fin.
