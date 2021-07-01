@@ -1,5 +1,5 @@
-(** IlistMult.v Version 0.9.3 January 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** IlistMult.v Version 0.9.3.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -41,10 +41,10 @@ Section ilistnMult_def_tools.
     {l: ilistn T i | PropMult inf sup i}.
 
   Definition fctin  (inf: nat)(sup: option nat)(i: nat)
-    (l: ilistnMult inf sup i) : ilistn T i := projS1 l.
+    (l: ilistnMult inf sup i) : ilistn T i := proj1_sig l.
     
   Definition propin (inf: nat)(sup: option nat)(i: nat)
-    (l: ilistnMult inf sup i): PropMult inf sup i := projS2 l.
+    (l: ilistnMult inf sup i): PropMult inf sup i := proj2_sig l.
 
 End ilistnMult_def_tools.
 
@@ -372,7 +372,7 @@ Section Bij_ilistMult_list.
 
   Lemma list2ilistM_nth: 
     forall (n: nat)(l: list T)(h: n < length l)(t: T) (p: PropMult inf sup _),
-    comp (nth n l t) (projS1 (fctiMult (list2ilistM l p)) 
+    comp (nth n l t) (proj1_sig (fctiMult (list2ilistM l p)) 
       (code_Fin1 (inf_length_lgtiM l h p))).
   Proof.
     destruct n as [|n]; intros l h t p;

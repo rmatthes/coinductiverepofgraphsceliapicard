@@ -1,5 +1,5 @@
-(** IPPJustification.v Version 1.0 February 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** IPPJustification.v Version 1.0.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Ralph Matthes and Celia Picard, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -21,8 +21,17 @@ Require Import Logic.ChoiceFacts. (* this does not assume choice axioms but only
 
 Set Implicit Arguments.
 
+Definition FinIndex (n: nat)(e: Fin n): nat.
+Proof.
+  destruct e.
+  exact k.
+  exact k.
+Defined.
+
+(* in Coq 8.4, the following was possible:
 Fixpoint FinIndex (n: nat)(e: Fin n): nat :=
-  match e with first m => m | succ m e' => m end. 
+  match e with first m => m | succ m e' => m end.
+*)
 
 Lemma FinIndexOk (n: nat)(e: Fin n):
   n = S (FinIndex e).
@@ -69,7 +78,7 @@ Qed.
 Definition FinCasesAux (A: Type)(a: A)(n: nat)(f: Fin (n-1) -> A): Fin n -> A.
 Proof.
   intro e.
-  refine ((match e in Fin k return (Fin (k-1) -> A) -> A with first _ => fun _ => a | succ _ e' => _ end) f).
+  refine ((match e in Fin k return (Fin (k-1) -> A) -> A with first _ => fun _ => a | succ e' => _ end) f).
   intro f'.
   rewrite SkAux in f'.
   exact (f' e').

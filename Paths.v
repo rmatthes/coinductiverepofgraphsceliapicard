@@ -1,5 +1,5 @@
-(** Paths.v Version 1.2 February 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** Paths.v Version 1.2.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -39,9 +39,9 @@ Section GeqPath.
       assert (sn1 : ilistn (Graph nat) 2).
       set (n11 := mk_Graph 4 (inil _)).
       set (n10 := mk_Graph 3 (singleton  n11)).
-      exact (fun f => match f with first _ => n10 | succ _ _ => n11 end).
+      exact (fun f => match f with first _ => n10 | succ _ => n11 end).
       apply (@mkilist _ 2 (fun f => match f with first _ => mk_Graph 1 (singleton n00) | 
-        succ _ _ => mk_Graph 2 (mkilist sn1) end)).
+        succ _ => mk_Graph 2 (mkilist sn1) end)).
     Defined.
     
     Lemma label_path_test1 : label_path nil graph_test = Some 0.

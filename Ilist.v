@@ -1,5 +1,5 @@
 (** Ilist.v Version 1.5 January 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** runs under V8.4beta, tested with version 8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -773,6 +773,42 @@ Section ilist_def_tools.
       rewrite length_ilist2list; try assumption.
     Qed.
       
+    Lemma iappend_ilist_rel (X: Set)(RelX : relation X)(ls ls' rs rs': ilist X): 
+      ilist_rel RelX ls ls' -> ilist_rel RelX rs rs' -> 
+      ilist_rel RelX (iappend ls rs) (iappend ls' rs').
+    Proof.
+      intros [h1 H1] [h2 H2].
+      assert (h3 : lgti (iappend ls rs) = lgti (iappend ls' rs')).
+      do 2 rewrite iappend_lgti.
+      rewrite h1, h2.
+      reflexivity.
+      apply (is_ilist_rel _ _ _ h3).
+      intro i.
+      elim (le_lt_dec (lgti ls) (decode_Fin i)) ; intros a ; assert (b := a); 
+      rewrite (decode_Fin_match' i h3), h1 in b.
+      rewrite (decode_Fin_match' i (iappend_lgti ls rs)) in a.
+      rewrite (iappend_right _ _ _ a).
+      rewrite (decode_Fin_match' _ (iappend_lgti ls' rs')) in b. 
+      rewrite (iappend_right _ _ _ b).
+      assert (H3 : rightFin (lgti rs') (rewriteFins (iappend_lgti ls' rs') (rewriteFins h3 i)) b = 
+        rewriteFins h2 (rightFin (lgti rs) (rewriteFins (iappend_lgti ls rs) i) a)).
+      apply decode_Fin_unique.
+      rewrite <- decode_Fin_match'.
+      apply (plus_reg_l _ _ (lgti ls')).
+      rewrite plus_comm, rightFin_decode_Fin, <- decode_Fin_match', <- decode_Fin_match'.
+      rewrite <- h1.
+      rewrite plus_comm, rightFin_decode_Fin, <- decode_Fin_match'.
+      reflexivity.
+      rewrite H3.
+      apply H2.
+      
+      rewrite (iappend_left _ _ _ a).
+      rewrite (iappend_left _ _ _ b).
+      assert (H3 : code_Fin1 b = rewriteFins h1 (code_Fin1 a)) by treatFinPure.
+      rewrite H3.
+      apply H1.
+    Qed.
+
   End iappend.
 
 
@@ -1222,6 +1258,33 @@ Section manip_ilist.
     rewrite map_map.
     reflexivity.
   Qed.
+
+  Lemma iappend_icons_ilist_rel_cor (X: Set)(RelX : relation X)(ls ls' rs rs': ilist X)(x x': X): 
+    ilist_rel RelX ls ls' -> ilist_rel RelX rs rs' -> RelX x x' -> 
+    ilist_rel (RelX) (iappend ls (icons x rs)) (iappend ls' (icons x' rs')).
+  Proof.
+    intros H1 [h H2] H3.
+    apply iappend_ilist_rel.
+    apply H1.
+    assert (h' : lgti (icons x rs) = lgti (icons x' rs')).
+    simpl.
+    f_equal; assumption.
+    apply (is_ilist_rel _ _ _ h').
+    intro i.
+    elim (zerop (decode_Fin i)) ; intros a.
+    rewrite (decode_Fin_0_first _ a).
+    assert (H4 : rewriteFins h' (first (lgti rs)) = first (lgti rs')) by treatFinPure.
+    rewrite H4.
+    assumption.
+    rewrite <- (get_cons_ok1 _ a).
+    assert (H4 : rewriteFins h' (succ (get_cons i a)) = succ (rewriteFins h (get_cons i a))).
+    apply decode_Fin_unique.
+    simpl.
+    do 2 rewrite <- decode_Fin_match'.
+    reflexivity.
+    rewrite H4.
+    apply H2.
+  Qed.
   
     
 End manip_ilist.
@@ -1339,7 +1402,231 @@ Qed.
       apply left_sib_right_sib.
     Qed.
 
+    Lemma left_sib_right_sib_cor': forall (X: Set)(RelX : relation X)(Rrefl : Reflexive RelX)(l: ilist X)
+      (i: Fin (lgti l)),  ilist_rel RelX l (iappend (left_sib l i) (icons (fcti l i) (right_sib l i))).
+    Proof.
+      intros X RelX Rrefl l i.
+      assert (h : lgti l = lgti (iappend (left_sib l i) (icons (fcti l i) (right_sib l i)))).
+      rewrite iappend_lgti.
+      change (lgti (icons (fcti l i) (right_sib l i))) with (S (lgti (right_sib l i))).
+      rewrite <- plus_n_Sm.
+      rewrite left_sib_right_sib_lgti.
+      reflexivity.
+      apply (is_ilist_rel _ _ _ h).
+      intro i'.
+      elim (le_lt_dec (lgti (left_sib l i)) (decode_Fin i') ) ; intros a.
+      rewrite (decode_Fin_match' i' h), (decode_Fin_match' _   (iappend_lgti _ _)) in a.
+      rewrite (iappend_right _ _ _ a).
+      set (i1 := rightFin (lgti (icons (fcti l i) (right_sib l i))) (rewriteFins
+        (iappend_lgti (left_sib l i) (icons (fcti l i) (right_sib l i))) (rewriteFins h i')) a).
+      elim (zerop (decode_Fin i1)) ; intros b.
+      rewrite (decode_Fin_0_first _ b).
+      simpl.
+      assert (i = i').
+      apply decode_Fin_unique.
+      simpl in a.
+      assert (H1 := rightFin_decode_Fin _ _ a).
+      do 2 rewrite <- decode_Fin_match' in H1.
+      rewrite <- H1.
+      change (decode_Fin i = decode_Fin i1 + decode_Fin i).
+      rewrite b.
+      symmetry.
+      apply plus_O_n.
+      rewrite H.
+      apply Rrefl.
+      
+      rewrite <- (get_cons_ok1 _ b).
+      change (RelX (fcti l i') (fcti (right_sib l i) (get_cons i1 b))).
+      simpl.
+      assert (i' = (code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (get_cons _ b)))
+           (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n i)))))).
+      apply decode_Fin_unique.
+      rewrite decode_code1_Id.
+      rewrite plus_Sn_m, plus_n_Sm.
+      rewrite <- decode_Fin_get_cons.
+      change (decode_Fin i) with (lgti (left_sib l i)).
+      unfold i1.
+      rewrite plus_comm.
+      rewrite rightFin_decode_Fin.
+      do 2 rewrite <- decode_Fin_match'.
+      reflexivity.
+      rewrite H.
+      apply Rrefl.
+
+      rewrite (decode_Fin_match' i' h) in a.
+      rewrite (iappend_left _ _ _ a).
+      simpl.
+      assert (code_Fin1 (lt_trans _ _ _ (decode_Fin_inf_n (code_Fin1 a)) (decode_Fin_inf_n i)) = i').
+      apply decode_Fin_unique.
+      do 2 rewrite decode_code1_Id.
+      apply sym_eq, decode_Fin_match'.
+      rewrite <- H at 1.
+      apply Rrefl.
+    Qed.
+
+    Lemma left_sib_ilist_rel (X: Set)(RelX : relation X)(xs xs': ilist X)(i: Fin (lgti xs))(h: lgti xs = lgti xs'): 
+      ilist_rel RelX xs xs' -> ilist_rel RelX (left_sib xs i) (left_sib xs' (rewriteFins h i)).
+    Proof.
+      intros [h1 H1].
+      assert (h2 : lgti (left_sib xs i) = lgti (left_sib xs' (rewriteFins h i))).
+      apply decode_Fin_match'.
+      apply (is_ilist_rel _ _ _ h2).
+      intro i'.
+      simpl.
+      assert (H2 : code_Fin1 (lt_trans _ _ _ (decode_Fin_inf_n (rewriteFins h2 i')) 
+        (decode_Fin_inf_n (rewriteFins h i))) = rewriteFins h1 (code_Fin1
+        (lt_trans _ _ _ (decode_Fin_inf_n i') (decode_Fin_inf_n i)))) by treatFinPure.
+      simpl in H2.
+      rewrite H2.
+      apply H1.
+    Qed.
+    
+    Lemma right_sib_ilist_rel (X: Set)(RelX : relation X)(xs xs': ilist X)(i: Fin (lgti xs))(h: lgti xs = lgti xs'): 
+      ilist_rel RelX xs xs' -> ilist_rel RelX (right_sib xs i) (right_sib xs' (rewriteFins h i)).
+    Proof.
+      intros [h1 H1].
+      assert (h2 : lgti (right_sib xs i) = lgti (right_sib xs' (rewriteFins h i))).
+      simpl.
+      rewrite <- decode_Fin_match', <- h1.
+      reflexivity.
+      apply (is_ilist_rel _ _ _ h2).
+      intro i'.
+      simpl.
+      set (i1 := code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n i'))
+           (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n i))))).
+      assert (code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h2 i')))
+           (le_plus_minus _ _  (gt_le_S _ _  (decode_Fin_inf_n (rewriteFins h i))))) = rewriteFins h1 i1).
+      apply decode_Fin_unique.
+      unfold i1.
+      rewrite decode_code1_Id.
+      do 3 rewrite <- decode_Fin_match'.
+      rewrite decode_code1_Id.
+      apply plus_Sn_m.
+      assert (H1' := H1 i1).
+      rewrite <- H in H1'.
+      assumption.
+    Qed.
+    
+    Lemma left_sib_iappend (X: Set)(l1 l2 : ilist X)(t: X)(n: nat)
+      (h: n < lgti (iappend l1 (icons t l2))): n = lgti l1 -> 
+      ilist_rel eq l1 (left_sib (iappend l1 (icons t l2)) (code_Fin1 h)).
+    Proof.
+      intros H1.
+      assert (h1 : lgti l1 = lgti (left_sib (iappend l1 (icons t l2)) (code_Fin1 h))).
+      simpl.
+      rewrite decode_code1_Id.
+      symmetry ; assumption.
+      apply (is_ilist_rel _ _ _ h1).
+      intro i.
+      simpl.
+      assert (h2 : decode_Fin ((code_Fin1 (lt_trans _ _ _
+        (decode_Fin_inf_n (rewriteFins h1 i)) (decode_Fin_inf_n (code_Fin1 h))))) < lgti l1).
+      rewrite decode_code1_Id, <- decode_Fin_match'.
+      apply decode_Fin_inf_n.
+      assert (H3 : i = code_Fin1 h2) by treatFinPure.
+      rewrite H3 at 1.
+      symmetry.
+      apply (iappend_left _ _ _ h2).
+    Qed.
+    
+    Lemma right_sib_iappend (X: Set)(l1 l2 : ilist X)(t: X)(n: nat)
+      (h: n < lgti (iappend l1 (icons t l2))): n = lgti l1 -> 
+      ilist_rel eq l2 (right_sib (iappend l1 (icons t l2)) (code_Fin1 h)).
+    Proof.
+      intros H1.
+      assert (h1 : lgti l2 = lgti (right_sib (iappend l1 (icons t l2)) (code_Fin1 h))).
+      simpl.
+      rewrite decode_code1_Id.
+      rewrite iappend_lgti.
+      simpl.
+      rewrite <- plus_n_Sm, <- plus_Sn_m.
+      rewrite H1.
+      apply sym_eq, minus_plus.
+      apply (is_ilist_rel _ _ _ h1).
+      intro i.
+      simpl.
+      assert (h2 : lgti l1 <= decode_Fin (rewriteFins (iappend_lgti l1 _)
+        (code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
+        (le_plus_minus _ _ (gt_le_S _ _  (decode_Fin_inf_n (code_Fin1 h)))))))).
+      do 2 (rewrite <- decode_Fin_match', decode_code1_Id).
+      rewrite H1.
+      rewrite plus_Sn_m, plus_n_Sm.
+      apply le_plus_l.
+      assert (H3 := iappend_right _ _ _ h2).
+      assert (H4 : rightFin _ (rewriteFins (iappend_lgti l1 (icons t l2))
+             (code_Fin1 (eq_ind_r  (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
+             (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n (code_Fin1 h))))))) h2 = succ i).
+      apply decode_Fin_unique.
+      apply (plus_reg_l _ _ (lgti l1)).
+      rewrite plus_comm.
+      rewrite rightFin_decode_Fin, <- decode_Fin_match', decode_code1_Id, decode_code1_Id, <- decode_Fin_match', H1.
+      apply plus_n_Sm.
+      rewrite H4 in H3.
+      clear H4.
+      change (fcti (icons t l2) (succ i)) with (fcti l2 i) in H3.
+      apply sym_eq, H3.
+    Qed.
+    
+    Lemma middle_iappend (X: Set)(l1 l2 : ilist X)(t: X)(n: nat)
+      (h: n < lgti (iappend l1 (icons t l2))): n = lgti l1 -> t = (fcti (iappend l1 (icons t l2)) (code_Fin1 h)).
+    Proof.
+      intros H.
+      assert (h1 : lgti l1 <= decode_Fin (rewriteFins (iappend_lgti l1 (icons t l2)) (code_Fin1 h))).
+      rewrite <- decode_Fin_match', decode_code1_Id.
+      rewrite H ; apply le_refl.
+      rewrite (iappend_right _ _ _ h1).
+      assert (H2 : 
+        rightFin (lgti (icons t l2)) (rewriteFins (iappend_lgti l1 (icons t l2)) (code_Fin1 h)) h1 = first _).
+      apply decode_Fin_unique, (plus_reg_l _ _ (lgti l1)).
+      rewrite plus_comm.
+      rewrite rightFin_decode_Fin, <- decode_Fin_match', decode_code1_Id, H.
+      apply plus_n_O.
+      rewrite H2.
+      reflexivity.
+    Qed.
+
   End left_and_right_siblings.
+  
+  Section ilflatten.
+  
+    Definition ilflatten (X: Set)(l: ilist (list X)): list X.
+    Proof.
+      destruct l as [n l].
+      induction n as [|n IH].
+      exact nil.
+      exact (l (first n) ++ (IH (fun i => l (succ i)))).
+    Defined.
+    
+    Lemma ilflatten_mkilist (X: Set)(n: nat)(l: ilistn (list X) n)(i: Fin n): incl (l i) (ilflatten (mkilist l)).
+    Proof.
+      induction n as [|n IH].
+      inversion i.
+      elim (zerop (decode_Fin i)) ; intros a.
+      rewrite (decode_Fin_0_first _ a).
+      apply incl_appl.
+      apply incl_refl.
+      rewrite <- (get_cons_ok1 _ a).
+      apply incl_appr.
+      change (incl ((fun x => l (succ x)) (get_cons i a)) (ilflatten (mkilist (fun x => l (succ x))))).
+      apply IH.
+    Qed.
+    
+    Lemma ilflatten_ilist_rel(X: Set)(l l': ilist (list X)): ilist_rel eq l l' -> ilflatten l = ilflatten l'.
+    Proof.
+      intros [h H].
+      destruct l as [n l] ; destruct l' as [n' l'].
+      simpl in h.
+      revert l' H ; rewrite <- h ; clear n' h  ; intros l' H.
+      simpl in H.
+      induction n as [|n IH].
+      reflexivity.
+      simpl.
+      rewrite H.
+      f_equal.
+      apply IH.
+      intro i ; apply H.
+    Qed.
+  End ilflatten.
    
   Section ilist_rel_dec.
 

@@ -1,5 +1,5 @@
-(** GPermBij.v Version 1.1 February 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** GPermBij.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -154,7 +154,7 @@ Section GeqPerm2.
   (* direct proof by R.M.: *)
   Lemma GeqPerm2_GeqPerm_ALT: subrelation GeqPerm2 (GeqPerm RelT).
   Proof.
-    do 4 red.
+    red.
     apply GeqPerm_coind.
     intros _ _ [g1 g2 H1 H2].
     apply IlistPerm7_IlistPerm3 in H2.

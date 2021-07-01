@@ -1,5 +1,5 @@
-(** Extroduce.v Version 1.2 February 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** Extroduce.v Version 1.2.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -175,7 +175,7 @@ Set Implicit Arguments.
 
     (* this is weakening in the sense of logic *)
    Fixpoint weakFin (n: nat)(f: Fin n): Fin (S n) :=
-     match f in Fin k return Fin (S k) with first k => first (S k) | succ k f => succ (weakFin f) end.
+     match f in Fin k return Fin (S k) with first k => first (S k) | succ f => succ (weakFin f) end.
 
     (* the minimum requirement for weakening *)
    Lemma weakFin_ok : forall (n:nat)(f: Fin n), decode_Fin (weakFin f) = decode_Fin f.

@@ -1,5 +1,5 @@
-(** ListEq.v Version 1.1 February 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** ListEq.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -30,7 +30,7 @@ Add Parametric Morphism (A: Set): (ListEq(A:= A))
   with signature (subrelation(A:= A)) ==> (subrelation(A:= list A))
   as ListEq_monM.
 Proof.
-  do 4 red.
+  red.
   intros eqA1 eqA2 HypSub t1 t2 Hyp.
   induction Hyp as [|a1 a2 l1 l2 e Hyp IH].
   apply ListEq_nil.
@@ -95,7 +95,7 @@ Add Parametric Relation (A: Set)(eqA: relation A)`{Equivalence A eqA}:
 
 Instance ListEqeqeq : forall(A: Set), subrelation (ListEq (@eq A)) (@eq (list A)).
 Proof.
-  do 4 red.
+  red.
   intros A x x0 H.
   induction H as [| a1 a2 l1 l2 e1 H IH].
   reflexivity.
@@ -106,7 +106,7 @@ Qed.
 
 Instance eqListEqeq : forall (A: Set), subrelation (@eq (list A)) (ListEq (@eq A)).
 Proof.
-  do 4 red. 
+  red. 
   intros A x x0 h.
   rewrite h.
   reflexivity.
@@ -117,7 +117,7 @@ Section additional_functions.
 Instance cmpeq : forall (A: Set)(cmp: relation A)(cmpRel : Equivalence cmp),
   subrelation (@eq A) cmp.
 Proof.
-  do 4 red.
+  red.
   intros A cmp cmpRel x x0 h.
   rewrite h.
   reflexivity.

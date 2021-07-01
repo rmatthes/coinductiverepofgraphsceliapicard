@@ -1,5 +1,5 @@
-(** GPerm.v Version 1.1 February 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** GPerm.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -349,7 +349,7 @@ Section GeqPerm.
       clear g1 g2 H1 H2 ; intros g1 g2 [H1 H2].
       split ; try assumption.
       apply (@IlistPerm3_mon _ _ _ GeqPerm) ; try assumption.
-      do 4 red.
+      red.
       apply GeqPerm_out.
       split; assumption.
     Qed.

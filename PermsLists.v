@@ -1,5 +1,5 @@
-(** PermsLists.v Version 1.2 February 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** PermsLists.v Version 1.2.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -162,7 +162,7 @@ Section remel.
   Proof.
     intros h.
     unfold remel.
-    rewrite app_length, firstn_length, length_skipn, Min.min_l, <- plus_Sn_m.
+    rewrite app_length, firstn_length, length_skipn, Nat.min_l, <- plus_Sn_m.
     apply le_plus_minus_r, lt_le_S, h.
     apply lt_le_weak, h.
   Qed.

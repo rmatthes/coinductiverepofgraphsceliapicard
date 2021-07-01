@@ -1,5 +1,5 @@
-(** Fin.v Version 1.1 January 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** Fin.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -39,8 +39,10 @@ Proof.
   rewrite app_length.
   apply lt_plus_S.
   apply (IlistPerm3_cons _ _ (first _ : Fin (lgti (list2ilist (a :: l)))) (code_Fin1 h)).
-  rewrite <- (list2ilist_nth2 _ _ b).
+  do 2 rewrite <- (list2ilist_nth2 _ _ b).
   rewrite decode_code1_Id.
+  simpl decode_Fin.
+  simpl nth.
   rewrite (app_nth2 _ _ b (le_refl _)).
   rewrite minus_diag.
   assumption.

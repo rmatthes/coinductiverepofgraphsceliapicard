@@ -1,5 +1,5 @@
-(** Fin.v Version 1.1 February 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** Fin.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -57,7 +57,7 @@ Section Fin_def_tools.
   (* decode_Fin allows to associate an integer to an element of Fin n *)
   Fixpoint decode_Fin (n: nat)(f: Fin n): nat := match f with 
         first k => 0
-      | succ k f' => S ( decode_Fin f') 
+      | succ f' => S ( decode_Fin f') 
   end.
 
   Definition decode_Fin_inf_n: forall (n: nat)(f: Fin n), decode_Fin f < n.
@@ -80,8 +80,8 @@ Section Fin_def_tools.
       refl_equal => f end).  
   Proof.
     intros n m f H.
-    destruct f as [ n | n f] ;
-    refine (match H return _ with refl_equal => _ end) ;
+    destruct f as [ n | n f];
+    rewrite <- H;  (* astonishingly, this works *)
     reflexivity.
   Qed.
 
@@ -116,7 +116,7 @@ Section Fin_def_tools.
   Defined.
 
   Definition code_Fin1_Sn (n m: nat)(h: m<=n): Fin (S n) := 
-    projT1 (code_fin1_aux_def h).
+    proj1_sig (code_fin1_aux_def h).
 
   (* First version of code_Fin *)
   Definition code_Fin1 (n m: nat)(h: m<n): Fin n :=
@@ -139,7 +139,7 @@ Section Fin_def_tools.
   Proof.
     intros n m h.
     unfold code_Fin1_Sn.
-    simpl projT1.
+    simpl proj1_sig.
     destruct (code_fin1_aux_def (le_S_n m n h)) as [x e].
     reflexivity.
   Qed.
@@ -811,6 +811,14 @@ Section rewrite_Fins.
     refine ((match e2 return _ with refl_equal => _ end) f).
     reflexivity.
   Qed.
+
+  Lemma rewriteFins_proofirr (n1 n2: nat)(i: Fin n1) (h1 h2 : n1 = n2) : 
+    rewriteFins h1 i = rewriteFins h2 i.
+  Proof.
+    apply decode_Fin_unique.
+    do 2 rewrite <- decode_Fin_match'.
+    reflexivity.
+  Qed.
 End rewrite_Fins.
 
 Section Fin_injectivity.
@@ -964,5 +972,39 @@ Section Fin_injectivity.
 
 End Fin_injectivity.
 
+Section minus_Fin.
+
+Definition minusFin (n: nat)(i: Fin n): nat.
+Proof.
+  induction i as [n|n i IH].
+  exact n.
+  exact IH.
+Defined.
+
+Lemma minusFin1 (n: nat) : @minusFin (S n) (first n) = n.
+Proof.
+  reflexivity.
+Qed.
+
+Lemma minusFin2 (n: nat)(i: Fin n) : @minusFin (S n) (succ i) = @minusFin n i.
+Proof.
+  reflexivity.
+Qed.
+
+Lemma minusFin3 (n: nat) : @minusFin (S n) (code_Fin1 (lt_n_Sn n)) = 0.
+Proof.
+  induction n as [|n IH].
+  reflexivity.
+  assert (H1 : code_Fin1 (lt_n_Sn (S n)) = succ (code_Fin1 (lt_n_Sn n))).
+  apply decode_Fin_unique.
+  change (decode_Fin (code_Fin1 (lt_n_Sn (S n))) =
+  S (decode_Fin (code_Fin1 (lt_n_Sn n)))).
+  do 2 rewrite decode_code1_Id.
+  reflexivity.
+  rewrite H1.
+  rewrite  minusFin2.
+  assumption.
+Qed.
+End minus_Fin.
 
 

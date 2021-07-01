@@ -1,5 +1,5 @@
 (** Introduce.v Version 1.2 February 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** runs under V8.4beta, tested with version 8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)

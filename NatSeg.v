@@ -1,5 +1,5 @@
-(** NatSeg.v Version 0.9 February 2010 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** NatSeg.v Version 0.9.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -7,6 +7,12 @@
 (**  provides an implementation of the segments of natural numbers
      NatSeg. It also provides various properties 
      and lemmas about it *)
+
+(** this is code that conforms to the description in the article
+    " Coinductive graph representation: the problem of embedded lists"
+    by the authors *)
+
+
 
 Require Export Arith. 
 Require Import Utf8.
@@ -20,8 +26,8 @@ Set Implicit Arguments.
 Definition NatSeg (n: nat):= {m | m < n}.
 
 (* And we define basic operation over these segments *)
-Definition elem (n: nat)(f: NatSeg n): nat := projT1 f.
-Definition proof_lt(n: nat)(f: NatSeg n): elem f < n := projT2 f.
+Definition elem (n: nat)(f: NatSeg n): nat := proj1_sig f.
+Definition proof_lt(n: nat)(f: NatSeg n): elem f < n := proj2_sig f.
 
 Lemma elem_lt_n: forall (n: nat)(ns: NatSeg n), elem ns < n.
 Proof.

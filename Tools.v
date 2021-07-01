@@ -1,5 +1,5 @@
 (** Tools.v Version 1.0 January 2012 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** runs under V8.4beta, tested with version 8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -14,6 +14,7 @@ Require Import Morphisms.
 Require Import List.
 Require Import Basics.
 Require Import Max. 
+Require Import Omega.
 
 Set Implicit Arguments.
 
@@ -158,8 +159,164 @@ Section Tools_lists.
       Qed.
   
   End MaxListNat.
+  Fixpoint remove' (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})(x: X)(l: list X) : 
+    list X:= 
+  match l with 
+    nil => nil
+  | t::q => if (eq_dec x t) then q else t::(remove' eq_dec x q)
+  end.
   
-   
+  Lemma remove'_In_length (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})
+    (x: X)(l: list X): In x l -> S (length (remove' eq_dec x l)) = length l.
+  Proof.
+    induction l as [|t l IH] ; intro H.
+    inversion H.
+    destruct H as [H|H].
+    rewrite H.
+    simpl.
+    elim (eq_dec x x) ; intros a.
+    reflexivity.
+    contradiction (eq_refl x).
+    simpl.
+    elim (eq_dec x t) ; intros a.
+    reflexivity.
+    simpl.
+    rewrite (IH H).
+    reflexivity.
+  Qed.
+
+  Lemma remove'_In (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})
+    (x1 x2: X)(l: list X): In x1 l -> x1 <> x2 -> In x1 (remove' eq_dec x2 l).
+  Proof.
+    induction l as [|t l IH].
+    intros H ; inversion H.
+    intros [H1|H1] H2.
+    simpl.
+    elim (eq_dec x2 t) ; intros a.
+    contradiction (sym_eq (trans_eq a H1)).
+    left.
+    assumption.
+    simpl.
+    elim (eq_dec x2 t) ; intros a.
+    assumption.
+    right.
+    apply IH ; assumption.
+  Qed.
+  
+  Lemma NoDup_cons'(X: Set)(x: X)(l: list X) : NoDup (x::l) -> NoDup l.
+  Proof.
+    intros H.
+    inversion_clear H.
+    assumption.
+  Qed.
+
+  Lemma incl_length (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})(l1 l2 : list X): 
+    incl l1 l2 -> NoDup l1 -> length l1 = length l2 -> incl l2 l1.
+  Proof.
+    revert l2 ; induction l1 as [|t1 l1 IH] ; intros [|t2 l2] H1 H2 H3 x H4.
+    assumption.
+    inversion H3.
+    inversion H3.
+    destruct H4 as [H4 | H4].
+    rewrite <- H4 ; clear x H4.
+    destruct (H1 t1 (in_eq _ _)).
+    rewrite H ; apply in_eq.
+    inversion_clear H2 as [| t1' l1' H4 H5].
+    right.
+    apply (IH (remove' eq_dec t1 (t2 :: l2))).
+    intros x H6.
+    apply remove'_In.
+    apply (H1 x (in_cons _ _ _ H6)).
+    intro H7 ; rewrite H7 in H6 ; contradiction H6.
+    assumption.
+    apply eq_add_S.
+    rewrite remove'_In_length.
+    assumption.
+    apply (in_cons _ _ _ H).
+    
+    simpl.
+    elim (eq_dec t1 t2) ; intros a.
+    rewrite <- a ; assumption.
+    apply in_eq.
+    
+    elim (eq_dec t1 x) ; intros a.
+    left ; assumption.
+    right.
+    apply (IH (remove' eq_dec t1 (t2::l2))).
+    inversion_clear H2 as [| t1' l1' H5 H6].
+    intros x1 H7.
+
+    apply remove'_In.
+    apply H1, in_cons, H7.
+    intros H8 ; rewrite H8 in H7 ; contradiction H7.
+    apply (NoDup_cons' H2).
+    apply eq_add_S.
+    rewrite remove'_In_length.
+    assumption.
+    apply (H1 t1 (in_eq _ _)).
+    apply remove'_In.
+    apply (in_cons _ _ _ H4).
+    intro H ; contradiction (sym_eq H).
+  Qed.
+
+  Lemma incl_length2 (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})(l1 l2 : list X): 
+    incl l1 l2 -> NoDup l1 -> length l1 <= length l2.
+  Proof.
+    revert l2 ; induction l1 as [|t1 l1 IH] ; intros l2 H1 H2.
+    apply le_0_n.
+    simpl.
+    rewrite <- (remove'_In_length eq_dec t1 l2).
+    apply le_n_S.
+    apply IH.
+    intros x H3.
+    apply remove'_In.
+    apply H1, (in_cons _ _ _ H3).
+    inversion_clear H2 as [| t1' l1' H4 H5].
+    intros H6.
+    rewrite H6 in H3 ; contradiction H3.
+    apply (NoDup_cons' H2).
+    apply (H1 _ (in_eq _ _)).
+  Qed.
+  
+  Lemma cons_not_eq(X: Set): forall (x: X) l, x :: l <> l.
+  Proof.
+    intros x l ; revert x ; induction l ; intros x H.
+    inversion H.
+    inversion H.
+    apply (IHl a H2).
+  Qed.
+
+  Lemma eq_list_nat_dec : forall (l l': list nat), {l = l'} + {not (l = l')}.
+  Proof.
+    induction l.
+    intros [| n l].
+    left.
+    reflexivity.
+    right.
+    intros H.
+    inversion H.
+    intros l'.
+    elim (IHl l') ; intros H.
+    rewrite H.
+    right.
+    apply cons_not_eq.
+    destruct l'.
+    right.
+    intros H1 ; inversion H1.
+    elim (eq_nat_dec a n) ; intros H1.
+    rewrite H1.
+    elim (IHl l') ; intros H2.
+    left.
+    f_equal; assumption.
+    right.
+    intros H3.
+    inversion H3.
+    contradiction H2.
+    right.
+    intros H3.
+    inversion H3.
+    contradiction H2.
+  Qed.
 End Tools_lists.
 
 Section Tools_arith.
@@ -238,7 +395,11 @@ Section Tools_arith.
     intros m n h.
     apply (lt_pred_n_n n (lt_n_m_0 h)).
   Qed.
-
+  
+  Lemma minus_le (n m: nat) : n <= m -> 0 = m - n -> m = n.
+  Proof.
+    omega.
+  Qed.
 
 
 End Tools_arith.
@@ -320,3 +481,14 @@ Section Bijective.
   Qed.
 
 End Bijective.
+
+Section subrel.
+  Lemma subrelation_eq (X: Set)(RelX: relation X): Reflexive RelX -> subrelation eq RelX.
+  Proof.
+    intros H1 x1 x2 H2.
+    rewrite H2.
+    apply H1.
+  Qed.
+End subrel.
+
+

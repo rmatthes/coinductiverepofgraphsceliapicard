@@ -1,5 +1,5 @@
-(** IlistPerm.v Version 1.1 February 2011 *)
-(** runs under V8.4beta, tested with version trunk 15623 *)
+(** IlistPerm.v Version 1.1.1 April 2016 *)
+(** runs under V8.5pl1 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -1753,7 +1753,8 @@ Section IlistPerm_ind.
       rewrite <- IlistPerm3Cert_list_eq.
       intros i2' h4.
       do 2 rewrite <- (decode_Fin_unique _ _ (decode_Fin_match' _ _)).
-      apply (IH _ _ _ _), h3.
+      inversion h.
+      apply (IH _ _ _ h3'), h3.
     Qed.
 
     Lemma IlistPerm3Cert_list_function_ok (T: Set)(R: relation T)(l1 l2 : ilist T)(c: IlistPerm3Cert_list (lgti l1)) 
