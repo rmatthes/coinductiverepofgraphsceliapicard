@@ -1,6 +1,3 @@
-(** Ilist.v Version 1.5 January 2012 *)
-(** runs under V8.4beta, tested with version 8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -160,7 +157,7 @@ Section ilist_def_tools.
 
   Add Parametric Morphism (T: Set)(eqT: relation T)
     (eqTR : Equivalence eqT)(p: T -> Prop)
-    (pM: Morphism (eqT --> impl) p): (iall p)
+    (pM: Proper (eqT --> impl) p): (iall p)
   with signature (ilist_rel eqT ==> impl)
   as iallM.
   Proof.
@@ -217,19 +214,19 @@ Section ilist_def_tools.
     map (fcti i) (makeListFin (lgti i)).
   
   Definition eq_comp_morph (n : nat) (f: Fin (n) -> T) := 
-    Morphism (eq(A:= Fin (n)) ==> comp) f.
-
+    Proper (eq(A:= Fin (n)) ==> comp) f.
+  
   Definition fctiiM (i: ilist T): 
-    Morphism (eq(A:= Fin (lgti i)) ==> comp) (fcti i).
+    Proper (eq(A:= Fin (lgti i)) ==> comp) (fcti i).
   Proof.
-    unfold Proper.
+    red. intros f g H. rewrite H.
     reflexivity.
   Qed.
 
   Definition iM (n: nat)(i: ilistn T n): 
-    Morphism (eq(A:= Fin n) ==> comp) i.
+    Proper (eq(A:= Fin n) ==> comp) i.
   Proof.
-    unfold Proper.
+    red. intros j k H. rewrite H.
     reflexivity.
   Qed.
 
@@ -474,9 +471,9 @@ Section ilist_def_tools.
   Qed.
 
   Definition ilistM (n: nat)(i: ilistn T n): 
-    Morphism (eq(A:= Fin n) ==> comp) i.
+    Proper (eq(A:= Fin n) ==> comp) i.
   Proof.
-    unfold Proper.
+    red. intros j k H. rewrite H.
     reflexivity.
   Qed.
 
@@ -648,7 +645,7 @@ Section ilist_def_tools.
     Definition iappend (X: Set)(l1 l2 : ilist X) : ilist X.
     Proof.
       destruct l1 as [n1 l1] ; destruct l2 as [n2 l2].
-      apply (existS (ilistn X) (n1 + n2)).
+      apply (existT (ilistn X) (n1 + n2)).
       intro i.
       elim (le_lt_dec n1 (decode_Fin i)); intros a.
       exact (l2 (rightFin _ _ a)).
@@ -914,7 +911,7 @@ Section ilist_def_tools.
   Lemma map_imap_ilist_list: forall (T U: Set)(i: ilist T)(f: T -> U)
     (compT: relation T)(compTRel: Equivalence compT)
     (compU: relation U)(compURel: Equivalence compU)
-    (fM: Morphism (compT ==> compU) f), 
+    (fM: Proper (compT ==> compU) f), 
     ilist_rel compU (imap f i) (list2ilist (map f (ilist2list i))).
   Proof.
     intros T U i f compT compTRel compU compURel fM.
@@ -962,7 +959,7 @@ Section ilist_def_tools.
   Lemma list2Fin_T_succ_map_f: 
     forall (T U: Set) (l: list T)(a: T)(lf: list (Fin (length l)))(f: T -> U)
     (compT: relation T)(compU: relation U)(compURel: Equivalence compU)
-    (fM: Morphism (compT ==> compU) f), 
+    (fM: Proper (compT ==> compU) f), 
      ListEq compU (map (fun x : Fin (length l) => f( list2Fin_T l x)) lf)
        (map (fun x : Fin (length l) => f(list2Fin_T (a :: l) (succ x))) lf).
   Proof.
@@ -978,7 +975,7 @@ Section ilist_def_tools.
   Lemma imap_cons: forall (T U: Set)(a: T)(l: list T)(f: T -> U)
     (compT: relation T)(compTRel: Equivalence compT)
     (compU: relation U)(compURel: Equivalence compU)
-    (fM: Morphism (compT ==> compU) f), 
+    (fM: Proper (compT ==> compU) f), 
     ListEq compU (ilist2list (imap f (list2ilist (a :: l)))) 
       (f a :: (ilist2list (imap f (list2ilist l)))).
   Proof.
@@ -997,7 +994,7 @@ Section ilist_def_tools.
   Lemma imap_map_list_ilist: forall (T U: Set)(l: list T)(f: T -> U)
     (compT: relation T)(compTRel: Equivalence compT)
     (compU: relation U)(compURel: Equivalence compU)
-    (fM: Morphism (compT ==> compU) f), 
+    (fM: Proper (compT ==> compU) f), 
     ListEq compU (map f l) (ilist2list (imap f (list2ilist l))).
   Proof.
     intros T U l f compT compTRel compU compURel fM.
@@ -1286,7 +1283,6 @@ Section manip_ilist.
     apply H2.
   Qed.
   
-    
 End manip_ilist.
 
 Lemma imap_apply: forall (T U: Set)(i: ilist U)(m: U -> T)(f: Fin (lgti i)), 

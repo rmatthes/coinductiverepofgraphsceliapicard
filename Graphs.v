@@ -1,6 +1,3 @@
-(** Graphs.v Version 1.5 February 2012 *)
-(** runs under V8.4beta, tested with version 8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -53,19 +50,19 @@ Section Graphs_def_tools.
     (* Proof that Geq preserves equivalence *)
     Lemma Geq_refl (Rrefl: Reflexive RelT): forall g: Graph, Geq g g.
     Proof.
-      cofix.
+      cofix coIH.
       intros [lab l].
       apply Geq_intro.
       reflexivity.
       apply (is_ilist_rel Geq l l (refl_equal _)).
       intro i.
-      apply Geq_refl.
+      apply coIH.
     Qed.
 
     Lemma Geq_trans (Rtrans: Transitive RelT): 
       forall g1 g2 g3, Geq g1 g2 -> Geq g2 g3 -> Geq g1 g3.
     Proof.
-      cofix.
+      cofix coIH.
       intros _ _ g3 [[t1 l1] g2 e1 [e1' h1]] h2 ; 
         destruct h2 as [[t2 l2] [t3 l3] e2 [e2' h2]].
       apply Geq_intro.
@@ -77,13 +74,13 @@ Section Graphs_def_tools.
       assert (h3 : rewriteFins (eq_trans e1' e2') i =  
         rewriteFins e2' (rewriteFins e1' i)) by treatFinPure.
       rewrite h3; clear h3.
-      apply (Geq_trans _ _ _ (h1 i) (h2 (rewriteFins e1' i))).
+      apply (coIH _ _ _ (h1 i) (h2 (rewriteFins e1' i))).
     Qed.
 
     Lemma Geq_sym (Rsym: Symmetric RelT): 
       forall g1 g2: Graph, Geq g1 g2 -> Geq g2 g1.
     Proof.
-      cofix.
+      cofix coIH.
       intros _ _ [[t1 l1] [t2 l2] e1 [e2 h1]].
       apply Geq_intro ; simpl in *|-*.
       apply Rsym, e1.
@@ -92,7 +89,7 @@ Section Graphs_def_tools.
       assert (h2 := h1 (rewriteFins (eq_sym e2) i)).
       assert (h3 : rewriteFins e2 (rewriteFins (eq_sym e2) i) = i) by treatFinPure.
       rewrite h3 in h2.
-      apply (Geq_sym _ _ h2).
+      apply (coIH _ _ h2).
     Qed.
     
     (* Recording that Geq preserves equivalence *)
@@ -139,14 +136,14 @@ Section Graphs_def_tools.
   Theorem wfG_applyF2G: forall (g :Graph) (f: T -> T), 
     wfG g -> wfG (applyF2G f g).
   Proof.
-    cofix.
+    cofix coIH.
     destruct g; intros f h.
     inversion_clear h as (a, H).
     simpl in H.
     apply is_wfG; simpl.
     inversion_clear i as (n', iln).
     unfold iall; simpl; intro fi.
-    apply (wfG_applyF2G _ _ (H fi)).
+    apply (coIH _ _ (H fi)).
   Qed.
   End wf_def_tools.
 

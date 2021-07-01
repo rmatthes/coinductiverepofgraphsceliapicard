@@ -1,6 +1,3 @@
-(** Extroduce.v Version 1.2.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -710,7 +707,7 @@ Set Implicit Arguments.
      reflexivity.
    Qed.
 
-   Require Import Omega.
+   Require Import Lia.
    Definition extroduce_interchange_statement_eq: Prop :=
      forall (T : Set)(n : nat)(i : ilistn T (S n))
        (f f': Fin (S n))(a : decode_Fin f <> decode_Fin f')(a' : decode_Fin f' <> decode_Fin f),
@@ -734,7 +731,7 @@ Set Implicit Arguments.
      by (apply index_in_extroduce_decode1; exact d);
      unfold fnew in *|-;
      unfold f'new in *|-;
-     omega | 
+     lia | 
      exact (a' d) |
      assert (Hyp1: decode_Fin fnew = decode_Fin f) 
      by (apply index_in_extroduce_decode2; exact d);
@@ -742,7 +739,7 @@ Set Implicit Arguments.
      by (apply index_in_extroduce_decode1; exact d);
      unfold fnew in *|-;
      unfold f'new in *|-;
-     omega
+     lia
      ];
      fail.
      
@@ -780,7 +777,7 @@ Set Implicit Arguments.
    (* It is quite obvious that the tactics are way too eager for the normalization of 
    decode_Fin expressions, and that they are also too cautious concerning the hypotheses 
    being in normal form. Most of the steps of the execution are completely unproductive. 
-   Still, the question is if optimization is useful here. How could one know if omega takes 
+   Still, the question is if optimization is useful here. How could one know if lia takes 
    most of the time in the whole proof? Are there profiling tools for Coq? At least, 
    we can see better how much is really needed in order to program the proof. *) 
 
@@ -839,4 +836,5 @@ Set Implicit Arguments.
       apply map_ext.
       assumption.
     Qed.
+    
   End left_right_sib_extro.

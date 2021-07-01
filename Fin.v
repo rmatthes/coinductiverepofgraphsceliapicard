@@ -1,6 +1,3 @@
-(** Fin.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -103,7 +100,7 @@ Section Fin_def_tools.
     end. 
 
   Definition code_fin1_aux_def: forall n m: nat, m <= n -> 
-    {f: Fin (S n) | code_Fin1_aux n m = Some f}.
+    {f: Fin (S n) & code_Fin1_aux n m = Some f}.
   Proof.
     induction n as [ | n IHn]; intros m H ; destruct m as [ | m]; simpl.
     exists (first 0); reflexivity.
@@ -116,7 +113,7 @@ Section Fin_def_tools.
   Defined.
 
   Definition code_Fin1_Sn (n m: nat)(h: m<=n): Fin (S n) := 
-    proj1_sig (code_fin1_aux_def h).
+    projT1 (code_fin1_aux_def h).
 
   (* First version of code_Fin *)
   Definition code_Fin1 (n m: nat)(h: m<n): Fin n :=
@@ -139,7 +136,7 @@ Section Fin_def_tools.
   Proof.
     intros n m h.
     unfold code_Fin1_Sn.
-    simpl proj1_sig.
+    simpl projT1.
     destruct (code_fin1_aux_def (le_S_n m n h)) as [x e].
     reflexivity.
   Qed.
@@ -775,7 +772,7 @@ Section rewrite_Fins.
      match sym_eq e in (_ = l) return (Fin l) with refl_equal => f end end.
    Proof.
      intros n1 n2 f e.
-     refine ((match e as e' in (_ = l) return forall g: Fin l, _ 
+     refine ((match e as e' return forall g: Fin _, _ 
        with refl_equal => _ end) f).
      reflexivity.
    Qed.
@@ -819,6 +816,7 @@ Section rewrite_Fins.
     do 2 rewrite <- decode_Fin_match'.
     reflexivity.
   Qed.
+  
 End rewrite_Fins.
 
 Section Fin_injectivity.
@@ -1005,6 +1003,6 @@ Proof.
   rewrite  minusFin2.
   assumption.
 Qed.
-End minus_Fin.
 
+End minus_Fin.
 

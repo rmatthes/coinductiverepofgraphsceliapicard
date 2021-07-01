@@ -1,6 +1,3 @@
-(** IPPJustification.v Version 1.0.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Ralph Matthes and Celia Picard, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -21,17 +18,21 @@ Require Import Logic.ChoiceFacts. (* this does not assume choice axioms but only
 
 Set Implicit Arguments.
 
-Definition FinIndex (n: nat)(e: Fin n): nat.
+Fixpoint FinIndex (n: nat)(e: Fin n): nat :=
+  match e with first m => m | @succ m e' => m end.
+
+(* an interactive definition: *)
+Definition FinIndex_alt (n: nat)(e: Fin n): nat.
 Proof.
   destruct e.
   exact k.
   exact k.
 Defined.
 
-(* in Coq 8.4, the following was possible:
-Fixpoint FinIndex (n: nat)(e: Fin n): nat :=
-  match e with first m => m | succ m e' => m end.
-*)
+Lemma FinIndex_alt_is_same (n: nat)(e: Fin n): FinIndex e = FinIndex_alt e.
+Proof.
+  induction e; reflexivity.
+Qed.
 
 Lemma FinIndexOk (n: nat)(e: Fin n):
   n = S (FinIndex e).

@@ -1,5 +1,5 @@
-(** ListEq.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
+(** ListEq.v Version 1.1 February 2011 *)
+(** runs under V8.3, tested with 8.3pl2 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -16,7 +16,7 @@ Require Import Utf8.
 Require Import Setoid.
 Require Import Morphisms.
 
-Notation Morphism R f := (Proper (R%signature) f).
+(* Notation Morphism R f := (Proper (R%signature) f). *)
 
 Definition map:= List.map.
 
@@ -30,7 +30,6 @@ Add Parametric Morphism (A: Set): (ListEq(A:= A))
   with signature (subrelation(A:= A)) ==> (subrelation(A:= list A))
   as ListEq_monM.
 Proof.
-  red.
   intros eqA1 eqA2 HypSub t1 t2 Hyp.
   induction Hyp as [|a1 a2 l1 l2 e Hyp IH].
   apply ListEq_nil.
@@ -44,7 +43,6 @@ Qed.
 Instance ListEq_refl : forall (A: Set)(eqA: relation A)`{Reflexive A eqA},
   Reflexive (ListEq eqA).
 Proof.
-  red.
   intros A eqA reflA x.
   induction x as [| a la IHl].
   apply ListEq_nil.
@@ -56,7 +54,6 @@ Qed.
 Instance ListEq_sym : forall (A: Set)(eqA: relation A)`{Symmetric A eqA},
   Symmetric (ListEq eqA).
 Proof.
-  red.
   intros A eqA symA x y H.
   induction H as [|a1 a2 l1 l2 e H IH].
   apply ListEq_nil.
@@ -68,7 +65,6 @@ Qed.
 Instance ListEq_trans: forall (A: Set)(eqA: relation A)`{Transitive A eqA},
   Transitive (ListEq eqA).
 Proof.
-  red.
   intros A eqA transA x y z H1 H2.
   revert z H2.
   induction H1 as [|a1 a2 x y e1 H1 IH1]; intros z H2.
@@ -82,20 +78,19 @@ Qed.
 
 Add Parametric Relation (A: Set)(eqA: relation A)`{Reflexive A eqA}: 
   (list A) (ListEq eqA) 
-  reflexivity proved by (ListEq_refl A eqA)
+  reflexivity proved by (ListEq_refl(eqA:=eqA))
   as ListeqRefl.
 
 
 Add Parametric Relation (A: Set)(eqA: relation A)`{Equivalence A eqA}: 
   (list A) (ListEq eqA) 
-  reflexivity proved by (ListEq_refl A eqA)
-  symmetry proved by (ListEq_sym A eqA)
-  transitivity proved by (ListEq_trans A eqA)
+  reflexivity proved by (ListEq_refl(eqA:=eqA))
+  symmetry proved by (ListEq_sym(eqA:=eqA))
+  transitivity proved by (ListEq_trans(eqA:=eqA))
   as ListEqRel.
 
 Instance ListEqeqeq : forall(A: Set), subrelation (ListEq (@eq A)) (@eq (list A)).
 Proof.
-  red.
   intros A x x0 H.
   induction H as [| a1 a2 l1 l2 e1 H IH].
   reflexivity.
@@ -106,7 +101,6 @@ Qed.
 
 Instance eqListEqeq : forall (A: Set), subrelation (@eq (list A)) (ListEq (@eq A)).
 Proof.
-  red. 
   intros A x x0 h.
   rewrite h.
   reflexivity.
@@ -117,7 +111,6 @@ Section additional_functions.
 Instance cmpeq : forall (A: Set)(cmp: relation A)(cmpRel : Equivalence cmp),
   subrelation (@eq A) cmp.
 Proof.
-  red.
   intros A cmp cmpRel x x0 h.
   rewrite h.
   reflexivity.
@@ -144,7 +137,7 @@ Lemma map_map_ListEq:
   ListEq cmpC (map g (map f l)) (map (fun x: A => g (f x)) l).
 Proof.
   intros A B C cmpC cmpCRel f g l.
-  apply (cmpeq (ListEqRel _ cmpC)).
+  apply (cmpeq (ListEqRel(eqA:=cmpC))).
   apply map_map.
 Qed.
 
@@ -160,7 +153,7 @@ Qed.
 Lemma map_map_nth_comp: 
   forall (A B C: Set)(cmpB: relation B)(cmpBRel: Equivalence cmpB)
   (cmpC: relation C)(cmpCRel: Equivalence cmpC)
-  (f: A -> B)(g: B -> C)(gM: Morphism (cmpB ==> cmpC) g)
+  (f: A -> B)(g: B -> C)(gM: Proper (cmpB ==> cmpC) g)
   (l: list A)(d: A)(n: nat), 
   cmpC (nth n (map g (map f l)) (g (f d))) (g (f (nth n l d))).
 Proof.

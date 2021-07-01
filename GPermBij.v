@@ -1,6 +1,3 @@
-(** GPermBij.v Version 1.1.1 April 2016 *)
-(** runs under V8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -167,5 +164,6 @@ Section GeqPerm2.
     apply GeqPerm_GeqPerm2.
     apply GeqPerm0_GeqPerm.
     assumption.
-  Qed. 
+  Qed.
+
 End GeqPerm2.

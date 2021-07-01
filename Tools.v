@@ -1,6 +1,3 @@
-(** Tools.v Version 1.0 January 2012 *)
-(** runs under V8.4beta, tested with version 8.5pl1 *)
-
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
 
@@ -13,8 +10,8 @@ Require Import Setoid.
 Require Import Morphisms.
 Require Import List.
 Require Import Basics.
-Require Import Max. 
-Require Import Omega.
+Require Import PeanoNat.
+Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -113,7 +110,7 @@ Section Tools_lists.
         reflexivity.
         simpl.
         do 2 rewrite IHl.
-        rewrite max_assoc.
+        rewrite Nat.max_assoc.
         reflexivity.
       Qed.
 
@@ -144,9 +141,9 @@ Section Tools_lists.
         rewrite max_list_cons.
         destruct H as [e | H].
         rewrite <- e.
-        apply le_max_l.
+        apply Nat.le_max_l.
         assert (H1: max_list_nat t <= max h (max_list_nat t)).
-        apply le_max_r.
+        apply Nat.le_max_r.
         apply (le_trans _ _ _ (IHt x H) H1).
       Qed.
       
@@ -159,6 +156,7 @@ Section Tools_lists.
       Qed.
   
   End MaxListNat.
+  
   Fixpoint remove' (X: Set)(eq_dec : forall x y : X, {x = y}+{x <> y})(x: X)(l: list X) : 
     list X:= 
   match l with 
@@ -398,7 +396,7 @@ Section Tools_arith.
   
   Lemma minus_le (n m: nat) : n <= m -> 0 = m - n -> m = n.
   Proof.
-    omega.
+    lia.
   Qed.
 
 
@@ -483,12 +481,14 @@ Section Bijective.
 End Bijective.
 
 Section subrel.
+
   Lemma subrelation_eq (X: Set)(RelX: relation X): Reflexive RelX -> subrelation eq RelX.
   Proof.
     intros H1 x1 x2 H2.
     rewrite H2.
     apply H1.
   Qed.
+  
 End subrel.
 
 

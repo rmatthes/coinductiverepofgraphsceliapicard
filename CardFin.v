@@ -1,5 +1,5 @@
-(** CardFin.v Version 1.1 February 2011 *)
-(** runs under V8.4beta, tested with 8.5pl1 *)
+(** CardFin.v Version 1.0 May 2012 *)
+(** runs under V8.3, tested with 8.3pl2 *)
 
 (** Celia Picard, I.R.I.T.,  University of Toulouse, 
     based on a development by Yves Bertot (INRIA Sophia-Antipolis), 
