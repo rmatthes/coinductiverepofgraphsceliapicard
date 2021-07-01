@@ -1,5 +1,5 @@
 (** Fin.v Version 1.1 February 2011 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -775,7 +775,7 @@ Section rewrite_Fins.
      match sym_eq e in (_ = l) return (Fin l) with refl_equal => f end end.
    Proof.
      intros n1 n2 f e.
-     refine ((match e as e' return forall g: Fin _, _ 
+     refine ((match e as e' in (_ = l) return forall g: Fin l, _ 
        with refl_equal => _ end) f).
      reflexivity.
    Qed.

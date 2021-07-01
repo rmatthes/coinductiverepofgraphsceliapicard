@@ -1,5 +1,5 @@
 (** IPPJustification.v Version 1.0 February 2012 *)
-(** runs under V8.3, tested with 8.3pl3 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Ralph Matthes and Celia Picard, 
     I.R.I.T.,  University of Toulouse and CNRS*)

@@ -1,5 +1,5 @@
 (** Extroduce.v Version 1.2 February 2011 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)

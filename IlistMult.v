@@ -1,5 +1,5 @@
 (** IlistMult.v Version 0.9.3 January 2011 *)
-(** runs under V8.3, tested with 8.3pl1 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -639,7 +639,7 @@ Section Bij_ilistMult_list.
     compU _ match df with 0 => _ | S m => 
       nth m (List.map (fun x : Fin n => f (i (@succ n x))) (makeListFin n)) (f (i (first n)))
     end with refl_equal => _ end).
-    do 2 rewrite <- map_map.
+    rewrite <- (map_map (fun x => i (succ x)) f), <- (map_map (@succ _) i).
     rewrite (map_map_nth_comp compTRel compURel i fM).
     assert (H2 := (lt_n_Sm_le (decode_Fin fi) n (decode_Fin_inf_n fi))).
     rewrite (code_Fin1_Sn_proofirr _ H2).

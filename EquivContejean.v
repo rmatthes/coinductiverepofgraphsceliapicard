@@ -1,5 +1,5 @@
 (** Fin.v Version 1.1 January 2012 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -47,7 +47,7 @@ Proof.
 
   assert (H3 : ilist_rel eq (list2ilist l) (extroduce (list2ilist (a :: l)) (first _))).
   simpl.
-  apply (is_ilist_rel _ _ _ (refl_equal _ : lgti (list2ilist l) = lgti (mkilist (fun x => _)))).
+  apply (is_ilist_rel _ _ _ (eq_refl _ : lgti (list2ilist l) = lgti (mkilist (fun x => nth (decode_Fin x) l a)))).
   simpl in *|-*.
   intro i.
   symmetry. 

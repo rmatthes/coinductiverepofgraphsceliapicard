@@ -1,5 +1,5 @@
 (** GPerm.v Version 1.1 February 2012 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -445,13 +445,13 @@ Section GeqPerm.
    Lemma TeqPermn_Sn_back (n:nat)(g1 g2: Graph T): TeqPermn (S n) g1 g2 ->
      RelT (label g1) (label g2) /\ IlistPerm3 (TeqPermn n) (sons g1) (sons g2).
    Proof.
-     intro Hyp.
-     red in Hyp.
+     intro Hyp ; red in Hyp.
      do 2 rewrite Graph2TreeG_okS in Hyp.
      inversion_clear Hyp as [g3 g4 H1 H2].
      simpl in *|-*.
      split.
      assumption.
+     unfold TeqPermn.
      apply IlistPerm3_imap_back.
      assumption.
    Qed.

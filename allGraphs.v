@@ -1,5 +1,5 @@
 (** allGraphs.v Version 0.9 April 2010 *)
-(** runs under V8.2, tested with 8.2pl1 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
