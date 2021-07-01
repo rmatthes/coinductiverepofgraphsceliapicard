@@ -8,4 +8,4 @@ The thesis advisor was [Ralph Matthes](https://www.irit.fr/~Ralph.Matthes/) who 
 Installation instructions are found in (INSTALL.txt)[INSTALL.txt].
 There is a list of correspondances between the thesis text and the code:  (correspondances.pdf)[correspondances.pdf].
 
-The current version was tested with Coq 8.4 beta.
+The files for Coq 8.4 beta still compile fine with Coq 8.4pl6 - regardless of whether with provided makefile or the one generated with coq_makefile from Coq 8.4pl6 provided here (taken from a remark of July 2015 by Ralph Matthes).
