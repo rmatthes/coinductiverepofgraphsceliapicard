@@ -1,5 +1,5 @@
 (** Tools.v Version 1.0 January 2012 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -13,7 +13,7 @@ Require Import Setoid.
 Require Import Morphisms.
 Require Import List.
 Require Import Basics.
-Require Import MinMax. 
+Require Import Max. 
 
 Set Implicit Arguments.
 

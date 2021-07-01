@@ -1,5 +1,5 @@
 (** IlistPerm.v Version 1.1 February 2011 *)
-(** runs under V8.3, tested with 8.3pl2 *)
+(** runs under V8.4beta, tested with version trunk 15623 *)
 
 (** Celia Picard with contributions by Ralph Matthes, 
     I.R.I.T.,  University of Toulouse and CNRS*)
@@ -1276,7 +1276,7 @@ Section IlistPerm_ind.
       right.
       intro H.
       inversion H.
-      rewrite H3, H4 in H2 ; clear i1 i2 H0 H3 H4.
+      try(rewrite H3, H4 in H2) ; clear i1 i2 H0 H3 H4.
       simpl lgti in H2 ; simpl fcti in H2.
       destruct (H2 (first n1)) as [i [H3 _]].
       apply H1.
