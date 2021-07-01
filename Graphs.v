@@ -53,7 +53,7 @@ Section Graphs_def_tools.
       cofix coIH.
       intros [lab l].
       apply Geq_intro.
-      reflexivity.
+      { reflexivity. }
       apply (is_ilist_rel Geq l l (refl_equal _)).
       intro i.
       apply coIH.
@@ -66,10 +66,9 @@ Section Graphs_def_tools.
       intros _ _ g3 [[t1 l1] g2 e1 [e1' h1]] h2 ; 
         destruct h2 as [[t2 l2] [t3 l3] e2 [e2' h2]].
       apply Geq_intro.
-      apply (Rtrans _ t2) ; assumption.
-      simpl in *|-*.
+      { apply (Rtrans _ t2) ; assumption. }
+      cbn in *|-*.
       apply (is_ilist_rel Geq _ _ (trans_eq e1' e2')).
-      
       intro i.
       assert (h3 : rewriteFins (eq_trans e1' e2') i =  
         rewriteFins e2' (rewriteFins e1' i)) by treatFinPure.
@@ -82,8 +81,8 @@ Section Graphs_def_tools.
     Proof.
       cofix coIH.
       intros _ _ [[t1 l1] [t2 l2] e1 [e2 h1]].
-      apply Geq_intro ; simpl in *|-*.
-      apply Rsym, e1.
+      apply Geq_intro ; cbn in *|-*.
+      { apply Rsym, e1. }
       apply (is_ilist_rel _ _ _ (sym_eq e2)).
       intro i.
       assert (h2 := h1 (rewriteFins (eq_sym e2) i)).
@@ -139,12 +138,13 @@ Section Graphs_def_tools.
     cofix coIH.
     destruct g; intros f h.
     inversion_clear h as (a, H).
-    simpl in H.
-    apply is_wfG; simpl.
+    cbn in H.
+    apply is_wfG; cbn.
     inversion_clear i as (n', iln).
-    unfold iall; simpl; intro fi.
+    unfold iall; cbn; intro fi.
     apply (coIH _ _ (H fi)).
   Qed.
+  
   End wf_def_tools.
 
   Section Graph_in_Graph.
@@ -164,9 +164,9 @@ Section Graphs_def_tools.
       intros g1 g2 Heq H.
       revert g2 Heq.
       induction H as [g1 f H | g1 f H IH]; intros y Heq ;
-      destruct Heq as [g1 g2 e1 [e2 Heq]].
-      apply (is_Graph_in_Graph_dir g2 (rewriteFins e2 f) (Geq_trans _ H (Heq f))).
-      apply (is_Graph_in_Graph_indir g2 (rewriteFins e2 f) (IH _ (Heq f))).
+        destruct Heq as [g1 g2 e1 [e2 Heq]].
+      - apply (is_Graph_in_Graph_dir g2 (rewriteFins e2 f) (Geq_trans _ H (Heq f))).
+      - apply (is_Graph_in_Graph_indir g2 (rewriteFins e2 f) (IH _ (Heq f))).
     Qed.
 
     Add Parametric Morphism (RelT: relation T)(Req: Equivalence RelT)(g: Graph) : 
@@ -176,8 +176,8 @@ Section Graphs_def_tools.
       intros g1 g2 Heq H.
       revert g2 Heq.
       induction H as [g f H | g f H IH]; intros g2 Heq.
-      apply (is_Graph_in_Graph_dir g f (Geq_trans _ (Geq_sym _ Heq) H)).
-      apply (is_Graph_in_Graph_indir g f (IH _ Heq)).
+      - apply (is_Graph_in_Graph_dir g f (Geq_trans _ (Geq_sym _ Heq) H)).
+      - apply (is_Graph_in_Graph_indir g f (IH _ Heq)).
     Qed.
 
     (* Lemma to validate the definitions *)
@@ -193,9 +193,9 @@ Section Graphs_def_tools.
     Proof.
       intros g1 g2 H f.
       induction H as [g2 f' H | g2 f' H IH]; apply (is_Graph_in_Graph_indir g2 f').
-      inversion_clear H as [x i _ [H2 H3]].
-      apply (is_Graph_in_Graph_dir _ (rewriteFins H2 f) (H3 _)).
-      apply IH.
+      - inversion_clear H as [x i _ [H2 H3]].
+        apply (is_Graph_in_Graph_dir _ (rewriteFins H2 f) (H3 _)).
+      - apply IH.
     Qed.
       
     (* Proof of preservation of transitivity for Graph_in_Graph *)
@@ -205,9 +205,9 @@ Section Graphs_def_tools.
     Proof.
       intros g1 g2 g3 H1 H2.
       induction H1 as [g2 f H1 | g2 f H1 IH1].
-      apply (Graph_in_GraphM2 _ (Geq_sym _ H1)).
-      apply (GinG_sons_in_Graph H2).
-      apply (IH1 (GinG_sons_in_Graph H2 f)).
+      - apply (Graph_in_GraphM2 _ (Geq_sym _ H1)).
+        apply (GinG_sons_in_Graph H2).
+      - apply (IH1 (GinG_sons_in_Graph H2 f)).
     Qed.
 
   Section Graph_in_Graph_gene.
@@ -247,10 +247,10 @@ Section Graphs_def_tools.
       Graph_in_Graph R g1 g2 -> GinG' R g1 g2.
     Proof.
       intros H ; induction H as [g2 i H1 |g2 i H1 IH].
-      apply (is_Graph_in_Graph_Gene_indir _ i).
-      apply (is_Graph_in_Graph_Gene_dir _ _ _ H1).
-      apply (is_Graph_in_Graph_Gene_indir _ i).
-      apply IH.
+      - apply (is_Graph_in_Graph_Gene_indir _ i).
+        apply (is_Graph_in_Graph_Gene_dir _ _ _ H1).
+      - apply (is_Graph_in_Graph_Gene_indir _ i).
+        apply IH.
     Qed.
   
     Add Parametric Morphism(RelT: relation T)(R_trans: Transitive RelT)(g: Graph) : 
@@ -260,10 +260,10 @@ Section Graphs_def_tools.
       intros g1 g2 Heq H.
       revert g2 Heq.
       induction H as [g1 H | g1 f H IH]; intros y Heq.
-      apply is_Graph_in_Graph_Gene_dir.
-      apply (Geq_trans _ H Heq).
-      destruct Heq as [g1 g2 e1 [e2 Heq]].
-      apply (is_Graph_in_Graph_Gene_indir g2 (rewriteFins e2 f) (IH _ (Heq f))).
+      - apply is_Graph_in_Graph_Gene_dir.
+        apply (Geq_trans _ H Heq).
+      - destruct Heq as [g1 g2 e1 [e2 Heq]].
+        apply (is_Graph_in_Graph_Gene_indir g2 (rewriteFins e2 f) (IH _ (Heq f))).
     Qed.
 
     Add Parametric Morphism (RelT: relation T)(Req: Equivalence RelT)(g: Graph) : 
@@ -273,8 +273,8 @@ Section Graphs_def_tools.
       intros g1 g2 Heq H.
       revert g2 Heq.
       induction H as [g H | g f H IH]; intros g2 Heq.
-      apply (is_Graph_in_Graph_Gene_dir _ _ _ (Geq_trans _ (Geq_sym _ Heq) H)).
-      apply (is_Graph_in_Graph_Gene_indir g f (IH _ Heq)).
+      - apply (is_Graph_in_Graph_Gene_dir _ _ _ (Geq_trans _ (Geq_sym _ Heq) H)).
+      - apply (is_Graph_in_Graph_Gene_indir g f (IH _ Heq)).
     Qed.
 
     Lemma GinG'_sons_in_Graph (RelT: relation T): forall g1 g2, 
@@ -282,9 +282,9 @@ Section Graphs_def_tools.
     Proof.
       intros g1 g2 H i.
       induction H as [g2 H | g2 i' H IH].
-      destruct H as [g1 g2 _ [H1 H2]].
-      apply (is_Graph_in_Graph_Gene_indir _ (rewriteFins H1 i)), is_Graph_in_Graph_Gene_dir, H2.
-      apply (is_Graph_in_Graph_Gene_indir _ i'), IH.
+      - destruct H as [g1 g2 _ [H1 H2]].
+        apply (is_Graph_in_Graph_Gene_indir _ (rewriteFins H1 i)), is_Graph_in_Graph_Gene_dir, H2.
+      - apply (is_Graph_in_Graph_Gene_indir _ i'), IH.
     Qed.
       
     Lemma GinG'_trans (R: relation T)(Req: Equivalence R)(g1 g2 g3: Graph ) : 
@@ -292,8 +292,8 @@ Section Graphs_def_tools.
     Proof.
       intros H1 H2.
       induction H1 as [g2 H1 |g2 i H1 IH].
-      apply (GinG'M2 _ (Geq_sym _ H1)), H2.
-      apply IH, GinG'_sons_in_Graph, H2.
+      - apply (GinG'M2 _ (Geq_sym _ H1)), H2.
+      - apply IH, GinG'_sons_in_Graph, H2.
     Qed.
     
   End GinG'.
@@ -342,8 +342,8 @@ Section Graphs_def_tools.
       intros g1 g2 H1 [g [H2 H3]].
       exists g.
       split.
-      assumption.
-      apply (Geq_trans _ (Geq_sym _ H1) H3).
+      - assumption.
+      - apply (Geq_trans _ (Geq_sym _ H1) H3).
     Qed.
 
     Lemma Geq_ilist_rel(RelT: relation T): forall g1 g2: Graph, Geq RelT g1 g2 -> 
@@ -364,13 +364,13 @@ Section Graphs_def_tools.
       destruct H2 as [g1 Hpb1 H2].
       unfold Geq_prop_morph in HypPg.
       apply is_Gall.
-      rewrite <- H1.
-      assumption.
-      destruct H1 as [g1 g2 _ [H3 H4]].
-      intro i.
-      assert (H5 : i = (rewriteFins H3 (rewriteFins (sym_eq H3) i))) by treatFinPure.
-      rewrite H5.
-      apply (Hcb _ _ (H4 _) (H2 _)).
+      - rewrite <- H1.
+       assumption.
+      - destruct H1 as [g1 g2 _ [H3 H4]].
+       intro i.
+       assert (H5 : i = (rewriteFins H3 (rewriteFins (sym_eq H3) i))) by treatFinPure.
+       rewrite H5.
+       apply (Hcb _ _ (H4 _) (H2 _)).
     Qed.
 
     (* Proof of the monotonicity of P_Finite *)
@@ -379,8 +379,8 @@ Section Graphs_def_tools.
     Proof.
       intros lg lg' g H1 [g' [H2 H3]].
       exists g' ; split.
-      apply (H1 g' H2).
-      assumption.
+      - apply (H1 g' H2).
+      - assumption.
     Qed.
 
     (* Proof of the monotonicity of G_all with P_Finite *)
@@ -389,9 +389,9 @@ Section Graphs_def_tools.
     Proof.
       intros P P' g H1 ; revert g ; cofix Hc ; intros _ [g H2 H3].
       apply is_Gall.
-      apply H1, H2.
-      intro i.
-      apply (Hc _ (H3 i)).
+      - apply H1, H2.
+      - intro i.
+        apply (Hc _ (H3 i)).
     Qed.
 
     Lemma G_all_P_Finite_monotone (RelT: relation T): forall (lg lg':list Graph)(g: Graph),
@@ -417,23 +417,23 @@ Section Graphs_def_tools.
       intros H.
       destruct l as [n l] ; fold (mkilist l) in *|-*.
       induction n as [|n IH].
-      exists nil.
-      intro i.
-      inversion i.
-      assert (H1 : iall (G_finite RelT) (mkilist (fun x => l (succ x)))).
-      intro i.
-      apply (H (succ i)).
-      destruct (IH _ H1) as [lg H2].
-      destruct (H (first n)) as [lg' H3].
-      exists (lg' ++ lg).
-      unfold iall.
-      intro i.
-      elim (zerop (decode_Fin i)) ; intros H4.
-      rewrite (decode_Fin_0_first _ H4).
-      apply (G_all_P_Finite_monotone (incl_appl lg (incl_refl _))), H3.
-      apply (G_all_P_Finite_monotone (incl_appr lg' (incl_refl _))).
-      rewrite (decode_Fin_unique _ _ (decode_Fin_get_cons _ H4 : _ = decode_Fin (succ _))).
-      apply (H2 (get_cons i H4)).
+      - exists nil.
+        intro i.
+        inversion i.
+      - assert (H1 : iall (G_finite RelT) (mkilist (fun x => l (succ x)))).
+        { intro i.
+          apply (H (succ i)). }
+        destruct (IH _ H1) as [lg H2].
+        destruct (H (first n)) as [lg' H3].
+        exists (lg' ++ lg).
+        unfold iall.
+        intro i.
+        elim (zerop (decode_Fin i)) ; intros H4.
+        + rewrite (decode_Fin_0_first _ H4).
+          apply (G_all_P_Finite_monotone (incl_appl lg (incl_refl _))), H3.
+        + apply (G_all_P_Finite_monotone (incl_appr lg' (incl_refl _))).
+          rewrite (decode_Fin_unique _ _ (decode_Fin_get_cons _ H4 : _ = decode_Fin (succ _))).
+          apply (H2 (get_cons i H4)).
     Qed.
 
     (* Proof that if and only if g is finite, 
@@ -443,21 +443,20 @@ Section Graphs_def_tools.
     Proof.
       split ;
       intros H.
-      intro f.
-      destruct H as [lg H].
-      apply (is_Gfinite (lg := lg)).
-      destruct H as [g _ H2].
-      apply (H2 f).
-      
-      destruct (collectLists_G' _ H) as [lg H1].
-      apply (is_Gfinite (lg := g :: lg)).
-      apply is_Gall.
-      exists g.
-      split.
-      apply in_eq.
-      apply (Geq_refl _).
-      intro i. 
-      apply (G_all_P_Finite_monotone (incl_tl _ (incl_refl lg))), H1.
+      - intro f.
+        destruct H as [lg H].
+        apply (is_Gfinite (lg := lg)).
+        destruct H as [g _ H2].
+        apply (H2 f).
+      - destruct (collectLists_G' _ H) as [lg H1].
+        apply (is_Gfinite (lg := g :: lg)).
+        apply is_Gall.
+        + exists g.
+          split.
+          * apply in_eq.
+          * apply (Geq_refl _).
+        + intro i. 
+          apply (G_all_P_Finite_monotone (incl_tl _ (incl_refl lg))), H1.
     Qed.
 
     Lemma G_all_G_in_G_P(RelT: relation T)(Req: Equivalence RelT): 
@@ -467,11 +466,11 @@ Section Graphs_def_tools.
       intros P HypP _ [g _ Hall] gin Hin.
       unfold Geq_prop_morph in HypP.
       induction Hin as [g f Hin | g f Hin IH].
-      rewrite <- (Geq_sym _ Hin).
-      destruct (Hall f) as [g' HPg _].
-      assumption.
-      destruct (Hall f) as [g'  _ H].
-      apply (IH H).
+      - rewrite <- (Geq_sym _ Hin).
+        destruct (Hall f) as [g' HPg _].
+        assumption.
+      - destruct (Hall f) as [g'  _ H].
+        apply (IH H).
     Qed.
 
     Lemma G_finite_All_G_in_G_finite (RelT: relation T)(Req: Equivalence RelT): 
@@ -490,9 +489,9 @@ Section Graphs_def_tools.
       intros g H1 gin H2.
       induction H2 as [g f H3 | g f _ IH] ; 
       destruct (GinG_finite_ci _ g) as [H2 _].
-      apply (G_Finite_Geq_eq _ (Geq_sym _ H3)).
-      apply (H2 H1 f).
-      apply (IH (H2 H1 f)).
+      - apply (G_Finite_Geq_eq _ (Geq_sym _ H3)).
+        apply (H2 H1 f).
+      - apply (IH (H2 H1 f)).
     Qed.
 
   End Finite_def_tools.
@@ -518,10 +517,10 @@ Section Graphs_of_nat.
       cofix Hc.
       intros _ [g [g' [H1 H2]] H].
       apply is_Gall.
-      rewrite (hm _ _ H2).
-      apply (max_list_max (map f lg) _ (in_map _ _ _ H1)).
-      intro i.
-      apply (Hc _ (H i)).
+      - rewrite (hm _ _ H2).
+        apply (max_list_max (map f lg) _ (in_map _ _ _ H1)).
+      - intro i.
+        apply (Hc _ (H i)).
     Qed.
 
     Lemma morph_f_label_nat : morph_f (Geq (@eq nat)) (@label nat).
@@ -621,20 +620,20 @@ Section Examples.
         finite_example :: (mk_Graph 1 (singleton finite_example)) ::nil)).
       cofix Hc.
       apply is_Gall.
-      exists finite_example.
-      split.
-      apply in_eq.
-      apply (Geq_refl _).
-      intro f.
-      apply is_Gall.
-      exists (fcti (sons finite_example) (first 0)).
-      split.
-      right ; left; reflexivity.
-      apply (Geq_refl _).
-      unfold iall.
-      simpl.
-      intro f'.
-      apply Hc.
+      - exists finite_example.
+        split.
+        + apply in_eq.
+        + apply (Geq_refl _).
+      - intro f.
+        apply is_Gall.
+        + exists (fcti (sons finite_example) (first 0)).
+          split.
+          * right ; left; reflexivity.
+          * apply (Geq_refl _).
+        + unfold iall.
+          cbn.
+          intro f'.
+          apply Hc.
     Qed.
 
     Definition finite_example_unfolded: Graph nat.
@@ -649,10 +648,10 @@ Section Examples.
     Proof.
       cofix Hc.
       assert (H :forall (T: Set) (a1 a2: T), lgti (singleton a1) = lgti (singleton a2)).
-      intros T a1 a2 ; reflexivity.
-      do 4 (apply Geq_intro ; try reflexivity ; simpl ; 
+      { intros T a1 a2 ; reflexivity. }
+      do 4 (apply Geq_intro ; try reflexivity ; cbn ; 
         apply (is_ilist_rel _ _ _ (H _ _ _)) ; 
-        simpl ; intro f ; clear f).
+        cbn ; intro f ; clear f).
       apply Hc.
     Qed.
 
@@ -689,12 +688,12 @@ Section Examples.
     Proof.
       intros n m H.
       induction m as [| m IHm].
-      inversion H.
+      { inversion H. }
       elim (le_lt_eq_dec n m (lt_n_Sm_le _ _ H)); intros h.
-      apply (Graph_in_Graph_trans (@eq_equivalence _) (infinite_graph_gene_Sn_in_n m) 
-        (IHm h)).
-      rewrite h.
-      apply infinite_graph_gene_Sn_in_n.
+      - apply (Graph_in_Graph_trans (@eq_equivalence _) (infinite_graph_gene_Sn_in_n m) 
+          (IHm h)).
+      - rewrite h.
+       apply infinite_graph_gene_Sn_in_n.
     Qed.
 
     Lemma infinite_example_gene_unbounded : forall n: nat, 
@@ -703,10 +702,10 @@ Section Examples.
       intros n [m H].
       inversion H as [g h H0 e].
       clear g e H0.
-      simpl in *|-*.
+      cbn in *|-*.
       assert (Hin := infinite_example_gene_n_inc_all (le_gt_S _ _ h)).
       assert (S m <= m).
-      apply (G_all_G_in_G_P (@eq_equivalence _) (@Pg_label_boundM m) H Hin).
+      { apply (G_all_G_in_G_P (@eq_equivalence _) (@Pg_label_boundM m) H Hin). }
       apply (le_Sn_n _ H0).
     Qed.
   
@@ -740,8 +739,8 @@ Section Examples.
       cofix Hc.
       intros n m.
       destruct m as [| m].
-      exact (add11 (Hc (S n) (S n))).
-      exact (mk_Graph 0 (singleton (Hc n m))).
+      - exact (add11 (Hc (S n) (S n))).
+      - exact (mk_Graph 0 (singleton (Hc n m))).
     Defined.
 
 
@@ -763,75 +762,66 @@ Section Examples.
     (forall (n:nat), n <= length lg -> ~~P_Finite (@eq _) lg (seq n)) -> False.
   Proof.
     induction lg as [|g lg IH]; intros seq H1 H2.
-    apply (H2 0 (le_refl 0)).
-    intros [g [H3 _]].
-    inversion H3.
-
-(* the following first part of the proof is based on a simple intuitive argument:
-   not all elements up to index length lg can be in P_Finite lg, 
-   hence one of them must be bisimilar with g
-*)
-
-    apply (IH _ H1).
-    intros n H3 H4.
-
-    apply (H2 _ (lt_le_weak _ _ (le_lt_n_Sm _ _ H3))) ; intro H0.
-
-    assert (H5: Geq (@eq _) (seq n) g).
-    destruct H0 as [g' [[H5|H5] H6]];
-    [rewrite H5 | destruct H4 ; exists g' ; split]; assumption.
-
-  
-(* also the following second  part of the proof is based on a simple intuitive argument:   
-   If we throw this element (seq x) out, the remaining sequence has all elements up to index 
-   length lg in P_Finite lg since g is already taken. Now, this is a contradiction.
-*)
+    - apply (H2 0 (le_refl 0)).
+      intros [g [H3 _]].
+      inversion H3.
+    - (* the following first part of the proof is based on a simple intuitive argument:
+         not all elements up to index length lg can be in P_Finite lg, 
+         hence one of them must be bisimilar with g
+       *)
+      apply (IH _ H1).
+      intros n H3 H4.
+      apply (H2 _ (lt_le_weak _ _ (le_lt_n_Sm _ _ H3))) ; intro H0.
+      assert (H5: Geq (@eq _) (seq n) g).
+      { destruct H0 as [g' [[H5|H5] H6]];
+          [rewrite H5 | destruct H4 ; exists g' ; split]; assumption. }  
+      (* also the following second part of the proof is based on a simple intuitive argument:   
+         If we throw this element (seq x) out, the remaining sequence has all elements up to index 
+         length lg in P_Finite lg since g is already taken. Now, this is a contradiction.
+       *)
  
-(* first some preparations *)
-   set (seq' := fun x: nat => if (le_lt_dec n x) then seq (S x) else seq x).
-   assert (seq'Prop: (forall x: nat, x < n -> seq' x = seq x) /\ 
-     (forall x: nat, n <= x -> seq' x = seq (S x))).
-   split ; intros x h ; unfold seq'; elim (le_lt_dec n x) ; intro a ; try reflexivity ; 
-   [assert (h1 := (le_lt_trans n x n a h)) | assert (h1 := (le_lt_trans n x n h a))] ; 
-   elim (lt_irrefl _ h1).
-   destruct seq'Prop as [seq'Prop1 seq'Prop2].
-
-   assert (H6 : (∀n m : nat, Geq (@eq _) (seq' n) (seq' (n + m)) → m = 0)).
-
-(* seq' is a sub-sequence of seq, so 
-  forall n m : nat, Geq (seq' n) (seq' (n + m)) -> m = 0
-   is a consequence of the same property for seq *)
-
-   intros n' m H6.
-   destruct (le_lt_dec n (n'+m)) as [h1|h1].
-   rewrite (seq'Prop2 _ h1) in H6.
-   destruct (le_lt_dec n n') as [h2 |h2].
-   rewrite (seq'Prop2 _ h2) in H6.
-   rewrite <- plus_Sn_m in H6.
-   apply (H1 (S n') _ H6).
-   rewrite (seq'Prop1 _ h2) in H6.
-   rewrite plus_n_Sm in H6.
-   elim (O_S _ (sym_eq (H1 _ _ H6))).
-   do 2 rewrite seq'Prop1 in H6 ; try exact h1 ; 
-   try exact (le_lt_trans _ _ _ (le_plus_l n' m) h1).
-   apply (H1 _ _ H6).
-
-(* we can now carry out the second step of the proof *)
-   apply (IH _ H6).
-   intros n' H7 H8.
-   destruct (le_lt_dec n n') as [h1|h1'];
-   [rewrite (seq'Prop2 _ h1) in H8 ; destruct (H2 (S n') (le_n_S _ _ H7))
-   | rewrite (seq'Prop1 _ h1') in H8 ; set (h1 := lt_le_weak _ _ h1'); 
-     destruct (H2 n' (le_S _ _ H7))];
-   intros  [g0 [[Hyp1|Hyp1] Hyp2]] ; apply H8;
-   try (exists g0 ; split; assumption) ; rewrite <- Hyp1 in Hyp2 ;
-   assert (H10:=(GeqRel_Transitive (@eq_equivalence _) H5 
-     (GeqRel_Symmetric (@eq_equivalence _) Hyp2)));
-   rewrite (le_plus_minus _ _ h1) in H10.
-   rewrite plus_n_Sm in H10.
-   elim (O_S _ (sym_eq (H1 _ _ H10))).
-   elim (lt_irrefl _ (le_lt_trans n n' n 
-     (not_minus_O_le _ _ (H1 _ _ (GeqRel_Symmetric (@eq_equivalence _) H10))) h1')).
+      (* first some preparations *)
+      set (seq' := fun x: nat => if (le_lt_dec n x) then seq (S x) else seq x).
+      assert (seq'Prop: (forall x: nat, x < n -> seq' x = seq x) /\ 
+         (forall x: nat, n <= x -> seq' x = seq (S x))).
+      { split ; intros x h ; unfold seq'; elim (le_lt_dec n x) ; intro a ; try reflexivity ; 
+          [assert (h1 := (le_lt_trans n x n a h)) | assert (h1 := (le_lt_trans n x n h a))] ; 
+            elim (lt_irrefl _ h1). }
+      destruct seq'Prop as [seq'Prop1 seq'Prop2].
+      assert (H6 : (∀n m : nat, Geq (@eq _) (seq' n) (seq' (n + m)) → m = 0)).
+      { (* seq' is a sub-sequence of seq, so 
+           forall n m : nat, Geq (seq' n) (seq' (n + m)) -> m = 0
+           is a consequence of the same property for seq *)
+        intros n' m H6.
+        destruct (le_lt_dec n (n'+m)) as [h1|h1].
+        + rewrite (seq'Prop2 _ h1) in H6.
+          destruct (le_lt_dec n n') as [h2 |h2].
+          * rewrite (seq'Prop2 _ h2) in H6.
+            rewrite <- plus_Sn_m in H6.
+            apply (H1 (S n') _ H6).
+          * rewrite (seq'Prop1 _ h2) in H6.
+            rewrite plus_n_Sm in H6.
+            elim (O_S _ (sym_eq (H1 _ _ H6))).
+        + do 2 rewrite seq'Prop1 in H6 ; try exact h1 ; 
+             try exact (le_lt_trans _ _ _ (le_plus_l n' m) h1).
+          apply (H1 _ _ H6).
+      }
+      (* we can now carry out the second step of the proof *)
+      apply (IH _ H6).
+      intros n' H7 H8.
+      destruct (le_lt_dec n n') as [h1|h1'];
+       [rewrite (seq'Prop2 _ h1) in H8 ; destruct (H2 (S n') (le_n_S _ _ H7))
+       | rewrite (seq'Prop1 _ h1') in H8 ; set (h1 := lt_le_weak _ _ h1'); 
+         destruct (H2 n' (le_S _ _ H7))];
+       intros  [g0 [[Hyp1|Hyp1] Hyp2]] ; apply H8;
+       try (exists g0 ; split; assumption) ; rewrite <- Hyp1 in Hyp2 ;
+       assert (H10:=(GeqRel_Transitive (@eq_equivalence _) H5 
+         (GeqRel_Symmetric (@eq_equivalence _) Hyp2)));
+       rewrite (le_plus_minus _ _ h1) in H10.
+      + rewrite plus_n_Sm in H10.
+        elim (O_S _ (sym_eq (H1 _ _ H10))).
+      + elim (lt_irrefl _ (le_lt_trans n n' n 
+         (not_minus_O_le _ _ (H1 _ _ (GeqRel_Symmetric (@eq_equivalence _) H10))) h1')).
 Qed.
 
   Lemma list_not_infinite: forall (lg: list (Graph nat))(seq: nat -> Graph nat),
@@ -868,11 +858,11 @@ Qed.
   Proof.
     intro n.
     induction m as [|m IHm].
-    apply inf_ex_bounded_gene_aux_0.
-    rewrite inf_ex_bounded_gene_aux_S.
-    rewrite IHm.
-    unfold addn011 at 2.
-    reflexivity.
+    - apply inf_ex_bounded_gene_aux_0.
+    - rewrite inf_ex_bounded_gene_aux_S.
+      rewrite IHm.
+      unfold addn011 at 2.
+      reflexivity.
   Qed.
     
   Lemma inf_ex_bounded_gene_addn011: forall n, 
@@ -888,30 +878,30 @@ Qed.
   Proof.
     intros g1 g2 n H.
     induction n as [|n IHn].
-    apply Geq_intro.
-    reflexivity.
-    assert (h : lgti (singleton g1) = lgti (singleton g2)).
-    reflexivity.
-    apply (is_ilist_rel _ _ _ h).
-    intro f.
-    assumption.
-    simpl.
-    apply Geq_intro.
-    reflexivity.
-    assert (h : lgti (singleton (addn011 n g1)) = lgti (singleton (addn011 n g2))).
-    reflexivity.
-    apply (is_ilist_rel _ _ _ h).
-    intro f.
-    assumption.
+    - apply Geq_intro.
+      { reflexivity. }
+      assert (h : lgti (singleton g1) = lgti (singleton g2)).
+      { reflexivity. }
+      apply (is_ilist_rel _ _ _ h).
+      intro f.
+      assumption.
+    - cbn.
+      apply Geq_intro.
+      { reflexivity. }
+      assert (h : lgti (singleton (addn011 n g1)) = lgti (singleton (addn011 n g2))).
+      { reflexivity. }
+      apply (is_ilist_rel _ _ _ h).
+      intro f.
+      assumption.
   Qed.
 
   Lemma addn0comp : forall (n1 n2: nat)(g: Graph nat),
     addn0 n1 (addn0 n2 g) = addn0 (n1+n2) g.
   Proof.
     induction n1 as [|n1 IHn].
-    reflexivity.
+    { reflexivity. }
     intros n2 g.
-    simpl.
+    cbn.
     rewrite IHn.
     reflexivity.
   Qed.
@@ -923,30 +913,30 @@ Qed.
     induction n as [|n IHn] ;
     inversion H as [g3 g4 e1 [e H1] h1 h2] ;
     clear g3 g4 e1 h1 h2.
-    assumption.
-    simpl in H1.
-    apply (IHn (H1 (first _))).
+    - assumption.
+    - cbn in H1.
+      apply (IHn (H1 (first _))).
   Qed.
 
   Lemma addn0_Geq: forall (n: nat)(g1 g2: Graph nat),
    Geq (@eq _) g1 g2 ->  Geq (@eq _) (addn0 n g1)(addn0 n g2).
   Proof.
     induction n as [|n IH]; intros g1 g2 H.
-    apply H.
-    apply Geq_intro.
-    reflexivity.
-    simpl.
-    apply (is_ilist_rel _ _ _ (refl_equal _ : 
-     lgti (singleton (addn0 n g1)) = lgti(singleton (addn0 n g2)))).
-    simpl.
-    intro i ; apply IH, H.
+    - apply H.
+    - apply Geq_intro.
+      { reflexivity. }
+      cbn.
+      apply (is_ilist_rel _ _ _ (refl_equal _ : 
+         lgti (singleton (addn0 n g1)) = lgti(singleton (addn0 n g2)))).
+      cbn.
+      intro i ; apply IH, H.
   Qed.
 
   Lemma inf_ex_bounded_gene_inj (n m: nat): 
     Geq (@eq _) (inf_ex_bounded_gene n)(inf_ex_bounded_gene (n+m)) -> m=0.
   Proof.
     destruct m.
-    reflexivity.
+    { reflexivity. }
     intro.
     rewrite inf_ex_bounded_gene_addn011 in H.
     rewrite (inf_ex_bounded_gene_addn011 (n + S m)) in H.
@@ -962,7 +952,7 @@ Qed.
   Proof.
     intros lg g n H.
     induction n as [|n IHn].
-    assumption.
+    { assumption. }
     inversion H as [g' Hp Hall e].
     apply (IHn (Hall (first 0))).
   Qed.
@@ -988,12 +978,12 @@ Qed.
   Proof.
     intros n lg Hyp m. revert n Hyp.
     induction m as [|m IHm]; intros n Hyp.
-    rewrite <- plus_n_O.
-    assumption.
-    rewrite <- plus_n_Sm.
-    assert (H:= IHm _ Hyp).
-    rewrite inf_ex_bounded_gene_addn011 in H.
-    apply (G_all_addn011_inv _ _ H).
+    - rewrite <- plus_n_O.
+      assumption.
+    - rewrite <- plus_n_Sm.
+      assert (H:= IHm _ Hyp).
+      rewrite inf_ex_bounded_gene_addn011 in H.
+      apply (G_all_addn011_inv _ _ H).
   Qed.
 
   Lemma inf_ex_bounded_geneelements: forall (n: nat)(lg: list (Graph nat)),
@@ -1014,12 +1004,12 @@ Qed.
       intros n H.
       inversion H as [lg Hall].
       apply (list_not_infinite (lg:=lg) (fun m:nat => inf_ex_bounded_gene (n+m))).
-      intros n' m H1.
-      rewrite plus_assoc in H1.
-      apply inf_ex_bounded_gene_inj in H1.
-      assumption.
-      intros n' Hle.
-      apply (inf_ex_bounded_geneelements _ Hall).
+      - intros n' m H1.
+        rewrite plus_assoc in H1.
+        apply inf_ex_bounded_gene_inj in H1.
+        assumption.
+      - intros n' Hle.
+        apply (inf_ex_bounded_geneelements _ Hall).
     Qed.
     
     Definition ilist_n0 (n: nat) := mkilist (fun i : Fin n => 0).
@@ -1032,7 +1022,8 @@ Qed.
       match g with 
         mk_Graph l _ => lgti l 
       end.
-    Lemma  inf_ex_bounded_gene'_Sn_n(n: nat): 
+    
+    Lemma  inf_ex_bounded_gene'_Sn_n (n: nat): 
       Graph_in_Graph eq (inf_ex_bounded_gene' (S n)) (inf_ex_bounded_gene' n).
     Proof.
       apply (is_Graph_in_Graph_dir _ (first _ : Fin (lgti (sons (inf_ex_bounded_gene' n))))).
@@ -1044,12 +1035,12 @@ Qed.
     Proof.
       intros H.
       induction m as [| m IHm].
-      inversion H.
+      { inversion H. }
       elim (le_lt_eq_dec n m (lt_n_Sm_le _ _ H)); intros h.
-      apply (Graph_in_Graph_trans (@eq_equivalence _) (inf_ex_bounded_gene'_Sn_n _)
-        (IHm h)).
-      rewrite h.
-      apply inf_ex_bounded_gene'_Sn_n.
+      - apply (Graph_in_Graph_trans (@eq_equivalence _) (inf_ex_bounded_gene'_Sn_n _)
+          (IHm h)).
+      - rewrite h.
+        apply inf_ex_bounded_gene'_Sn_n.
     Qed.
     
     Theorem inf_ex_bounded_gene'_infinite: forall (n: nat), 
@@ -1058,21 +1049,22 @@ Qed.
       intros n.
       assert (H1 := @infinite_unbounded _ eq (inf_ex_bounded_gene' n) nb_O).
       assert (H2 : morph_f (Geq eq) nb_O).
-      intros _ _ [[lab1 l1] [lab2 l2] H2 _].
-      simpl in *|-*.
-      rewrite H2.
-      reflexivity.
+      { intros _ _ [[lab1 l1] [lab2 l2] H2 _].
+        cbn in *|-*.
+        rewrite H2.
+        reflexivity. }
       apply (H1 H2) ; clear H1.
       intros [m H3].
       inversion H3.
       assert (H4 : S m <= m).
-      assert (H5 : forall m x y, Geq eq x y -> impl (nb_O x <= m) (nb_O y <= m)).
-      intros m' _ _ [[labx lx] [laby ly] H4 H5] H6.
-      simpl in *|-*.
-      rewrite <- H4 ; assumption.
-      rewrite (refl_equal _ : S m = nb_O (inf_ex_bounded_gene' (S m))).
-      apply (G_all_G_in_G_P _ (H5 m) H3).
-      apply inf_ex_bounded_gene'_m_n, le_gt_S, H.
+      { assert (H5 : forall m x y, Geq eq x y -> impl (nb_O x <= m) (nb_O y <= m)).
+        { intros m' _ _ [[labx lx] [laby ly] H4 H5] H6.
+          cbn in *|-*.
+          rewrite <- H4 ; assumption. }
+        rewrite (refl_equal _ : S m = nb_O (inf_ex_bounded_gene' (S m))).
+        apply (G_all_G_in_G_P _ (H5 m) H3).
+        apply inf_ex_bounded_gene'_m_n, le_gt_S, H.
+      }
       apply (le_Sn_n _ H4).
     Qed.
       
@@ -1112,14 +1104,14 @@ Lemma JustOneLeaf_finite (n: nat) : G_finite eq (JustOneLeaf n).
 Proof.
   apply (is_Gfinite (lg := JustOneLeaf n :: nil)).
   apply is_Gall.
-  exists (JustOneLeaf n).
-  split.
-  left ; reflexivity.
-  apply (Geq_refl _).
-  unfold iall.
-  simpl.
-  intro i.
-  inversion i.
+  - exists (JustOneLeaf n).
+    split.
+    + left ; reflexivity.
+    + apply (Geq_refl _).
+  - unfold iall.
+    cbn.
+    intro i.
+    inversion i.
 Qed.
 
 CoFixpoint three_nodes_graph: Graph nat :=
@@ -1150,12 +1142,12 @@ Proof.
   try assert (H2 := decode_Fin_unique _ _ (h: _ = decode_Fin (first _)) : f = first 1) ; 
   try assert (H2 := decode_Fin_unique _ _ (h: _ = decode_Fin (succ (first 0))) : 
     f = succ (first 0)) ; 
-  simpl in f, H ; rewrite H2 in H; clear f h H2 a;
+  cbn in f, H ; rewrite H2 in H; clear f h H2 a;
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e) ; 
   try (destruct H as [f' | f'] ;
   rewrite (Fin_first_1 f') in H ; clear f' ; 
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e)) ; 
-  try (destruct H as [[f H | f H] |f H] ; simpl in H ; rewrite (Fin_first_1 f) in H ; 
+  try (destruct H as [[f H | f H] |f H] ; cbn in H ; rewrite (Fin_first_1 f) in H ; 
     clear f) ; 
   try (inversion H as [g1 g2 e H1 H3 H4] ; inversion e) ; 
   try (destruct H as [[f H| f H] | f H] ; inversion f) ; 
@@ -1241,10 +1233,10 @@ Section hasCycle'.
     Proof.
       intros H.
       induction H as [g H |g i H IH].
-      apply (hasCycle'_intro H).
-      apply is_Graph_in_Graph_Gene_dir.
-      apply (Geq_refl _). 
-      apply (hasCycle'_sons _ _ _ IH).
+      - apply (hasCycle'_intro H).
+        apply is_Graph_in_Graph_Gene_dir.
+        apply (Geq_refl _). 
+      - apply (hasCycle'_sons _ _ _ IH).
     Qed.
     
     Add Parametric Morphism (T: Set)(RelT: relation T)(Req: Equivalence RelT) : 
@@ -1260,10 +1252,10 @@ Section hasCycle'.
     Proof.
       intros [g' H1 H2].
       induction H2 as [g H2 |g i H2 IH].
-      apply hasCycle_dir.
-      rewrite <- H2.
-      apply H1.
-      apply (hasCycle_indir _ i IH).
+      - apply hasCycle_dir.
+        rewrite <- H2.
+        apply H1.
+      - apply (hasCycle_indir _ i IH).
     Qed.
 
 End hasCycle'.
