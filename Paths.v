@@ -4,15 +4,15 @@
 (** provides the definition of exploration of the graphs
     with paths *)
 
-Require Import List.
-Require Import Setoid.
+From Stdlib Require Import List.
+From Stdlib Require Import Setoid.
 
 Require Import Tools.
 Require Import Fin.
 Require Import Ilist.
 Require Import IlistPerm.
 Require Import Graphs.
-Require Import Utf8.
+From Stdlib Require Import Utf8.
 
 Set Implicit Arguments.
 
@@ -82,7 +82,7 @@ Section GeqPath.
       cbn in *|-*.
       unfold sumbool_rec, sumbool_rect.
       elim (le_lt_dec ng n) ; intros a.
-      - apply False_rec, (lt_irrefl _ (lt_le_trans _ _ _ h a)).
+      - apply False_rec, (Nat.lt_irrefl _ (Nat.lt_le_trans _ _ _ h a)).
       - assert (H: code_Fin1 a = code_Fin1 h).
         { apply decode_Fin_unique ; do 2 rewrite decode_code1_Id.
           reflexivity. }
@@ -98,7 +98,7 @@ Section GeqPath.
       simpl in *|-*.
       unfold sumbool_rec, sumbool_rect.
       elim (le_lt_dec n' n) ; intros a.
-      - apply False_rec, (lt_irrefl n'), (le_lt_trans _ _ _ a h).
+      - apply False_rec, (Nat.lt_irrefl n'), (Nat.le_lt_trans _ _ _ a h).
       - do 2 f_equal.
         treatFinPure.
     Qed.
@@ -142,18 +142,18 @@ Section GeqPath.
       cbn ; unfold GeqPath in H.
       - reflexivity.
       - assert (H' := H (n2 :: nil)).
-        rewrite (label_path_sons RelT (mk_Graph t2 (mkilist ln2)) (lt_n_Sn n2)) in H'.
+        rewrite (label_path_sons RelT (mk_Graph t2 (mkilist ln2)) (Nat.lt_succ_diag_r n2)) in H'.
         inversion H'.
       - assert (H' := H (n1 :: nil)).
-        rewrite (label_path_sons RelT (mk_Graph t1 (mkilist ln1)) (lt_n_Sn n1)) in H'.
+        rewrite (label_path_sons RelT (mk_Graph t1 (mkilist ln1)) (Nat.lt_succ_diag_r n1)) in H'.
         inversion H'.
       - assert (H1 := H (n1 :: nil)).
-        rewrite (label_path_sons RelT (mk_Graph t1 (mkilist ln1)) (lt_n_Sn n1)) in H1.
+        rewrite (label_path_sons RelT (mk_Graph t1 (mkilist ln1)) (Nat.lt_succ_diag_r n1)) in H1.
         assert (H1lgti := label_path_inf_n_rel_sym RelT _ _ _ H1).
         assert (H2 := H (n2 :: nil)).
-        rewrite (label_path_sons RelT (mk_Graph t2 (mkilist ln2)) (lt_n_Sn n2)) in H2.
+        rewrite (label_path_sons RelT (mk_Graph t2 (mkilist ln2)) (Nat.lt_succ_diag_r n2)) in H2.
         assert (H2lgti := label_path_inf_n_rel RelT _ _ _ H2).
-        rewrite (le_antisym _ _ (lt_n_Sm_le _ _ H1lgti) (lt_n_Sm_le _ _ H2lgti)).
+        rewrite (Nat.le_antisymm _ _ (PeanoNat.lt_n_Sm_le _ _ H1lgti) (PeanoNat.lt_n_Sm_le _ _ H2lgti)).
         reflexivity.
     Qed.
 
@@ -321,7 +321,7 @@ Section GeqPath.
         cbn in *|-*.
         unfold sumbool_rec, sumbool_rect.
         elim (le_lt_dec lgti1 (decode_Fin i1)) ; intros a.
-        + apply (lt_irrefl _ (le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
+        + apply (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
         + assert (h: code_Fin1 a = i1).
           { apply decode_Fin_unique, decode_code1_Id. }
           rewrite h ; assumption.
@@ -329,7 +329,7 @@ Section GeqPath.
         cbn in *|-*.
         unfold sumbool_rec, sumbool_rect.
         elim (le_lt_dec lgti1 (decode_Fin i1)) ; intros a.
-        + apply (lt_irrefl _ (le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
+        + apply (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
         + assert (h: code_Fin1 a = i1).
           { apply decode_Fin_unique, decode_code1_Id. }
           rewrite h.
@@ -346,7 +346,7 @@ Section GeqPath.
         cbn in *|-*.
         unfold sumbool_rec, sumbool_rect.
         elim (le_lt_dec lgti1 (decode_Fin i1)) ; intros a.
-        + apply (lt_irrefl _ (le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
+        + apply (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
         + assert (h: code_Fin1 a = i1).
           { apply decode_Fin_unique, decode_code1_Id. }
           rewrite h ; assumption.
@@ -354,7 +354,7 @@ Section GeqPath.
         cbn in *|-*.
         unfold sumbool_rec, sumbool_rect.
         elim (le_lt_dec lgti1 (decode_Fin i1)) ; intros a.
-        + apply (lt_irrefl _ (le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
+        + apply (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ a (decode_Fin_inf_n i1))).
         + assert (h: code_Fin1 a = i1).
           { apply decode_Fin_unique, decode_code1_Id. }
           rewrite h.
@@ -370,7 +370,7 @@ Section GeqPath.
       exists (n :: l).
       split.
       - assumption.
-      - apply lt_O_Sn.
+      - apply Nat.lt_0_succ.
     Qed.
 
     Lemma getGraph_path_Some_in (T: Set)(g: Graph T)(l: list nat)(RelT: relation T)
@@ -452,7 +452,7 @@ Section GeqPath.
    Proof.
      intros h1 h2.
      destruct l as [|n l].
-     - apply False_rec, (lt_irrefl _ h2).
+     - apply False_rec, (Nat.lt_irrefl _ h2).
      - apply (getGraph_path_Some_cons_in _ n l EqT _ h1).
    Qed.
 
@@ -742,12 +742,12 @@ Section GeqPermPath.
         inversion H2 as [h2 H3] ; cbn in h2, H3.
         elim (le_lt_dec lgti1 t) ; elim (le_lt_dec lgti2 t) ; intros b a.
         + reflexivity.
-        + assert (c := le_lt_trans _ _ _ a b).
+        + assert (c := Nat.le_lt_trans _ _ _ a b).
           rewrite h2 in c.
-          apply (lt_irrefl _ c).
-        + assert (c := le_lt_trans _ _ _ b a).
+          apply (Nat.lt_irrefl _ c).
+        + assert (c := Nat.le_lt_trans _ _ _ b a).
           rewrite h2 in c.
-          apply (lt_irrefl _ c).
+          apply (Nat.lt_irrefl _ c).
         + assert (h3 : code_Fin1 b = rewriteFins h2 (code_Fin1 a)).
           { apply decode_Fin_unique.
             unfold rewriteFins.

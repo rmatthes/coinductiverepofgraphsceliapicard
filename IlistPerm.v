@@ -6,11 +6,11 @@
 
 Require Import Fin.
 Require Import Ilist. 
-Require Import Setoid.
+From Stdlib Require Import Setoid.
 Require Import Extroduce. 
-Require Import Utf8.
-Require Import Basics.
-Require Import Morphisms.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Basics.
+From Stdlib Require Import Morphisms.
 Require Import Tools.
 
 Set Implicit Arguments. 
@@ -1612,8 +1612,8 @@ Section IlistPerm_ind.
           (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
           * intros h.
             rewrite h in b.
-            apply (le_Sn_n _ b).
-          * apply le_lt_n_Sm in b.
+            apply (Nat.nle_succ_diag_l _ b).
+          * apply PeanoNat.le_lt_n_Sm in b.
             change (S (decode_Fin _)) with (decode_Fin (succ  (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c)
         (index_in_extroduce i2 i a)))) in b.
             fold (IlistPerm3Cert_list_function_inv c) in *|-*.
@@ -1637,7 +1637,7 @@ Section IlistPerm_ind.
             (IlistPerm3Cert_list_function (IlistPerm3Cert_list_inv n c) (index_in_extroduce i2 i a))))).
           { intros h.
             rewrite h in b.
-            apply (le_Sn_n _ b). }      
+            apply (Nat.nle_succ_diag_l _ b). }
           fold (IlistPerm3Cert_list_function_inv c) in *|-*.
           elim (le_lt_dec (decode_Fin i2) (decode_Fin (IlistPerm3Cert_list_function c (index_in_extroduce _ _ h)))); 
       intros d.
@@ -1888,16 +1888,16 @@ Section IlistPerm_bij.
        unfold extroduce_Fin, sumbool_rec, sumbool_rect.
        elim (le_lt_dec (decode_Fin (f (first n))) (decode_Fin i)) ; intros a h7 ;
          apply decode_Fin_unique, (f_equal f) in h7 ; rewrite h2 in h7 ; rewrite h7 in a.
-       - apply (le_Sn_n _ a).
+       - apply (Nat.nle_succ_diag_l _ a).
        - rewrite weakFin_ok in a.
-         apply (lt_irrefl _ a).
+         apply (Nat.lt_irrefl _ a).
      }
      set (g' := fun i => index_in_extroduce _ _ (h7 i)).
      apply (IH _ _ f' g') ; intros i; unfold f', g' ; clear f' g'.
      - assert (h8 : decode_Fin (first n) < decode_Fin (g (extroduce_Fin (f (first n))
          (index_in_extroduce (f (first n)) (f (succ i)) (h6 i))))).
        { rewrite (index_from_in_extroduce _ _ (h6 i)), h1. 
-         apply lt_0_Sn. }
+         apply Nat.lt_0_succ. }
        apply decode_Fin_unique, eq_add_S.
        rewrite index_in_extroduce_decode1, (index_from_in_extroduce _ _ (h6 i)), h1 ; try assumption.
        reflexivity.
@@ -1915,7 +1915,7 @@ Section IlistPerm_bij.
            -- apply False_rec.
               rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ (h7 _) b : decode_Fin (succ _) = _)), h2 in a.
               rewrite extroduce_Fin_ok2, weakFin_ok in a ; try assumption.
-              apply (lt_irrefl _ (lt_trans _ _ _ a c)).
+              apply (Nat.lt_irrefl _ (Nat.lt_trans _ _ _ a c)).
          * contradiction (h7 i).
          * inversion b.
        + apply decode_Fin_unique, (f_equal g) in a.
@@ -1928,7 +1928,7 @@ Section IlistPerm_bij.
            intros h8 a.
            elim (lt_eq_lt_dec (decode_Fin (first n)) (decode_Fin (g (succ i)))) ; try intros [c|c] ; try intros c.
            -- rewrite (decode_Fin_unique _ _ (index_in_extroduce_decode1 _ _ h8 c : decode_Fin (succ _) = _)), h2 in a.
-              apply False_rec, (le_Sn_n _ (lt_le_weak _ _ (lt_le_trans _ _ _ a b))).
+              apply False_rec, (Nat.nle_succ_diag_l _ (Nat.lt_le_incl _ _ (Nat.lt_le_trans _ _ _ a b))).
            -- contradiction c.
            -- inversion c.
          * rewrite extroduce_Fin_ok2 ; try assumption.

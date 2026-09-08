@@ -8,10 +8,10 @@ Require Import Fin.
 Require Import Ilist.
 Require Import Extroduce.
 Require Import IlistPerm.
-Require Import Setoid.
-Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Utf8.
 Require Import Graphs.
-Require Import Basics.
+From Stdlib Require Import Basics.
 
 Set Implicit Arguments.
 
@@ -138,7 +138,7 @@ Section GeqPerm.
       ilist_rel eq (imap labelT (sonsT (Graph2TreeG n g))) (imap (@label _) (sons g)).
     Proof.
       destruct n as [|n]; destruct g as [lab l] ; intros h.
-      - apply False_rec, (lt_irrefl _ h).
+      - apply False_rec, (Nat.lt_irrefl _ h).
       - apply (is_ilist_rel _ _ _ (refl_equal _ : 
           lgti (imap labelT (imap (fun x : Graph T => Graph2TreeG n x) l)) = lgti (imap (@label _) l))).
         cbn.

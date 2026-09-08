@@ -12,9 +12,9 @@ Require Import Graphs.
 Require Import GPerm.
 Require Import Tools.
 
-Require Import Setoid.
-Require Import Utf8.
-Require Import Basics.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Basics.
 
 Set Implicit Arguments.
 

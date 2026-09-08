@@ -6,12 +6,12 @@
      with a dedicated (possibly a bisimulation) relation *)
 
 Set Implicit Arguments.
-Require Import Arith.
-Require Import List.
-Require Import Relations.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
+From Stdlib Require Import Arith.
+From Stdlib Require Import List.
+From Stdlib Require Import Relations.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
 
 (* Notation Morphism R f := (Proper (R%signature) f). *)
 
@@ -193,7 +193,7 @@ Proof.
   - reflexivity.
   - destruct n as [|n].
   + assumption.
-  + apply (IHl _ _ (lt_S_n _ _ h) _ H).
+  + apply (IHl _ _ (PeanoNat.lt_S_n _ _ h) _ H).
 Qed.
 
 Lemma ListEq_eq: forall (A B: Set)

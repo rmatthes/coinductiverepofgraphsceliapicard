@@ -11,10 +11,10 @@
 
 
 
-Require Export Arith. 
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
 
 Set Implicit Arguments.
 
@@ -136,11 +136,11 @@ Proof.
     + apply False_rec.
       apply (NatSeg_0_empty (i ns)).
     + elim (eq_nat_dec (elem (i ns)) n'); intros a.
-      * exact (i (makeNatSeg (lt_n_Sn n))).
-      * elim (le_lt_eq_dec (elem ns) n (lt_n_Sm_le (elem ns) n (proof_lt ns))); 
+      * exact (i (makeNatSeg (Nat.lt_succ_diag_r n))).
+      * elim (le_lt_eq_dec (elem ns) n (PeanoNat.lt_n_Sm_le (elem ns) n (proof_lt ns)));
           intros b.
         -- exact (i ns).
-        -- exact ((makeNatSeg (lt_n_Sn n'))).
+        -- exact ((makeNatSeg (Nat.lt_succ_diag_r n'))).
 Defined.
 
 (* Transforms a function i of type : NatSeg (S n) -> NatSeg n' into a 
@@ -150,7 +150,7 @@ Definition mkLessI(n n': nat)(i: NatSeg (S n) -> NatSeg n'):
   NatSeg n -> NatSeg n'.
 Proof.
   intros [m h].
-  exact (i (makeNatSeg (lt_S m n h))).
+  exact (i (makeNatSeg (Nat.lt_lt_succ_r m n h))).
 Defined.
 
 (* Function that allow to create an element of type (NatSeg n) from an 
@@ -169,12 +169,12 @@ Qed.
 (* Function that allow to create an element of type (NatSeg (S n)) from an 
    element of (NatSeg n) *)
 Definition transfoSNs (n: nat) (ns: NatSeg n): NatSeg (S n) :=
-  makeNatSeg (lt_S (elem ns) n (proof_lt ns)).
+  makeNatSeg (Nat.lt_lt_succ_r (elem ns) n (proof_lt ns)).
 
 Program Definition transfoSNs' (n: nat) (ns: NatSeg n): NatSeg (S n) :=
   (elem ns).
 Next Obligation.
-  apply lt_S.
+  apply Nat.lt_lt_succ_r.
   apply elem_lt_n.
 Defined.
 
@@ -361,9 +361,9 @@ Proof.
     + no_NatSeg_0 (i ns).
     + unfold_transformI.
       elim (eq_nat_dec (elem (i ns)) n'); intros a.
-      * elim (eq_nat_dec (elem (j (i (makeNatSeg (lt_n_Sn n))))) n); 
+      * elim (eq_nat_dec (elem (j (i (makeNatSeg (Nat.lt_succ_diag_r n))))) n);
           intros b.
-        -- apply (makeNatSeg_ns_natSegeq (i ns) (lt_n_Sn n')) in a.
+        -- apply (makeNatSeg_ns_natSegeq (i ns) (Nat.lt_succ_diag_r n')) in a.
            rewrite <- a.
            apply Idji.
         -- rewrite Idji in b.
@@ -373,19 +373,19 @@ Proof.
            ++ rewrite Idji in c.
               rewrite c in b.
               apply False_rec.
-              apply (lt_irrefl n b).
+              apply (Nat.lt_irrefl n b).
            ++ elim (le_lt_eq_dec (elem (i ns)) n'); intros d.
               ** apply Idji.
               ** contradiction d ; reflexivity.
-        -- elim (eq_nat_dec (elem (j (makeNatSeg (lt_n_Sn n')))) n); intros c.
+        -- elim (eq_nat_dec (elem (j (makeNatSeg (Nat.lt_succ_diag_r n')))) n); intros c.
            ++ apply is_natSeg_eq.
               rewrite c.
               apply (sym_eq b).
-           ++ elim (le_lt_eq_dec (elem (makeNatSeg (lt_n_Sn n'))) n'); intros d.
+           ++ elim (le_lt_eq_dec (elem (makeNatSeg (Nat.lt_succ_diag_r n'))) n'); intros d.
               ** apply False_rec.
-                 apply (lt_irrefl n' d).
+                 apply (Nat.lt_irrefl n' d).
               ** symmetry.
-                 apply (makeNatSeg_ns_natSegeq ns (lt_n_Sn n)).
+                 apply (makeNatSeg_ns_natSegeq ns (Nat.lt_succ_diag_r n)).
                  assumption.
 Qed.
 
@@ -417,30 +417,30 @@ Proof.
   intros n n' ns i j Hypj Idji h.
   unfold_transformI.
   elim (eq_nat_dec (elem (i ns)) n'); intros a.
-  - elim (eq_nat_dec (elem (ns)) (elem (makeNatSeg (lt_n_Sn n)))); intros b.
+  - elim (eq_nat_dec (elem (ns)) (elem (makeNatSeg (Nat.lt_succ_diag_r n)))); intros b.
     + rewrite b in h.
       apply False_rec.
-      apply (lt_irrefl n h).
-    + elim (le_lt_eq_dec (elem (i (makeNatSeg (lt_n_Sn n)))) n') ;
+      apply (Nat.lt_irrefl n h).
+    + elim (le_lt_eq_dec (elem (i (makeNatSeg (Nat.lt_succ_diag_r n)))) n') ;
         try (intro c).
       * assumption.
       * rewrite <- a in c.
         rewrite elem_bij in c.
-        apply (j_i_inj (makeNatSeg (lt_n_Sn n)) ns i Hypj Idji) in c.
+        apply (j_i_inj (makeNatSeg (Nat.lt_succ_diag_r n)) ns i Hypj Idji) in c.
         destruct c as [c].
         rewrite c in b.
         contradiction b.
         reflexivity.
-      * apply lt_n_Sm_le.
+      * apply PeanoNat.lt_n_Sm_le.
         apply elem_lt_n.
   -  elim (le_lt_eq_dec (elem ns) n); intro b.
      + elim (not_eq (elem (i ns)) n' a); intro c.
        * assumption.
        * apply False_rec.
-         apply (lt_irrefl _ (lt_le_trans _ _ _ c (lt_n_Sm_le _ _ (elem_lt_n (i ns))))).
+         apply (Nat.lt_irrefl _ (Nat.lt_le_trans _ _ _ c (PeanoNat.lt_n_Sm_le _ _ (elem_lt_n (i ns))))).
      + rewrite b in h.
        apply False_rec.
-       apply (lt_irrefl _ h).
+       apply (Nat.lt_irrefl _ h).
 Qed.
 
 (* We define a function that given a function i: NatSeg (S n)-> NatSeg (S n'), 
@@ -536,11 +536,11 @@ Proof.
     + rewrite <- c in d.
       destruct h as [h].
       rewrite h in d.
-      apply False_rec; apply (lt_irrefl _ d).
+      apply False_rec; apply (Nat.lt_irrefl _ d).
     + rewrite <- d in c.
       destruct h as [h].
       rewrite h in c.
-      apply False_rec; apply (lt_irrefl _ c).
+      apply False_rec; apply (Nat.lt_irrefl _ c).
     + reflexivity.
 Qed.
 
@@ -565,21 +565,21 @@ Proof.
       rewrite elem_bij in b.
       apply (j_i_inj ns ns' i Hypj Idji b).
     + elim (le_lt_eq_dec (elem ns') n ); try (intros c H).
-      * apply (j_i_inj (makeNatSeg (lt_n_Sn n)) ns' i Hypj Idji) in H.
+      * apply (j_i_inj (makeNatSeg (Nat.lt_succ_diag_r n)) ns' i Hypj Idji) in H.
         rewrite <- H in c.
         apply False_rec.
-        apply (lt_irrefl n c).
-      * rewrite (makeNatSeg_ns_natSegeq ns' (lt_n_Sn n)) in c.
+        apply (Nat.lt_irrefl n c).
+      * rewrite (makeNatSeg_ns_natSegeq ns' (Nat.lt_succ_diag_r n)) in c.
         rewrite <- c in H.
         rewrite H in a.
         contradiction a; reflexivity.
     + elim (le_lt_eq_dec (elem ns) n );
         intros c H.
-      * apply (j_i_inj ns (makeNatSeg (lt_n_Sn n)) i Hypj Idji) in H.
+      * apply (j_i_inj ns (makeNatSeg (Nat.lt_succ_diag_r n)) i Hypj Idji) in H.
         rewrite H in c.
         apply False_rec. 
-        apply (lt_irrefl n c).
-      * rewrite (makeNatSeg_ns_natSegeq ns (lt_n_Sn n)) in c.
+        apply (Nat.lt_irrefl n c).
+      * rewrite (makeNatSeg_ns_natSegeq ns (Nat.lt_succ_diag_r n)) in c.
         rewrite <- c in H.
         rewrite <- H in b.
         contradiction b; reflexivity.
@@ -633,20 +633,20 @@ Proof.
   apply is_natSeg_eq.
   rewrite mkLessI_transform_transformI_elem_eq.
   assert (H: (exist (fun m : nat => m < S n')
-    (elem (transformI i (exist (fun m : nat => m < S n) m (lt_S m n h))))
-    (lt_S (elem 
-    (transformI i (exist (fun m : nat => m < S n) m (lt_S m n h)))) n'
-    (transformI_lt_n (exist (fun m : nat => m < S n) m (lt_S m n h)) i
+    (elem (transformI i (exist (fun m : nat => m < S n) m (Nat.lt_lt_succ_r m n h))))
+    (Nat.lt_lt_succ_r (elem
+    (transformI i (exist (fun m : nat => m < S n) m (Nat.lt_lt_succ_r m n h)))) n'
+    (transformI_lt_n (exist (fun m : nat => m < S n) m (Nat.lt_lt_succ_r m n h)) i
     Hypj Idji h))) ~ 
-    (transformI i (exist (fun m : nat => m < S n) m (lt_S m n h)))).
+    (transformI i (exist (fun m : nat => m < S n) m (Nat.lt_lt_succ_r m n h)))).
   { apply is_natSeg_eq.
     reflexivity. }
   rewrite H.
   apply (makeNatSeg_ns_natSegeq (transformI j
-    (transformI i (exist (fun m : nat => m < S n) m (lt_S m n h)))) 
-    (lt_S m n h)).
+    (transformI i (exist (fun m : nat => m < S n) m (Nat.lt_lt_succ_r m n h))))
+    (Nat.lt_lt_succ_r m n h)).
   apply (transform_Id Hypi Hypj Idji Idij).
-Qed.  
+Qed.
 
 Add Parametric Morphism (n n': nat)(i: NatSeg (S n) -> NatSeg (S n'))
   (j: NatSeg (S n') -> NatSeg (S n))
@@ -681,10 +681,10 @@ Proof.
   induction n as [|n IHn]; destruct n' as [|n']; 
   intros i j Hypi Hypj Idji Idij; 
   unfold natSeg_morph in Hypi ; unfold natSeg_morph in Hypj.
-  - apply le_refl.
-  - apply le_O_n.
+  - apply Nat.le_refl.
+  - apply Nat.le_0_l.
   - apply False_rec.
-    apply (NatSeg_0_empty (i (makeNatSeg (lt_n_Sn n)))).
+    apply (NatSeg_0_empty (i (makeNatSeg (Nat.lt_succ_diag_r n)))).
   - apply (le_n_S n n').
     set (Hypi':= mkLessI_transformM Hypi Hypj Idji ).
     set (Hypj':= mkLessI_transformM Hypj Hypi Idij).
@@ -703,6 +703,6 @@ Definition NatSeg_inj: forall (n n':nat)
   (forall ns': NatSeg n', i ( j ns') ~ ns') -> n = n'.
 Proof.
   intros n n' i j Hypi Hypj Idji Idij.
-  apply (le_antisym n n' 
+  apply (Nat.le_antisymm n n'
     (NatSeg_inj_aux Hypi Hypj Idji Idij) (NatSeg_inj_aux Hypj Hypi Idij Idji)).
 Defined.

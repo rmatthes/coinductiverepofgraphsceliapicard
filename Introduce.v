@@ -4,9 +4,9 @@
 (** provides the definition of introduce and all associated tools 
     and lemmas  -- just to compare with extroduce *)
 
-Require Import Arith.
-Require Import Utf8.
-Require Import Setoid.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
 Require Import Fin.
 Require Import Ilist.
 Require Import Tools.
@@ -23,7 +23,7 @@ Proof.
   intro f'.
   elim (lt_eq_lt_dec  (decode_Fin f') (decode_Fin f)) ; intros a.
   - destruct a as [a|a].
-    + exact (i (code_Fin1 (lt_le_trans _ _ _ a (lt_n_Sm_le _ _ (decode_Fin_inf_n f))))).
+    + exact (i (code_Fin1 (Nat.lt_le_trans _ _ _ a (PeanoNat.lt_n_Sm_le _ _ (decode_Fin_inf_n f))))).
     + exact t.
   - exact (i (get_cons f' (lt_n_m_0 a))).
 Defined.
@@ -43,14 +43,14 @@ Proof.
   cbn in *|-*.
   elim (lt_eq_lt_dec (decode_Fin f') (decode_Fin f)) ; intros a; try destruct a as [a|a]; 
   unfold sumor_rec,  sumor_rect;
-  try (apply False_rec ; rewrite h in a ; apply (lt_irrefl _ a)).
+  try (apply False_rec ; rewrite h in a ; apply (Nat.lt_irrefl _ a)).
   reflexivity.
 Qed.
 
 Lemma introduce_ok2': forall (T: Set)(i: ilist T)(f: Fin (S (lgti i)))(t:T)
   (f': Fin (lgti (introduce t i f)))(h: decode_Fin f' < decode_Fin f),    
   fcti (introduce t i f) f' = 
-  fcti i (code_Fin1 (lt_le_trans _ _ _ h (lt_n_Sm_le _ _ (decode_Fin_inf_n f)))).
+  fcti i (code_Fin1 (Nat.lt_le_trans _ _ _ h (PeanoNat.lt_n_Sm_le _ _ (decode_Fin_inf_n f)))).
 Proof.
   intros T [n i] f t f' h.
   cbn in *|-*.
@@ -61,10 +61,10 @@ Proof.
     + revert h a ; rewrite (Fin_first_1 f'), (Fin_first_1 f) ; cbn ; intros h a.
       inversion h.
     + apply code_Fin1_proofirr.
-  - apply False_rec, (lt_irrefl (decode_Fin f)).
+  - apply False_rec, (Nat.lt_irrefl (decode_Fin f)).
     rewrite <- a at 1.
     assumption.
-  - apply False_rec, (lt_irrefl (decode_Fin f) (lt_trans _ _ _ a h)).
+  - apply False_rec, (Nat.lt_irrefl (decode_Fin f) (Nat.lt_trans _ _ _ a h)).
 Qed.
 
 Lemma inf_rewriteFins (n m r: nat)(i: Fin n)(h: n = m) : 
@@ -84,8 +84,8 @@ Proof.
   cbn in *|-*.
   unfold sumor_rec, sumor_rect.
   elim (lt_eq_lt_dec (decode_Fin f') (decode_Fin f)) ; [intros a|intros a] ;
-  [apply False_rec, (lt_irrefl (decode_Fin f)); destruct a as [a|a] | f_equal].
-  - apply (lt_trans _ _ _ h a).
+  [apply False_rec, (Nat.lt_irrefl (decode_Fin f)); destruct a as [a|a] | f_equal].
+  - apply (Nat.lt_trans _ _ _ h a).
   - rewrite <- a at 2.
     assumption.
   - apply get_cons_proofirr.
@@ -128,7 +128,7 @@ Proof.
     + apply le_S_n.
       rewrite <- decode_Fin_get_cons, <- decode_Fin_match'.
       rewrite <- (decode_Fin_match' _ (extroduce_lgti (mkilist i) f)) in b.
-      apply gt_le_S, b.
+      apply Arith_base.gt_le_S_stt, b.
 Qed.
 
 Lemma extroduce_introduce_id (T: Set) (RelT : relation T) (EqT: Equivalence RelT)
@@ -150,7 +150,7 @@ Proof.
       { rewrite <- decode_Fin_match'.
         cbn.
         rewrite <- decode_Fin_match'.
-        apply le_lt_n_Sm, a. }
+        apply PeanoNat.le_lt_n_Sm, a. }
       rewrite (introduce_ok3' _ _ _ _ h').
       apply (fRel EqT).
       treatFinPure.

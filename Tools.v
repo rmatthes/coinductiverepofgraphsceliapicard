@@ -4,14 +4,14 @@
 (**  provides the implementation of some basic tools
      relating to arithmetic, lists, and so on *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
-Require Import List.
-Require Import Basics.
-Require Import PeanoNat.
-Require Import Lia.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import List.
+From Stdlib Require Import Basics.
+From Stdlib Require Import PeanoNat.
+From Stdlib Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -144,7 +144,7 @@ Section Tools_lists.
             apply Nat.le_max_l.
           + assert (H1: max_list_nat t <= max h (max_list_nat t)).
             { apply Nat.le_max_r. }
-            apply (le_trans _ _ _ (IHt x H) H1).
+            apply (Nat.le_trans _ _ _ (IHt x H) H1).
       Qed.
       
       Lemma exists_max_list_nat: forall l: list nat, 
@@ -319,9 +319,9 @@ Section Tools_arith.
   Lemma lt_m_n_Sm_n: forall m n: nat, m < n -> (n - (S m)) < n.
   Proof.
     intros m n h.
-    apply lt_minus.
-    - apply (lt_le_S m n h).
-    - apply lt_O_Sn.
+    apply Nat.sub_lt.
+    - apply (Arith_base.lt_le_S_stt m n h).
+    - apply Nat.lt_0_succ.
   Qed.
 
   Lemma Sn_Sm_eq_n_m: forall (n m: nat), (S n) - (S m) = n - m.
@@ -333,7 +333,7 @@ Section Tools_arith.
   Proof.
     intros n m p h.
     rewrite h.
-    apply minus_diag.
+    apply Nat.sub_diag.
   Qed.
 
   Lemma minus_reg_l: forall (n m: nat)(h: m <= n), n - m = n -> m = 0.
@@ -345,16 +345,16 @@ Section Tools_arith.
       + assumption.
     - apply False_rec.
       assert (n-m < n).
-      { apply (lt_minus _ _ h a). }
+      { apply (Nat.sub_lt _ _ h a). }
       rewrite H in H0.
-      apply (lt_irrefl _ H0).
+      apply (Nat.lt_irrefl _ H0).
   Qed.
 
   Lemma lt_plus_S : forall n m, n < n + (S m).
   Proof.
     intros n m.
     rewrite <- plus_n_Sm , <- plus_Sn_m.
-    apply lt_plus_trans, lt_n_Sn.
+    apply Nat.lt_lt_add_r, Nat.lt_succ_diag_r.
   Qed.
 
   Lemma minus_n_m_0 (n m: nat) : m <= n -> n - m = 0 -> n = m.
@@ -373,22 +373,20 @@ Section Tools_arith.
   Lemma lt_minus_S: forall m n: nat, m < n -> (n - (S m)) < n.
   Proof.
     intros m n h.
-    apply lt_minus.
-    - apply (lt_le_S m n h).
-    - apply lt_O_Sn.
+    apply Nat.sub_lt.
+    - apply (Arith_base.lt_le_S_stt m n h).
+    - apply Nat.lt_0_succ.
   Qed.
 
   Lemma lt_n_m_0: forall m n: nat, m < n -> 0 < n.
   Proof.
-    intros m n h.
-    rewrite (S_pred n m h).
-    apply (gt_Sn_O (pred n)).
+    exact Nat.lt_lt_0.
   Qed. 
 
   Lemma pred_inf_n: forall m n: nat, m < n -> pred n < n. 
   Proof. 
     intros m n h.
-    apply (lt_pred_n_n n (lt_n_m_0 h)).
+    apply (Arith_base.lt_pred_n_n_stt n (lt_n_m_0 h)).
   Qed.
   
   Lemma minus_le (n m: nat) : n <= m -> 0 = m - n -> m = n.

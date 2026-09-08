@@ -4,12 +4,12 @@
 (** provides the definition of various relation of permutations 
     on lists and equivalence between them *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
-Require Import List.
-Require Import Basics.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import List.
+From Stdlib Require Import Basics.
 
 Set Implicit Arguments.
 
@@ -30,7 +30,7 @@ Section Tools.
   Lemma length_skipn  (T: Set)(l: list T)(n: nat) : length (skipn n l) = length l - n.
   Proof.
     revert l ; induction n as [|n IH] ; intros l.
-    - apply minus_n_O.
+    - apply Arith_base.minus_n_O_stt.
     - destruct l as [|t l].
       + reflexivity.
       + apply IH.
@@ -40,7 +40,7 @@ Section Tools.
   Proof.
     revert l ; induction n as [|n IH] ; intros l h.
     - cbn.
-      apply le_n_0_eq, sym_eq in h.
+      apply Arith_base.le_n_0_eq_stt, sym_eq in h.
       apply sym_eq, length_nil, h.
     - destruct l as [|t l].
       + reflexivity.
@@ -52,7 +52,7 @@ Section Tools.
   Proof.
     revert l ; induction n as [|n IH] ; intros l h.
     - cbn.
-      apply le_n_0_eq, sym_eq in h.
+      apply Arith_base.le_n_0_eq_stt, sym_eq in h.
       apply length_nil, h.
     - destruct l as [|t l].
       + reflexivity.
@@ -116,7 +116,7 @@ Section Tools.
     - cbn.
       f_equal.
       apply IH.
-      apply lt_S_n, h.
+      apply PeanoNat.lt_S_n, h.
   Qed.
 
 (* another exercise by R.M. to use firstn_skipn - not so successful *)
@@ -130,7 +130,7 @@ Section Tools.
     - cbn.
       f_equal.
       apply IH.
-      apply lt_S_n, h.
+      apply PeanoNat.lt_S_n, h.
   Qed.
 
 Lemma firstn_nth_skipn_ALT (T: Set)(d: T)(n: nat)(l: list T) : 
@@ -139,7 +139,7 @@ Lemma firstn_nth_skipn_ALT (T: Set)(d: T)(n: nat)(l: list T) :
     intro h.
     rewrite <- (firstn_skipn (S n)) at 1.
     rewrite (firstn_nth_skipn_ALT_aux d) by assumption.
-    rewrite app_ass.
+    rewrite <- app_assoc.
     f_equal.
   Qed.
     
@@ -159,9 +159,9 @@ Section remel.
   Proof.
     intros h.
     unfold remel.
-    rewrite app_length, firstn_length, length_skipn, PeanoNat.Nat.min_l, <- plus_Sn_m.
-    - apply le_plus_minus_r, lt_le_S, h.
-    - apply lt_le_weak, h.
+    rewrite length_app, length_firstn, length_skipn, PeanoNat.Nat.min_l, <- plus_Sn_m.
+    - apply Arith_base.le_plus_minus_r_stt, Arith_base.lt_le_S_stt, h.
+    - apply Nat.lt_le_incl, h.
   Qed.
   
   Lemma remel_nil (T: Set)(n: nat) : remel n nil = @nil T.
@@ -192,7 +192,7 @@ Section remel.
     f_equal.
     rewrite (app_assoc l1 (t :: nil) l2 : l1 ++ t :: l2 = (l1 ++ (t :: nil)) ++ l2).
     apply skipn_app_cor.
-    rewrite app_length.
+    rewrite length_app.
     cbn.
     rewrite <- plus_n_Sm, <- plus_n_O.
     reflexivity.
@@ -210,7 +210,7 @@ Section remel.
         destruct n' as [|n'].
         * reflexivity.
         * apply IH.
-          apply lt_S_n, H.
+          apply PeanoNat.lt_S_n, H.
   Qed.
   
   Lemma remel_nth2 (T: Set)(d: T)(n n': nat)(l: list T) : 
@@ -245,7 +245,7 @@ Section remel.
       - elim (lt_eq_lt_dec n (S n')) ; try intros [a|a] ; try intros a ; try contradiction a.
         + exists n'.
           apply sym_eq, remel_nth2.
-          apply lt_n_Sm_le, a.
+          apply PeanoNat.lt_n_Sm_le, a.
         + exists (S n').
           apply sym_eq, remel_nth1 ; assumption.
     Qed. 
@@ -264,7 +264,7 @@ Section remel.
       - elim (lt_eq_lt_dec n (S n')) ; try intros [a|a] ; try intros a ; try contradiction a.
         + exists n'; intros.
           apply sym_eq, remel_nth2.
-          apply lt_n_Sm_le, a.
+          apply PeanoNat.lt_n_Sm_le, a.
         + exists (S n'); intros.
           apply sym_eq, remel_nth1 ; assumption.
     Qed.
@@ -288,7 +288,7 @@ Section remel.
       unfold sumor_rec, sumor_rect.
       elim (lt_eq_lt_dec n (S n')) ; try intros [a|a] ; try intros a ; try contradiction a.
       - reflexivity.
-      - apply False_rec, (lt_irrefl _ (lt_trans _ _ _ h1 a)).
+      - apply False_rec, (Nat.lt_irrefl _ (Nat.lt_trans _ _ _ h1 a)).
     Qed.
     
     Lemma index_in_remel_ok2 (n n' : nat)(h : n <> n') : 
@@ -300,7 +300,7 @@ Section remel.
       - cbn.
         unfold sumor_rec, sumor_rect.
         elim (lt_eq_lt_dec n (S n')) ; try intros [a|a] ; try intros a ; try contradiction a.
-        + apply False_rec, (lt_irrefl _ (lt_trans _ _ _ h1 a)).
+        + apply False_rec, (Nat.lt_irrefl _ (Nat.lt_trans _ _ _ h1 a)).
         + reflexivity.
     Qed.
     
@@ -312,7 +312,7 @@ Section remel.
         + inversion a.
         + rewrite index_in_remel_ok1 ; try assumption.
           apply sym_eq, remel_nth2.
-          apply lt_n_Sm_le, a.
+          apply PeanoNat.lt_n_Sm_le, a.
       - rewrite index_in_remel_ok2 ; try assumption.
         apply sym_eq, remel_nth1 ; assumption.
     Qed. 
@@ -323,9 +323,9 @@ Section remel.
       - destruct n' as [|n'].
         + inversion a.
         + rewrite index_in_remel_ok1 ; try assumption.
-          apply le_n_Sn.
+          apply Nat.le_succ_diag_r.
       - rewrite index_in_remel_ok2 ; try assumption.
-        apply le_refl.
+        apply Nat.le_refl.
     Qed.
 
 (* same kind of motivation by R.M. for index_from_remel *)
@@ -363,8 +363,8 @@ Section remel.
     Proof.
       unfold index_from_remel, sumbool_rec, sumbool_rect.
       elim (le_lt_dec n n') ; intros a h ; rewrite <- h in a.
-      - apply (le_Sn_n _ a).
-      - apply (lt_irrefl _ a).
+      - apply (Nat.nle_succ_diag_l _ a).
+      - apply (Nat.lt_irrefl _ a).
     Qed.
     
     Lemma index_from_remel_ok1 (n n' : nat) : n <= n' -> index_from_remel n n' = S n'.
@@ -373,7 +373,7 @@ Section remel.
       unfold index_from_remel, sumbool_rec, sumbool_rect.
       elim (le_lt_dec n n') ; intros a.
       - reflexivity.
-      - apply False_rec, (lt_irrefl _ (le_lt_trans _ _ _ h a)).
+      - apply False_rec, (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ h a)).
     Qed.
     
     Lemma index_from_remel_ok2 (n n' : nat) : n' < n -> index_from_remel n n' = n'.
@@ -381,7 +381,7 @@ Section remel.
       intros h.
       unfold index_from_remel, sumbool_rec, sumbool_rect.
       elim (le_lt_dec n n') ; intros a.
-      - apply False_rec, (lt_irrefl _ (le_lt_trans _ _ _ a h)).
+      - apply False_rec, (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ a h)).
       - reflexivity.
     Qed.
     
@@ -399,18 +399,18 @@ Section remel.
     Proof.
       elim (le_lt_dec n n') ; intros a.
       - rewrite index_from_remel_ok1 ; try assumption.
-        apply le_n_Sn.
+        apply Nat.le_succ_diag_r.
       - rewrite index_from_remel_ok2 ; try assumption.
-        apply le_refl.
+        apply Nat.le_refl.
     Qed.
     
     Lemma index_from_remel_le2 (n n' : nat): index_from_remel n n' <= S n'.
     Proof.
       elim (le_lt_dec n n') ; intros a.
       - rewrite index_from_remel_ok1 ; try assumption.
-        apply le_refl.
+        apply Nat.le_refl.
       - rewrite index_from_remel_ok2 ; try assumption.
-        apply le_n_Sn.
+        apply Nat.le_succ_diag_r.
     Qed.
     
     Lemma index_in_from_remel (n n' : nat)(h: n <> index_from_remel n n') : 
@@ -419,7 +419,7 @@ Section remel.
       revert h ; elim (le_lt_dec n n') ; intros a.
       - rewrite index_from_remel_ok1 ; try assumption.
         intros h.
-        apply index_in_remel_ok1, le_lt_n_Sm, a.
+        apply index_in_remel_ok1, PeanoNat.le_lt_n_Sm, a.
       - rewrite index_from_remel_ok2 ; try assumption.
         intros h.
         apply index_in_remel_ok2, a.
@@ -433,7 +433,7 @@ Section remel.
         + inversion a.
         + rewrite index_in_remel_ok1, index_from_remel_ok1 ; try assumption.
           * reflexivity.
-          * apply lt_n_Sm_le, a.
+          * apply PeanoNat.lt_n_Sm_le, a.
       - rewrite index_in_remel_ok2, index_from_remel_ok2 ; try assumption.
         reflexivity.
     Qed.
@@ -443,18 +443,18 @@ Section remel.
     Proof.
       intros h1.
       elim (not_eq _ _ h) ; intros a.
-      - apply lt_S_n.
+      - apply PeanoNat.lt_S_n.
         destruct n' as [|n'].
         + inversion a.
         + rewrite length_remel, index_in_remel_ok1 ; try assumption.
-          apply (lt_trans _ _ _ a h1).
+          apply (Nat.lt_trans _ _ _ a h1).
       - elim (le_lt_dec (length l) n) ; intros b.
         + rewrite remel_ext ; try assumption.
-          apply (le_lt_trans _ _ _ (index_in_remel_le h) h1).
-        + apply lt_S_n.
+          apply (Nat.le_lt_trans _ _ _ (index_in_remel_le h) h1).
+        + apply PeanoNat.lt_S_n.
           rewrite length_remel, index_in_remel_ok2 ; try assumption.
-          apply lt_le_S in a.
-          apply (le_lt_trans _ _ _ a b).
+          apply Arith_base.lt_le_S_stt in a.
+          apply (Nat.le_lt_trans _ _ _ a b).
     Qed.
     
     Lemma index_in_remel_proof_irrel (n n': nat) (a a' : n <> n') : 
@@ -481,29 +481,29 @@ Section remel.
       + rewrite remel_O_cons, remel_S_cons, remel_O_cons.
         reflexivity.
       + destruct n' as [|n'].
-        * apply lt_S_n in h ; inversion h.
+        * apply PeanoNat.lt_S_n in h ; inversion h.
         * repeat rewrite remel_S_cons.
           f_equal.
           apply IH.
-          apply lt_S_n, h.
+          apply PeanoNat.lt_S_n, h.
   Qed.
 
   Lemma remel_interchange_aux1_elemwise_aux  (n n' n'': nat)(h : n < S n') :
     index_from_remel n (index_from_remel n' n'') = index_from_remel (S n') (index_from_remel n n'').
   Proof.
     elim (le_lt_dec n' n'') ; intros a.
-    - assert (b := le_trans _ _ _ (lt_n_Sm_le _ _ h) a).
+    - assert (b := Nat.le_trans _ _ _ (PeanoNat.lt_n_Sm_le _ _ h) a).
       repeat rewrite index_from_remel_ok1 ; try assumption.
       + reflexivity.
       + apply le_n_S, a.
-      + apply (le_trans _ _ _ b (le_n_Sn n'')).
+      + apply (Nat.le_trans _ _ _ b (Nat.le_succ_diag_r n'')).
     - rewrite (index_from_remel_ok2 a), (@index_from_remel_ok2 (S n') _).
       + reflexivity.
       + elim (le_lt_dec n n'') ; intros b.
         * rewrite (index_from_remel_ok1 b).
-          apply lt_n_S, a.
+          apply Arith_base.lt_n_S_stt, a.
         * rewrite (index_from_remel_ok2 b).
-          apply (lt_trans _ _ _ b h).
+          apply (Nat.lt_trans _ _ _ b h).
   Qed.
 
   Lemma remel_interchange_aux1_elemwise  (T: Set)(n n' n'': nat)(h : n < S n')(l: list T)(d: T) : 
@@ -564,7 +564,7 @@ At least, the above lemma is a consequence of remel_interchange_aux1: *)
       + reflexivity.
       + cbn.
         apply IHn.
-        apply lt_S_n.
+        apply PeanoNat.lt_S_n.
         assumption.
   Qed.
 
@@ -683,7 +683,7 @@ Section Permutations_definitions.
   Proof.
     induction l as [|t l IH].
     - apply P1nil.
-    - apply (@P1cons _ _ 0 0 t) ; try apply lt_0_Sn.
+    - apply (@P1cons _ _ 0 0 t) ; try apply Nat.lt_0_succ.
       + reflexivity.
       + assumption.
   Qed. 
@@ -773,7 +773,7 @@ Section Permutations_definitions.
         * do 2 rewrite remel_O_cons.
           assumption.
       + cbn in HL.
-        apply lt_S_n in HL.
+        apply PeanoNat.lt_S_n in HL.
         destruct (H2 n1 d HL) as [n2 H] ; clear H2.
         exists (S n2).
         destruct H as [H3 [H4 H5]].
@@ -822,11 +822,11 @@ Section Proofs_of_equivalence.
   Proof.
     intros H ; induction H as [|a b l l1 l2 H1 H2 IH].
     - apply P1nil.
-    - apply (@P1cons _ _ 0 (length l1) a) ; try apply lt_O_Sn.
-      + rewrite app_length.
-        rewrite <- (plus_0_r (length l1)) at 1.
-        apply plus_lt_compat_l, lt_O_Sn.
-      + rewrite app_nth2, minus_diag ; try apply le_refl.
+    - apply (@P1cons _ _ 0 (length l1) a) ; try apply Nat.lt_0_succ.
+      + rewrite length_app.
+        rewrite <- (Nat.add_0_r (length l1)) at 1.
+        apply add_lt_mono_l_proj_l2r, Nat.lt_0_succ.
+      + rewrite app_nth2, Nat.sub_diag ; try apply Nat.le_refl.
         assumption.
       + rewrite remel_app, remel_O_cons.
         exact IH.
@@ -841,11 +841,11 @@ Section Proofs_of_equivalence.
     - apply P1nil.
     - inversion H1.
     - inversion H1.
-    - destruct (IH 0 t1 (lt_O_Sn _ : 0 < length (t1 :: l1))) as [n2 H].
+    - destruct (IH 0 t1 (Nat.lt_0_succ _ : 0 < length (t1 :: l1))) as [n2 H].
       destruct H as [H2 [H3 H4]] ; clear IH.
       apply (@P1cons _ _ 0 n2 t1) ; try assumption.
-      + apply lt_O_Sn.
-      + apply (permut2_wellformed _ _ n2 H1 (lt_O_Sn _ : 0 < length (t1 :: l1)) H3).
+      + apply Nat.lt_0_succ.
+      + apply (permut2_wellformed _ _ n2 H1 (Nat.lt_0_succ _ : 0 < length (t1 :: l1)) H3).
   Qed.
 
   Lemma permut2_permut (T: Set)(R: relation T)(l1 l2 : list T) : 
@@ -856,10 +856,10 @@ Section Proofs_of_equivalence.
     - apply Pnil.
     - inversion H1.
     - inversion H1.
-    - destruct (IH 0 t1 (lt_O_Sn _ : 0 < length (t1 :: l1))) as [n2 H]; clear IH.
+    - destruct (IH 0 t1 (Nat.lt_0_succ _ : 0 < length (t1 :: l1))) as [n2 H]; clear IH.
       destruct H as [H2 [H3 H4]].
       assert (a: n2 < length (t2 :: l2)).
-      { apply (permut2_wellformed _ _ n2 H1 (lt_O_Sn _ : 0 < length (t1 :: l1)) H3). }
+      { apply (permut2_wellformed _ _ n2 H1 (Nat.lt_0_succ _ : 0 < length (t1 :: l1)) H3). }
       rewrite (firstn_nth_skipn t1 (t2 :: l2) a).
       apply Pcons ; assumption.
   Qed.

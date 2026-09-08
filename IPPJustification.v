@@ -10,11 +10,9 @@ Require Import GPerm.
 Require Import IlistPerm. 
 Require Import Tools.
 
-Require Import List.
-Require Import Le.
-Require Import Plus.
-Require Import Logic.ClassicalFacts. (* this does not assume classical axioms but only studies them *)
-Require Import Logic.ChoiceFacts. (* this does not assume choice axioms but only studies them *)
+From Stdlib Require Import List.
+From Stdlib Require Import Logic.ClassicalFacts. (* this does not assume classical axioms but only studies them *)
+From Stdlib Require Import Logic.ChoiceFacts. (* this does not assume choice axioms but only studies them *)
 
 Set Implicit Arguments.
 
@@ -202,11 +200,11 @@ Lemma MaxFinOk (m: nat)(f: Fin m -> nat)(e: Fin m): MaxFin f >= f e.
 Proof.
   revert f; induction e; intros.
   - cbn.
-    apply le_plus_l.
+    apply Nat.le_add_r.
   - cbn.
-    eapply le_trans.
+    eapply Nat.le_trans.
     + eapply (IHe (fun e: Fin k => f (succ e))).
-    + apply le_plus_r.
+    + apply Nat.le_add_l.
 Qed.
 
 Definition MaxFin' (m: nat) (f: Fin m -> nat) : nat := max_list_nat (map f (makeListFin m)).
@@ -251,12 +249,12 @@ Proof.
     destruct (HH n) as [f fgood].
     intros H.
     apply (Hyp _ _ fgood).
-    apply (le_trans _ (MaxFin' k')).
+    apply (Nat.le_trans _ (MaxFin' k')).
     - apply MaxFin'Ok.
     - assumption.
   }
   apply (H (S (MaxFin' k'))).
-  apply le_n_Sn.
+  apply Nat.le_succ_diag_r.
 Qed.
 
 (* Thus, DNE (or excluded_middle) suffices to justify IPPFin, but we need to justify IPPIlistPerm3Cert.
@@ -291,8 +289,8 @@ Qed.
 
 Lemma FmFnFmn_aux(m n p : nat): p < m*n ->  p + n < (S m) * n.
 Proof.
-  rewrite plus_comm.
-  apply plus_lt_compat_l.
+  rewrite Nat.add_comm.
+  apply add_lt_mono_l_proj_l2r.
 Qed.
 
 Definition FmFnFmn (m n: nat) : Fin m * Fin n -> Fin (m * n).
@@ -300,7 +298,7 @@ Proof.
   revert n ; induction m as [|m IH]; intros n [i1 i2].
   { inversion i1. }
   elim (zerop (decode_Fin i1)) ; intros H1.
-  - apply (@code_Fin1 _ (decode_Fin i2)), lt_plus_trans, decode_Fin_inf_n.
+  - apply (@code_Fin1 _ (decode_Fin i2)), Nat.lt_lt_add_r, decode_Fin_inf_n.
   - apply (@code_Fin1 _ (decode_Fin (IH _ ((get_cons _ H1), i2)) + n)).
     apply FmFnFmn_aux, decode_Fin_inf_n.
 Defined.
@@ -309,7 +307,7 @@ Lemma FmnFmFn_aux(m n p : nat): p < S m * n -> n <= p -> p - n < m * n.
 Proof.
   intros h1 h2.
   apply (plus_lt_reg_l _ _ n).
-  rewrite <- (le_plus_minus _ _ h2).
+  rewrite <- (Arith_base.le_plus_minus_stt _ _ h2).
   apply h1.
 Qed.
 
@@ -331,7 +329,7 @@ Proof.
   set (x := le_lt_dec n (decode_Fin i)).
   change (le_lt_dec n (decode_Fin i)) with x.
   elim x ; intros a.
-  - apply False_rec, (lt_irrefl n), (le_lt_trans _ _ _ a h1).
+  - apply False_rec, (Nat.lt_irrefl n), (Nat.le_lt_trans _ _ _ a h1).
   - f_equal.
     treatFinPure.
 Qed.
@@ -348,17 +346,17 @@ Proof.
   elim x ; intros a.
   - do 3 f_equal ; try treatFinPure.
     + f_equal ; treatFinPure.
-  - apply False_rec, (lt_irrefl n), (le_lt_trans _ _ _ h1 a).
+  - apply False_rec, (Nat.lt_irrefl n), (Nat.le_lt_trans _ _ _ h1 a).
 Qed.
 
 Lemma FmFnFmn_ok1 (m n :nat) (i1: Fin (S m)) (i2 : Fin n)(h1 : decode_Fin i1 = 0): 
-  FmFnFmn (i1, i2) = code_Fin1 (lt_plus_trans  _ _ (m*n) (decode_Fin_inf_n i2)).
+  FmFnFmn (i1, i2) = code_Fin1 (Nat.lt_lt_add_r  _ _ (m*n) (decode_Fin_inf_n i2)).
 Proof.
   cbn.
   unfold sumbool_rec, sumbool_rect.
   elim (zerop (decode_Fin i1)) ; intros a.
   - treatFinPure.
-  - apply False_rec, (lt_irrefl 0).
+  - apply False_rec, (Nat.lt_irrefl 0).
     rewrite h1 in a.
     assumption.
 Qed.
@@ -369,7 +367,7 @@ Proof.
   cbn.
   unfold sumbool_rec, sumbool_rect.
   elim (zerop (decode_Fin i1)) ; intros a.
-  - apply False_rec, (lt_irrefl 0).
+  - apply False_rec, (Nat.lt_irrefl 0).
     rewrite a in h1.
     assumption.
   - assert (h2 : get_cons i1 a = get_cons i1 h1) by treatFinPure.
@@ -385,15 +383,15 @@ Proof.
   elim (zerop (decode_Fin i1)) ; intros H1.
   - rewrite FmFnFmn_ok1 ; try assumption.
     rewrite decode_code1_Id, H1.
-    rewrite mult_0_l.
+    rewrite Nat.mul_0_l.
     rewrite plus_O_n; reflexivity.
   - rewrite (FmFnFmn_ok2 _ _ H1).
     rewrite decode_code1_Id.
     rewrite IHm.
     rewrite (decode_Fin_get_cons _ H1).
     cbn.
-    rewrite plus_comm.
-    apply plus_assoc.
+    rewrite Nat.add_comm.
+    apply Nat.add_assoc.
 Qed.
 
 Lemma decode_FmnFmFn(m n: nat)(i : Fin (m*n)) : 
@@ -407,17 +405,17 @@ Proof.
     set (i' := code_Fin1 (FmnFmFn_aux m (decode_Fin_inf_n i) a)).
     change (n + decode_Fin (fst (FmnFmFn m n i')) * n + decode_Fin (snd (FmnFmFn m n i')) =
       decode_Fin i).
-    rewrite <- plus_assoc.
+    rewrite <- Nat.add_assoc.
     rewrite IHm.
     unfold i'.
     rewrite decode_code1_Id.
-    apply le_plus_minus_r, a.
+    apply Arith_base.le_plus_minus_r_stt, a.
   - rewrite (FmnFmFn_ok1 _ _ a).
     cbn.
     apply decode_code1_Id.
 Qed.
 
-Require Import Euclid.
+From Stdlib Require Import Euclid.
 
 Lemma le_exists (n m : nat) : 0 < m -> m <= n -> exists x, exists y, y < m /\ n = x * m + y.
 Proof.
@@ -435,7 +433,7 @@ Proof.
   - destruct (IH n) as [IH' _].
     elim (zerop (decode_Fin i1)); intros a.
     + rewrite (FmFnFmn_ok1 _ _ a).
-      assert (H1 : decode_Fin (code_Fin1 (lt_plus_trans (decode_Fin i2) n (m * n) (decode_Fin_inf_n i2))) < n).
+      assert (H1 : decode_Fin (code_Fin1 (Nat.lt_lt_add_r (decode_Fin i2) n (m * n) (decode_Fin_inf_n i2))) < n).
       { rewrite decode_code1_Id.
         apply decode_Fin_inf_n. }
       rewrite (FmnFmFn_ok1 _ _ H1).
@@ -445,7 +443,7 @@ Proof.
     + rewrite (FmFnFmn_ok2 _ _ a).
       assert (H1 : n <= decode_Fin (code_Fin1 (FmFnFmn_aux m n (decode_Fin_inf_n (FmFnFmn (get_cons i1 a, i2)))))).
       { rewrite decode_code1_Id.
-        apply le_plus_r. }
+        apply Nat.le_add_l. }
       rewrite (FmnFmFn_ok2 _ _ H1).
       revert H1.
       set (x := code_Fin1 (FmFnFmn_aux m n (decode_Fin_inf_n (FmFnFmn (get_cons i1 a, i2))))).
@@ -456,8 +454,8 @@ Proof.
         apply decode_Fin_unique.
         unfold x.
         repeat rewrite decode_code1_Id.
-        rewrite plus_comm.
-        apply minus_plus.
+        rewrite Nat.add_comm.
+        apply Nat.add_simpl_l.
       }
       rewrite H2.
       cbn.
@@ -482,7 +480,7 @@ Proof.
   - destruct IHn as [m0 [f0 [g0 HypB0]]].
     cbn.
     exists ((S n) * (S n) * m0).
-    rewrite <- mult_assoc.
+    rewrite <- Nat.mul_assoc.
     exists (fun x => FmFnFmn ((fst (fst x)) , (FmFnFmn (snd (fst x), (f0 (snd x)))))),
       (fun i => 
         (fst (FmnFmFn _ _ i), fst (FmnFmFn _ _ (snd (FmnFmFn _ _ i))), g0 (snd (FmnFmFn _ _ (snd (FmnFmFn _ _ i)))))).

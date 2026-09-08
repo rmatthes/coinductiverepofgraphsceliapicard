@@ -4,14 +4,14 @@
 (**  provides the implementation of the type Graphs, properties 
      and lemmas on it, and the development of various examples *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import List.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import List.
 Require Import Ilist.
 Require Import Fin.
-Require Import Morphisms.
-Require Import Basics.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import Basics.
 Require Import Tools.
 Require Import ListEq.
 
@@ -689,7 +689,7 @@ Section Examples.
       intros n m H.
       induction m as [| m IHm].
       { inversion H. }
-      elim (le_lt_eq_dec n m (lt_n_Sm_le _ _ H)); intros h.
+      elim (le_lt_eq_dec n m (PeanoNat.lt_n_Sm_le _ _ H)); intros h.
       - apply (Graph_in_Graph_trans (@eq_equivalence _) (infinite_graph_gene_Sn_in_n m) 
           (IHm h)).
       - rewrite h.
@@ -703,10 +703,10 @@ Section Examples.
       inversion H as [g h H0 e].
       clear g e H0.
       cbn in *|-*.
-      assert (Hin := infinite_example_gene_n_inc_all (le_gt_S _ _ h)).
+      assert (Hin := infinite_example_gene_n_inc_all (Arith_base.le_gt_S_stt _ _ h)).
       assert (S m <= m).
       { apply (G_all_G_in_G_P (@eq_equivalence _) (@Pg_label_boundM m) H Hin). }
-      apply (le_Sn_n _ H0).
+      apply (Nat.nle_succ_diag_l _ H0).
     Qed.
   
     (* Proof that it is infinite *)
@@ -753,8 +753,8 @@ Section Examples.
     intros n m H.
     apply not_lt.
     intros H1.
-    rewrite (minus_n_m_0 (lt_le_weak _ _ H1) H) in H1.
-    apply (lt_irrefl _ H1).
+    rewrite (minus_n_m_0 (Nat.lt_le_incl _ _ H1) H) in H1.
+    apply (Nat.lt_irrefl _ H1).
   Qed.
 
   Lemma list_not_infinite' : forall (lg: list (Graph nat))(seq: nat -> Graph nat),
@@ -762,7 +762,7 @@ Section Examples.
     (forall (n:nat), n <= length lg -> ~~P_Finite (@eq _) lg (seq n)) -> False.
   Proof.
     induction lg as [|g lg IH]; intros seq H1 H2.
-    - apply (H2 0 (le_refl 0)).
+    - apply (H2 0 (Nat.le_refl 0)).
       intros [g [H3 _]].
       inversion H3.
     - (* the following first part of the proof is based on a simple intuitive argument:
@@ -771,7 +771,7 @@ Section Examples.
        *)
       apply (IH _ H1).
       intros n H3 H4.
-      apply (H2 _ (lt_le_weak _ _ (le_lt_n_Sm _ _ H3))) ; intro H0.
+      apply (H2 _ (Nat.lt_le_incl _ _ (PeanoNat.le_lt_n_Sm _ _ H3))) ; intro H0.
       assert (H5: Geq (@eq _) (seq n) g).
       { destruct H0 as [g' [[H5|H5] H6]];
           [rewrite H5 | destruct H4 ; exists g' ; split]; assumption. }  
@@ -784,9 +784,9 @@ Section Examples.
       set (seq' := fun x: nat => if (le_lt_dec n x) then seq (S x) else seq x).
       assert (seq'Prop: (forall x: nat, x < n -> seq' x = seq x) /\ 
          (forall x: nat, n <= x -> seq' x = seq (S x))).
-      { split ; intros x h ; unfold seq'; elim (le_lt_dec n x) ; intro a ; try reflexivity ; 
-          [assert (h1 := (le_lt_trans n x n a h)) | assert (h1 := (le_lt_trans n x n h a))] ; 
-            elim (lt_irrefl _ h1). }
+      { split ; intros x h ; unfold seq'; elim (le_lt_dec n x) ; intro a ; try reflexivity ;
+          [assert (h1 := (Nat.le_lt_trans n x n a h)) | assert (h1 := (Nat.le_lt_trans n x n h a))] ;
+            elim (Nat.lt_irrefl _ h1). }
       destruct seq'Prop as [seq'Prop1 seq'Prop2].
       assert (H6 : (∀n m : nat, Geq (@eq _) (seq' n) (seq' (n + m)) → m = 0)).
       { (* seq' is a sub-sequence of seq, so 
@@ -802,8 +802,8 @@ Section Examples.
           * rewrite (seq'Prop1 _ h2) in H6.
             rewrite plus_n_Sm in H6.
             elim (O_S _ (sym_eq (H1 _ _ H6))).
-        + do 2 rewrite seq'Prop1 in H6 ; try exact h1 ; 
-             try exact (le_lt_trans _ _ _ (le_plus_l n' m) h1).
+        + do 2 rewrite seq'Prop1 in H6 ; try exact h1 ;
+             try exact (Nat.le_lt_trans _ _ _ (Nat.le_add_r n' m) h1).
           apply (H1 _ _ H6).
       }
       (* we can now carry out the second step of the proof *)
@@ -811,16 +811,16 @@ Section Examples.
       intros n' H7 H8.
       destruct (le_lt_dec n n') as [h1|h1'];
        [rewrite (seq'Prop2 _ h1) in H8 ; destruct (H2 (S n') (le_n_S _ _ H7))
-       | rewrite (seq'Prop1 _ h1') in H8 ; set (h1 := lt_le_weak _ _ h1'); 
+       | rewrite (seq'Prop1 _ h1') in H8 ; set (h1 := Nat.lt_le_incl _ _ h1'); 
          destruct (H2 n' (le_S _ _ H7))];
        intros  [g0 [[Hyp1|Hyp1] Hyp2]] ; apply H8;
        try (exists g0 ; split; assumption) ; rewrite <- Hyp1 in Hyp2 ;
        assert (H10:=(GeqRel_Transitive (@eq_equivalence _) H5 
          (GeqRel_Symmetric (@eq_equivalence _) Hyp2)));
-       rewrite (le_plus_minus _ _ h1) in H10.
+       rewrite (Arith_base.le_plus_minus_stt _ _ h1) in H10.
       + rewrite plus_n_Sm in H10.
         elim (O_S _ (sym_eq (H1 _ _ H10))).
-      + elim (lt_irrefl _ (le_lt_trans n n' n 
+      + elim (Nat.lt_irrefl _ (Nat.le_lt_trans n n' n
          (not_minus_O_le _ _ (H1 _ _ (GeqRel_Symmetric (@eq_equivalence _) H10))) h1')).
 Qed.
 
@@ -1005,7 +1005,7 @@ Qed.
       inversion H as [lg Hall].
       apply (list_not_infinite (lg:=lg) (fun m:nat => inf_ex_bounded_gene (n+m))).
       - intros n' m H1.
-        rewrite plus_assoc in H1.
+        rewrite Nat.add_assoc in H1.
         apply inf_ex_bounded_gene_inj in H1.
         assumption.
       - intros n' Hle.
@@ -1036,7 +1036,7 @@ Qed.
       intros H.
       induction m as [| m IHm].
       { inversion H. }
-      elim (le_lt_eq_dec n m (lt_n_Sm_le _ _ H)); intros h.
+      elim (le_lt_eq_dec n m (PeanoNat.lt_n_Sm_le _ _ H)); intros h.
       - apply (Graph_in_Graph_trans (@eq_equivalence _) (inf_ex_bounded_gene'_Sn_n _)
           (IHm h)).
       - rewrite h.
@@ -1063,9 +1063,9 @@ Qed.
           rewrite <- H4 ; assumption. }
         rewrite (refl_equal _ : S m = nb_O (inf_ex_bounded_gene' (S m))).
         apply (G_all_G_in_G_P _ (H5 m) H3).
-        apply inf_ex_bounded_gene'_m_n, le_gt_S, H.
+        apply inf_ex_bounded_gene'_m_n, Arith_base.le_gt_S_stt, H.
       }
-      apply (le_Sn_n _ H4).
+      apply (Nat.nle_succ_diag_l _ H4).
     Qed.
       
   End Infinite_example_bounded.
@@ -1137,7 +1137,7 @@ Lemma three_nodes_graph_bis_not_hasCycle: not (hasCycle (@eq _) three_nodes_grap
 Proof.
   intros [[f  |f ]| f ];
   elim (zerop (decode_Fin f)) ; intros a ;
-  try assert (h:= (le_antisym _ _ (gt_S_le _ _ (decode_Fin_inf_n f)) (gt_le_S _ _ a))) ;
+  try assert (h:= (Nat.le_antisymm _ _ (Arith_base.gt_S_le_stt _ _ (decode_Fin_inf_n f)) (Arith_base.gt_le_S_stt _ _ a))) ;
   try assert (h := a) ; 
   try assert (H2 := decode_Fin_unique _ _ (h: _ = decode_Fin (first _)) : f = first 1) ; 
   try assert (H2 := decode_Fin_unique _ _ (h: _ = decode_Fin (succ (first 0))) : 

@@ -4,15 +4,15 @@
 (**  provides the implementation of the type Graphs, properties 
      and lemmas on it, and the development of various examples *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import List.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import List.
 Require Import Ilist.
 Require Import Fin.
 Require Import Graphs.
-Require Import Morphisms.
-Require Import Basics.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import Basics.
 Require Import Tools.
 Require Import PermsLists.
 Require Import GPerm.
@@ -147,7 +147,7 @@ Proof.
         intro i'' ; inversion i''.
   - assert (h2 : i = succ (first 0)).
     { apply decode_Fin_unique.
-      apply symmetry, (le_antisym _ _ (lt_le_S _ _ a) (lt_n_Sm_le _ _ (decode_Fin_inf_n i))). }
+      apply symmetry, (Nat.le_antisymm _ _ (Arith_base.lt_le_S_stt _ _ a) (PeanoNat.lt_n_Sm_le _ _ (decode_Fin_inf_n i))). }
     rewrite h2 ; clear h2.
     cbn.
     apply Geq_intro.

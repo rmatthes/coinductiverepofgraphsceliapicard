@@ -10,11 +10,11 @@
     by the authors *)
 
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
-Require Import List.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import List.
 Require Import Fin.
 Require Import ListEq.
 Require Import Ilist.
@@ -273,7 +273,7 @@ Section Bij_ilistMult_list.
   Proof.
     intros i.
     unfold ilistM2list.
-    rewrite map_length.
+    rewrite length_map.
     apply (makeListFin_nb_elem_ok).
   Qed.
 
@@ -282,7 +282,7 @@ Section Bij_ilistMult_list.
     length (map f (ilistM2list l)) = lgtiMult l.
   Proof.
     intros U l f.
-    rewrite map_length.
+    rewrite length_map.
     apply length_ilistM2list.
   Qed.
 
@@ -350,13 +350,13 @@ Section Bij_ilistMult_list.
           with refl_equal => _ end).
         destruct l as [| ht l].
         * apply 
-            (lt_irrefl _ (gt_le_trans _ _ _ a (gt_S_le _ _ (decode_Fin_inf_n f)))).
+            (Nat.lt_irrefl _ (Arith_base.gt_le_trans_stt _ _ _ a (Arith_base.gt_S_le_stt _ _ (decode_Fin_inf_n f)))).
         * left ; reflexivity.
       + refine (match e in (_ = df) return 
           In match df with 0 => h | S m => nth m l h end l 
           with refl_equal => _ end).
         assert (H': n < (length l)).
-        { apply lt_S_n.
+        { apply PeanoNat.lt_S_n.
           rewrite e.
           apply decode_Fin_inf_n. }
         apply (nth_In _ _ H').
@@ -383,8 +383,8 @@ Section Bij_ilistMult_list.
     - inversion h.
     - cbn in h.
       simpl nth.
-      assert (h':= lt_le_S _ _ (lt_S_n _ _ h)).
-      assert (H: decode_Fin (code_Fin1_Sn (lt_n_Sm_le (S n) (length l) 
+      assert (h':= Arith_base.lt_le_S_stt _ _ (PeanoNat.lt_S_n _ _ h)).
+      assert (H: decode_Fin (code_Fin1_Sn (PeanoNat.lt_n_Sm_le (S n) (length l)
                                (inf_length_lgtiM (hd :: l) h p)))
                  = S n).
       { rewrite (code_Fin1_Sn_proofirr _ h').
@@ -399,7 +399,7 @@ Section Bij_ilistMult_list.
           destruct n as [|n].
           + rewrite code_Fin1_Sn_0.
             reflexivity.
-          + apply (IHll _ (lt_S_n _ _ h)).
+          + apply (IHll _ (PeanoNat.lt_S_n _ _ h)).
       }
       cbn.
       rewrite H.
@@ -424,11 +424,11 @@ Section Bij_ilistMult_list.
         destruct l as [|hhd l].
         * rewrite <- e in h.
           apply False_rec.
-          apply (lt_irrefl _ h).
+          apply (Nat.lt_irrefl _ h).
         * reflexivity.
         * apply (nth_indep_comp _ _ _ _).
           rewrite <- e in h.
-          apply (lt_S_n _ _ h).
+          apply (PeanoNat.lt_S_n _ _ h).
   Qed.
     
   Lemma lgtiM_list2ilistM: forall (l: list T)(p: PropMult inf sup (length l)), 
@@ -474,11 +474,11 @@ Section Bij_ilistMult_list.
          -- apply False_rec.
             assert (H:= decode_Fin_inf_n f) ; cbn in H.
             rewrite e in H.
-            apply (lt_irrefl _ H).
+            apply (Nat.lt_irrefl _ H).
          -- reflexivity.
        * assert (H1:= decode_Fin_inf_n f); cbn in H1.
          rewrite <- e in H1.
-         apply (lt_S_n n (length l)) in H1.
+         apply (PeanoNat.lt_S_n n (length l)) in H1.
          apply (nth_indep_comp compRel l a hd H1).
   Qed.
 
@@ -552,7 +552,7 @@ Section Bij_ilistMult_list.
         * apply (ListEq_map_f_g _ _ _ _ H).
     - assert (H1 := ListEq_length H).
       unfold ilistM2list in H1.
-      do 2 rewrite map_length, makeListFin_nb_elem_ok in H1 ; cbn in H1.
+      do 2 rewrite length_map, makeListFin_nb_elem_ok in H1 ; cbn in H1.
       revert i2 H ; rewrite <- H1 ; clear n2 H1 ; intros i2 H.
       apply (is_imeq _ _ _ (refl_equal _ :  
           lgtiMult (existT (fun n : nat => ilistnMult T inf sup n) n1 i1) = 
@@ -600,7 +600,7 @@ Section Bij_ilistMult_list.
     assert (H: lgtiMult (iMMap f i) = 
       lgtiMult (list2ilistM inf sup (map f (ilistM2list i)) p)).
     { cbn.
-      rewrite map_length.
+      rewrite length_map.
       apply (sym_eq (length_ilistM2list i)). }
     apply (is_imeq _ _ _ H); intro fi ;
       destruct i as [[|n] i].
@@ -637,7 +637,7 @@ Section Bij_ilistMult_list.
                               end with refl_equal => _ end).
         rewrite <- (map_map (fun x => i (succ x)) f), <- (map_map (@succ _) i).
         rewrite (map_map_nth_comp compTRel compURel i fM).
-        assert (H2 := (lt_n_Sm_le (decode_Fin fi) n (decode_Fin_inf_n fi))).
+        assert (H2 := (PeanoNat.lt_n_Sm_le (decode_Fin fi) n (decode_Fin_inf_n fi))).
         rewrite (code_Fin1_Sn_proofirr _ H2).
         revert H2 ; cbn ; rewrite <- e; intro H2.
         destruct n as [|n].
@@ -647,10 +647,10 @@ Section Bij_ilistMult_list.
              rewrite code_Fin1_Sn_S.
              rewrite <- (nth_makeListFin_def H2).
              cbn.
-             rewrite (code_Fin1_Sn_proofirr _ (lt_n_Sm_le m n H2)).
+             rewrite (code_Fin1_Sn_proofirr _ (PeanoNat.lt_n_Sm_le m n H2)).
              reflexivity.
           -- cbn.
-             do 2 (rewrite map_length).
+             do 2 (rewrite length_map).
              rewrite makeListFin_nb_elem_ok.
              apply H2.
   Qed.
@@ -808,7 +808,7 @@ Section manip_ilistMult.
   Proof.
     destruct sup as [s|] ;
     [destruct p as [p p2] ; split |] ;
-    try apply (lt_le_weak _ _ (le_lt_n_Sm _ _ p)).
+    try apply (Nat.lt_le_incl _ _ (PeanoNat.le_lt_n_Sm _ _ p)).
     apply (le_n_S _ _ p2).
   Qed.
 

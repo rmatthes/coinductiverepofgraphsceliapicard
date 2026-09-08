@@ -6,7 +6,7 @@
      without using Ssreflect (hence with no card operation really) 
      and an alternative proof of the injectivity of Fin *)
 
-Require Import List Arith.
+From Stdlib Require Import List Arith.
 Require Import Fin.
 
 Set Implicit Arguments.
@@ -148,11 +148,11 @@ Qed.
 Lemma rem1_count_inf : forall x y l, count T_eq_dec x (rem1 y l) <= count T_eq_dec x l.
 Proof.
   intros x y ; induction l as [|t l IH].
-  apply le_refl.
+  apply Nat.le_refl.
   cbn.
   elim (T_eq_dec y t) ; cbn ; elim (T_eq_dec x t) ; intros H1 H2.
-  - apply le_n_Sn.
-  - apply le_refl.
+  - apply Nat.le_succ_diag_r.
+  - apply Nat.le_refl.
   - apply le_n_S, IH.
   - apply IH.
 Qed.
@@ -161,9 +161,17 @@ Lemma rem1_count_0 :
   forall x y l, count T_eq_dec x l = 0 -> count T_eq_dec x (rem1 y l) = 0.
 Proof.
   intros x y l H1.
-  apply sym_eq, le_n_0_eq.
+  apply sym_eq, Arith_base.le_n_0_eq_stt.
   rewrite <- H1.
   apply rem1_count_inf.
+Qed.
+
+(** no longer in standard library, reproved maybe very differently *)
+Lemma plus_is_O (n m : nat) : n + m = 0 -> n = 0 /\ m = 0.
+Proof.
+  induction n.
+  - intro Hyp. simpl in Hyp. rewrite Hyp. split; reflexivity.
+  - intro Hyp. simpl in Hyp. discriminate Hyp.
 Qed.
 
 Lemma is_enum_eq (x: T)(l1 l2 : list T) : 
