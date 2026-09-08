@@ -4,14 +4,15 @@
 (**  provides an implementation of Ilist 
      It also provides various properties and lemmas about it.  *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
-Require Import List.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import List.
 Require Import Fin.
 Require Import ListEq.
-Require Import Basics.
+From Stdlib Require Import Basics.
+
 Require Import Tools.
 
 Set Implicit Arguments.
@@ -27,10 +28,10 @@ Hint Rewrite decode_code1_Id: evalDecode_FinDb.
 Hint Rewrite <- decode_Fin_get_cons: evalDecode_FinDb.
 Hint Rewrite decode_Fin_succ: evalDecode_FinDb.
 
-Ltac decode_Fin_get_cons_S := (apply eq_add_S || apply lt_S_n || apply le_S_n); 
+Ltac decode_Fin_get_cons_S := (apply eq_add_S || apply PeanoNat.lt_S_n || apply le_S_n);
                               rewrite <- decode_Fin_get_cons.
 Ltac evalDecode_Fin := repeat (autorewrite with evalDecode_FinDb || decode_Fin_get_cons_S).
-Ltac decode_Fin_get_cons_S_Ass c := (apply eq_S in c || apply lt_n_S in c || apply le_n_S in c); 
+Ltac decode_Fin_get_cons_S_Ass c := (apply eq_S in c || apply Arith_base.lt_n_S_stt in c || apply le_n_S in c);
                                     rewrite <- decode_Fin_get_cons in c.
 Ltac evalDecode_Fin_Ass c := repeat (autorewrite with evalDecode_FinDb in c || decode_Fin_get_cons_S_Ass c).
 
@@ -264,7 +265,7 @@ Section ilist_def_tools.
     rewrite (nth_indep _ _ (fcti i (code_Fin1 h))).
     - rewrite map_nth, <- nth_makeListFin.
       reflexivity.
-    - rewrite map_length, makeListFin_nb_elem_ok.
+    - rewrite length_map, makeListFin_nb_elem_ok.
       assumption.
   Qed.
 
@@ -273,7 +274,7 @@ Section ilist_def_tools.
   Proof.
     intros i.
     unfold ilist2list.
-    rewrite map_length.
+    rewrite length_map.
     apply (makeListFin_nb_elem_ok).
   Qed.
 
@@ -342,7 +343,7 @@ Section ilist_def_tools.
       refine (match e in (_ = df) return 
         In match df with 0 => h | S m => nth m l h end l 
         with refl_equal => _ end) ;
-      apply (nth_In _ _), lt_S_n ;
+      apply (nth_In _ _), PeanoNat.lt_S_n ;
       rewrite e ;
       apply decode_Fin_inf_n.
   Qed.
@@ -367,8 +368,8 @@ Section ilist_def_tools.
     - inversion h.
     - cbn in h.
       simpl nth.
-      assert (h':= lt_le_S _ _ (lt_S_n _ _ h)).
-      assert (H: decode_Fin (code_Fin1_Sn (lt_n_Sm_le _ (length l) (inf_length_lgti (hd :: l) h)))= S n).
+      assert (h':= Arith_base.lt_le_S_stt _ _ (PeanoNat.lt_S_n _ _ h)).
+      assert (H: decode_Fin (code_Fin1_Sn (PeanoNat.lt_n_Sm_le _ (length l) (inf_length_lgti (hd :: l) h)))= S n).
       { rewrite (code_Fin1_Sn_proofirr _ h').
         revert n h h'.
         induction (length l) as [| ll IHll] ; intros n h h'.
@@ -380,7 +381,7 @@ Section ilist_def_tools.
           destruct n as [|n].
           + rewrite code_Fin1_Sn_0.
             reflexivity.
-          + apply (IHll _ (lt_S_n _ _ h)).
+          + apply (IHll _ (PeanoNat.lt_S_n _ _ h)).
       }
       cbn.
       rewrite H.
@@ -400,9 +401,9 @@ Section ilist_def_tools.
       + rewrite e; reflexivity.
       + inversion a as [e| n H e] ; assert (h:= decode_Fin_inf_n f) ; rewrite <- e in h.
         * destruct l as [|hhd l].
-          -- apply False_rec, (lt_irrefl _ h).
+          -- apply False_rec, (Nat.lt_irrefl _ h).
           -- reflexivity.
-        * apply (nth_indep_comp _ _ _ _ (lt_S_n _ _ h)).
+        * apply (nth_indep_comp _ _ _ _ (PeanoNat.lt_S_n _ _ h)).
   Qed.
 
   Lemma lgti_list2ilist: forall (l: list T), 
@@ -441,7 +442,7 @@ Section ilist_def_tools.
      change (match d  with 0 => hd | S m => nth m l a end = match d with 0 => hd | S m => nth m l hd end ).
      revert h1 ; generalize d; clear d ; intros [|d] h1.
      + reflexivity.
-     + apply nth_indep, lt_S_n, h1.
+     + apply nth_indep, PeanoNat.lt_S_n, h1.
   Qed.
 
   Lemma list2Fin_T_succ_map: 
@@ -500,7 +501,7 @@ Section ilist_def_tools.
   Qed.
 
   Lemma list2Fin_T_map_bis : forall (T U: Set)(l: list T)(f: T -> U)(i: Fin (length (map f l))),
-    list2Fin_T (map f l) i = f (list2Fin_T l (rewriteFins (map_length f l) i)).
+    list2Fin_T (map f l) i = f (list2Fin_T l (rewriteFins (length_map f l) i)).
   Proof.
     intros T U l f i.
     destruct l as [|t l].
@@ -527,12 +528,12 @@ Section ilist_def_tools.
       + reflexivity.
       + assert (h3 : decode_Fin i > 0).
         { rewrite <- h2.
-          apply lt_0_Sn. }
+          apply Nat.lt_0_succ. }
         assert (i' := get_cons i h3).
-        rewrite map_length, makeListFin_nb_elem_ok in i'.
-        apply lt_S_n in h1.
+        rewrite length_map, makeListFin_nb_elem_ok in i'.
+        apply PeanoNat.lt_S_n in h1.
         rewrite (nth_indep _ (first n) (succ i') h1) , map_nth.
-        rewrite map_length, makeListFin_nb_elem_ok in h1.
+        rewrite length_map, makeListFin_nb_elem_ok in h1.
         rewrite <- (nth_makeListFin_def h1).
         change (S (decode_Fin (code_Fin1 h1)) = S d).
         f_equal.
@@ -566,14 +567,14 @@ Section ilist_def_tools.
              ++ rewrite map_nth.
                 assert (H3 : decode_Fin i >= S (S m)).
                 { rewrite H.
-                  apply le_refl. }
+                  apply Nat.le_refl. }
                 simpl.
                 simpl in i.
-                set (i' := get_cons i  (lt_le_trans _ _ _ (lt_0_Sn (S m)) H3) : 
+                set (i' := get_cons i  (Nat.lt_le_trans _ _ _ (Nat.lt_0_succ (S m)) H3) :
                   Fin (S (length (List.map (@succ (S n)) (List.map (@succ n) (makeListFin n)))))).
                 assert (H4 := decode_Fin_unique i (succ i') (decode_Fin_get_cons _ _)).
                 set (i'' := rewriteFins (eq_S _ _ 
-                       (map_length (@succ (S n)) (List.map (@succ n) (makeListFin n)))) i').
+                       (length_map (@succ (S n)) (List.map (@succ n) (makeListFin n)))) i').
                 assert (H5 : decode_Fin i'' = decode_Fin i').
                 { unfold i'', rewriteFins ; apply (sym_eq (decode_Fin_match _ _ )). }    
                 rewrite (IH i'').
@@ -588,7 +589,7 @@ Section ilist_def_tools.
                    transitivity (decode_Fin i').
                    --- exact H5.
                    --- apply eq_add_S; rewrite H, H4; reflexivity.
-             ++ do 2 apply lt_S_n ; rewrite H.
+             ++ do 2 apply PeanoNat.lt_S_n ; rewrite H.
                 apply decode_Fin_inf_n.
   Qed.
 
@@ -596,7 +597,7 @@ Section ilist_def_tools.
     S (lgti (list2ilist (l1 ++ l2))) = lgti (list2ilist (l1 ++ t :: l2)).
   Proof.
     cbn.
-    do 2 rewrite app_length.
+    do 2 rewrite length_app.
     apply plus_n_Sm.
   Qed.
 
@@ -619,11 +620,24 @@ Section ilist_def_tools.
   Qed.
 	
   Section iappend.
+
+    (** no longer in standard library *)
+    Lemma plus_lt_reg_l (n m p : nat) : p + n < p + m → n < m.
+    Proof.
+      intro Hyp.
+      assert (Hyp' : n + p < m + p).
+      { rewrite Nat.add_comm.
+        rewrite (Nat.add_comm m p).
+        assumption. }
+      simple refine (Nat.le_lt_add_lt _ _ _ _ _ Hyp').
+      apply Nat.le_refl.
+    Qed.
+
     Definition rightFin (n1 n2 : nat)(i: Fin (n1 + n2))(h: n1 <= decode_Fin i) : Fin n2.
     Proof.
       assert (h1 : decode_Fin i - n1 < n2).
       { apply (plus_lt_reg_l _ _ n1).
-        rewrite <- le_plus_minus ; try assumption.
+        rewrite <- Arith_base.le_plus_minus_stt ; try assumption.
         apply decode_Fin_inf_n. }
       exact (code_Fin1 h1).
     Defined.
@@ -634,8 +648,8 @@ Section ilist_def_tools.
       intros n1 n2 i h.
       unfold rightFin.
       rewrite decode_code1_Id.
-      rewrite plus_comm.
-      apply sym_eq, le_plus_minus,h.
+      rewrite Nat.add_comm.
+      apply sym_eq, Arith_base.le_plus_minus_stt,h.
     Qed.
 
     Definition iappend (X: Set)(l1 l2 : ilist X) : ilist X.
@@ -662,7 +676,7 @@ Section ilist_def_tools.
       cbn in *|-*.
       unfold sumbool_rec, sumbool_rect.
       elim (le_lt_dec n1 (decode_Fin i)) ; intros a.
-      - apply False_rec, (lt_irrefl n1), (le_lt_trans _ (decode_Fin i)) ; assumption.
+      - apply False_rec, (Nat.lt_irrefl n1), (Nat.le_lt_trans _ (decode_Fin i)) ; assumption.
       - f_equal.
         apply decode_Fin_unique.
         do 2 rewrite decode_code1_Id.
@@ -683,7 +697,7 @@ Section ilist_def_tools.
         unfold rightFin ; do 2 rewrite decode_code1_Id.
         rewrite <- decode_Fin_match'.
         reflexivity.
-      - apply False_rec, (lt_irrefl n1), (le_lt_trans _ (decode_Fin i)).
+      - apply False_rec, (Nat.lt_irrefl n1), (Nat.le_lt_trans _ (decode_Fin i)).
         + rewrite <- decode_Fin_match' in h.
           assumption.
         + assumption.
@@ -694,7 +708,7 @@ Section ilist_def_tools.
       ilist_rel eq (iappend l1 l2) (list2ilist ((ilist2list l1) ++ (ilist2list l2))).
     Proof.
       assert (h1 : lgti (iappend l1 l2) = lgti (list2ilist (ilist2list l1 ++ ilist2list l2))).
-      { rewrite lgti_list2ilist, app_length, length_ilist2list, length_ilist2list.
+      { rewrite lgti_list2ilist, length_app, length_ilist2list, length_ilist2list.
         apply iappend_lgti. }
       apply (is_ilist_rel _ _ _ h1).     
       intros i.
@@ -705,7 +719,7 @@ Section ilist_def_tools.
         rewrite app_nth2 ; rewrite length_ilist2list ; try assumption.
         rewrite (iappend_right _ _ _ b).
         unfold rightFin, eq_ind, eq_rect.
-        set (h2 := plus_lt_reg_l _ _ _ (match le_plus_minus (lgti l1)
+        set (h2 := plus_lt_reg_l _ _ _ (match Arith_base.le_plus_minus_stt (lgti l1)
           (decode_Fin (rewriteFins (iappend_lgti l1 l2) i)) b in _=y return y < lgti l1 + lgti l2 with 
           eq_refl => decode_Fin_inf_n (rewriteFins (iappend_lgti l1 l2) i) end)).
         rewrite (decode_Fin_match' i (iappend_lgti l1 l2)).
@@ -720,7 +734,7 @@ Section ilist_def_tools.
       ilist2list (iappend l1 l2) = (ilist2list l1) ++ (ilist2list l2).
     Proof.
       apply eq_nth_cor'.
-      - rewrite app_length.
+      - rewrite length_app.
         do 3 rewrite length_ilist2list.
         apply iappend_lgti.
       - intros n d h1.
@@ -729,12 +743,12 @@ Section ilist_def_tools.
         elim (le_lt_dec (lgti l1) n) ; intros b.
         + rewrite app_nth2; rewrite length_ilist2list; try assumption.
           assert (h2 : n- lgti l1 < lgti l2).
-          * rewrite <- (minus_plus (lgti l1) (lgti l2)).
+          * rewrite <- (Nat.add_simpl_l (lgti l1) (lgti l2)).
             rewrite <- iappend_lgti.
-            apply le_S_gt.
-            rewrite minus_Sn_m ; try assumption.
-            apply minus_le_compat_r.
-            apply gt_le_S.
+            apply Arith_base.le_S_gt_stt.
+            rewrite Arith_base.minus_Sn_m_stt ; try assumption.
+            apply Nat.sub_le_mono_r.
+            apply Arith_base.gt_le_S_stt.
             assumption.
           * rewrite <- (ilist2list_nth' _ _ h2).
             assert (h3 : lgti l1 ≤ decode_Fin (rewriteFins (iappend_lgti l1 l2) (code_Fin1 h1))).
@@ -779,10 +793,10 @@ Section ilist_def_tools.
             rewriteFins h2 (rightFin (lgti rs) (rewriteFins (iappend_lgti ls rs) i) a)).
         { apply decode_Fin_unique.
           rewrite <- decode_Fin_match'.
-          apply (plus_reg_l _ _ (lgti ls')).
-          rewrite plus_comm, rightFin_decode_Fin, <- decode_Fin_match', <- decode_Fin_match'.
+          apply (Nat.add_cancel_l _ _ (lgti ls')).
+          rewrite Nat.add_comm, rightFin_decode_Fin, <- decode_Fin_match', <- decode_Fin_match'.
           rewrite <- h1.
-          rewrite plus_comm, rightFin_decode_Fin, <- decode_Fin_match'.
+          rewrite Nat.add_comm, rightFin_decode_Fin, <- decode_Fin_match'.
           reflexivity.
         }
         rewrite H3.
@@ -815,7 +829,7 @@ Section ilist_def_tools.
     - unfold ilist2list in H.
       cbn in H.
       assert (H1 := ListEq_length H).
-      do 2 (rewrite map_length, makeListFin_nb_elem_ok in H1).
+      do 2 (rewrite length_map, makeListFin_nb_elem_ok in H1).
       revert i2 H ; rewrite <- H1 ; intros i2 H ; clear H1 n2.
       apply (is_ilist_rel _ _ _ (refl_equal n : lgti (existT _ _ i1) = lgti (existT _ _ i2))) ; cbn.
       intro f.
@@ -861,7 +875,7 @@ Section ilist_def_tools.
       fold (mkilist i1) (mkilist i2).
       assert (H1 : n = n2).
       { rewrite <- (makeListFin_nb_elem_ok n), <- (makeListFin_nb_elem_ok n2).
-        rewrite <- (map_length i1 (makeListFin n) : length (map _ _) = _), <- (map_length i2 (makeListFin n2)).
+        rewrite <- (length_map i1 (makeListFin n) : length (map _ _) = _), <- (length_map i2 (makeListFin n2)).
         rewrite H.
         reflexivity. }
       revert i2 H ; rewrite <- H1 ; intros i2 H ; clear H1 n2.
@@ -903,7 +917,7 @@ Section ilist_def_tools.
     intros T U i f compT compTRel compU compURel fM.
     assert (H: lgti (imap f i) = lgti (list2ilist (map f (ilist2list i)))).
     { cbn.
-      rewrite map_length.
+      rewrite length_map.
       apply (sym_eq (length_ilist2list i)). }
     apply (is_ilist_rel _ _ _ H); intro fi.
     destruct i as [ [|n] i].
@@ -926,7 +940,7 @@ Section ilist_def_tools.
            apply decode_Fin_unique in e.
            cbn ; rewrite e; reflexivity.
       * assert (H2 :m < n).
-        { apply (lt_S_n m n).
+        { apply (PeanoNat.lt_S_n m n).
           rewrite e.
           apply decode_Fin_inf_n. }
         rewrite (map_map_nth_comp compTRel compURel i fM).
@@ -936,7 +950,7 @@ Section ilist_def_tools.
            ++ rewrite (decode_Fin_unique _ _ (trans_eq
                            (eq_S _ _ (decode_code1_Id H2) : decode_Fin (succ _) = _) e)).
               reflexivity.
-           ++ rewrite map_length, makeListFin_nb_elem_ok.
+           ++ rewrite length_map, makeListFin_nb_elem_ok.
               assumption.
   Qed.
 
@@ -1282,7 +1296,7 @@ Qed.
     Proof.
       apply (@mkilist X (decode_Fin i)).
       intro i'.
-      exact (fcti l (code_Fin1 (lt_trans _ _ _ (decode_Fin_inf_n i') (decode_Fin_inf_n i)))).
+      exact (fcti l (code_Fin1 (Nat.lt_trans _ _ _ (decode_Fin_inf_n i') (decode_Fin_inf_n i)))).
     Defined.
     
     Lemma left_sib_lgti (X: Set)(l: ilist X)(i: Fin (lgti l)) : lgti (left_sib l i) = decode_Fin i.
@@ -1295,8 +1309,8 @@ Qed.
       apply (@mkilist X (lgti l - (S (decode_Fin i)))).
       intro i'.
       assert (h : S (decode_Fin i) + decode_Fin i' < lgti l).
-      { rewrite (le_plus_minus _ (lgti l) (gt_le_S _ _ (decode_Fin_inf_n i))).
-        apply (plus_gt_compat_l _ _ (S (decode_Fin i))), decode_Fin_inf_n. }
+      { rewrite (Arith_base.le_plus_minus_stt _ (lgti l) (Arith_base.gt_le_S_stt _ _ (decode_Fin_inf_n i))).
+        apply (Arith_base.plus_gt_compat_l_stt _ _ (S (decode_Fin i))), decode_Fin_inf_n. }
       exact (fcti l (code_Fin1 h)).
     Defined.
     
@@ -1311,20 +1325,20 @@ Qed.
     Proof.
       cbn.
       rewrite <- plus_Sn_m.
-      apply sym_eq, (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n i))).
+      apply sym_eq, (Arith_base.le_plus_minus_stt _ _ (Arith_base.gt_le_S_stt _ _ (decode_Fin_inf_n i))).
     Qed.
 
     Lemma left_sib_right_sib (T: Set)(l: ilist T)(i: Fin (lgti (l))) : 
       ilist2list (left_sib l i) ++ (fcti l i) :: ilist2list (right_sib l i) = ilist2list l.
     Proof.
       apply eq_nth_cor'.
-      - rewrite app_length.
+      - rewrite length_app.
         simpl.
         repeat rewrite length_ilist2list.
         rewrite <- plus_n_Sm.
         apply left_sib_right_sib_lgti.
       - intros n d h .
-        rewrite app_length in h ; simpl in h ; rewrite <- plus_n_Sm, <- plus_Sn_m in h.
+        rewrite length_app in h ; simpl in h ; rewrite <- plus_n_Sm, <- plus_Sn_m in h.
         do 2 rewrite length_ilist2list in h.
         assert (a : n < lgti l).
         { rewrite <- (left_sib_right_sib_lgti l i) ; assumption. }
@@ -1342,15 +1356,15 @@ Qed.
             rewrite decode_code1_Id.
             apply sym_eq, (minus_n_m_0 b h1).
           * assert (h2 : x < lgti (right_sib l i)).
-            { apply lt_S_n.
+            { apply PeanoNat.lt_S_n.
               rewrite <- h1.
               rewrite right_sib_lgti.
-              rewrite minus_Sn_m, Sn_Sm_eq_n_m.
-              - apply le_S_gt.
-                rewrite minus_Sn_m; try assumption.
-                apply minus_le_compat_r.
-                apply gt_le_S, a.
-              - apply gt_le_S, decode_Fin_inf_n.
+              rewrite Arith_base.minus_Sn_m_stt, Sn_Sm_eq_n_m.
+              - apply Arith_base.le_S_gt_stt.
+                rewrite Arith_base.minus_Sn_m_stt; try assumption.
+                apply Nat.sub_le_mono_r.
+                apply Arith_base.gt_le_S_stt, a.
+              - apply Arith_base.gt_le_S_stt, decode_Fin_inf_n.
             }
             rewrite <- (ilist2list_nth' _ _ h2).
             cbn.
@@ -1358,7 +1372,7 @@ Qed.
             apply decode_Fin_unique.
             repeat rewrite decode_code1_Id.
             rewrite plus_n_Sm, <-h1.
-            apply sym_eq, le_plus_minus ; assumption.
+            apply sym_eq, Arith_base.le_plus_minus_stt ; assumption.
         + rewrite app_nth1.
           * assert (h1 : n < lgti (left_sib l i)).
             { rewrite left_sib_lgti; assumption. }      
@@ -1414,15 +1428,15 @@ Qed.
       + rewrite <- (get_cons_ok1 _ b).
         change (RelX (fcti l i') (fcti (right_sib l i) (get_cons i1 b))).
         simpl.
-        assert (i' = (code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (get_cons _ b)))
-           (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n i)))))).
+        assert (i' = (code_Fin1 (eq_ind_r (lt _) (Arith_base.plus_gt_compat_l_stt _ _ _ (decode_Fin_inf_n (get_cons _ b)))
+           (Arith_base.le_plus_minus_stt _ _ (Arith_base.gt_le_S_stt _ _ (decode_Fin_inf_n i)))))).
         { apply decode_Fin_unique.
           rewrite decode_code1_Id.
           rewrite plus_Sn_m, plus_n_Sm.
           rewrite <- decode_Fin_get_cons.
           change (decode_Fin i) with (lgti (left_sib l i)).
           unfold i1.
-          rewrite plus_comm.
+          rewrite Nat.add_comm.
           rewrite rightFin_decode_Fin.
           do 2 rewrite <- decode_Fin_match'.
           reflexivity.
@@ -1432,7 +1446,7 @@ Qed.
       - rewrite (decode_Fin_match' i' h) in a.
         rewrite (iappend_left _ _ _ a).
         cbn.
-        assert (H: code_Fin1 (lt_trans _ _ _ (decode_Fin_inf_n (code_Fin1 a)) (decode_Fin_inf_n i)) = i').
+        assert (H: code_Fin1 (Nat.lt_trans _ _ _ (decode_Fin_inf_n (code_Fin1 a)) (decode_Fin_inf_n i)) = i').
         { apply decode_Fin_unique.
           do 2 rewrite decode_code1_Id.
           apply sym_eq, decode_Fin_match'. }
@@ -1449,9 +1463,9 @@ Qed.
       apply (is_ilist_rel _ _ _ h2).
       intro i'.
       cbn.
-      assert (H2 : code_Fin1 (lt_trans _ _ _ (decode_Fin_inf_n (rewriteFins h2 i')) 
+      assert (H2 : code_Fin1 (Nat.lt_trans _ _ _ (decode_Fin_inf_n (rewriteFins h2 i'))
         (decode_Fin_inf_n (rewriteFins h i))) = rewriteFins h1 (code_Fin1
-        (lt_trans _ _ _ (decode_Fin_inf_n i') (decode_Fin_inf_n i)))) by treatFinPure.
+        (Nat.lt_trans _ _ _ (decode_Fin_inf_n i') (decode_Fin_inf_n i)))) by treatFinPure.
       cbn in H2.
       rewrite H2.
       apply H1.
@@ -1468,10 +1482,10 @@ Qed.
       apply (is_ilist_rel _ _ _ h2).
       intro i'.
       cbn.
-      set (i1 := code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n i'))
-           (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n i))))).
-      assert (H: code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h2 i')))
-           (le_plus_minus _ _  (gt_le_S _ _  (decode_Fin_inf_n (rewriteFins h i))))) = rewriteFins h1 i1).
+      set (i1 := code_Fin1 (eq_ind_r (lt _) (Arith_base.plus_gt_compat_l_stt _ _ _ (decode_Fin_inf_n i'))
+           (Arith_base.le_plus_minus_stt _ _ (Arith_base.gt_le_S_stt _ _ (decode_Fin_inf_n i))))).
+      assert (H: code_Fin1 (eq_ind_r (lt _) (Arith_base.plus_gt_compat_l_stt _ _ _ (decode_Fin_inf_n (rewriteFins h2 i')))
+           (Arith_base.le_plus_minus_stt _ _  (Arith_base.gt_le_S_stt _ _  (decode_Fin_inf_n (rewriteFins h i))))) = rewriteFins h1 i1).
       { apply decode_Fin_unique.
         unfold i1.
         rewrite decode_code1_Id.
@@ -1495,7 +1509,7 @@ Qed.
       apply (is_ilist_rel _ _ _ h1).
       intro i.
       cbn.
-      assert (h2 : decode_Fin ((code_Fin1 (lt_trans _ _ _
+      assert (h2 : decode_Fin ((code_Fin1 (Nat.lt_trans _ _ _
         (decode_Fin_inf_n (rewriteFins h1 i)) (decode_Fin_inf_n (code_Fin1 h))))) < lgti l1).
       { rewrite decode_code1_Id, <- decode_Fin_match'.
         apply decode_Fin_inf_n. }
@@ -1517,24 +1531,24 @@ Qed.
         cbn.
         rewrite <- plus_n_Sm, <- plus_Sn_m.
         rewrite H1.
-        apply sym_eq, minus_plus. }
+        apply sym_eq, Nat.add_simpl_l. }
       apply (is_ilist_rel _ _ _ h1).
       intro i.
       cbn.
       assert (h2 : lgti l1 <= decode_Fin (rewriteFins (iappend_lgti l1 _)
-        (code_Fin1 (eq_ind_r (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
-        (le_plus_minus _ _ (gt_le_S _ _  (decode_Fin_inf_n (code_Fin1 h)))))))).
+        (code_Fin1 (eq_ind_r (lt _) (Arith_base.plus_gt_compat_l_stt _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
+        (Arith_base.le_plus_minus_stt _ _ (Arith_base.gt_le_S_stt _ _  (decode_Fin_inf_n (code_Fin1 h)))))))).
       { do 2 (rewrite <- decode_Fin_match', decode_code1_Id).
         rewrite H1.
         rewrite plus_Sn_m, plus_n_Sm.
-        apply le_plus_l. }
+        apply Nat.le_add_r. }
       assert (H3 := iappend_right _ _ _ h2).
       assert (H4 : rightFin _ (rewriteFins (iappend_lgti l1 (icons t l2))
-             (code_Fin1 (eq_ind_r  (lt _) (plus_gt_compat_l _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
-             (le_plus_minus _ _ (gt_le_S _ _ (decode_Fin_inf_n (code_Fin1 h))))))) h2 = succ i).
+             (code_Fin1 (eq_ind_r  (lt _) (Arith_base.plus_gt_compat_l_stt _ _ _ (decode_Fin_inf_n (rewriteFins h1 i)))
+             (Arith_base.le_plus_minus_stt _ _ (Arith_base.gt_le_S_stt _ _ (decode_Fin_inf_n (code_Fin1 h))))))) h2 = succ i).
       { apply decode_Fin_unique.
-        apply (plus_reg_l _ _ (lgti l1)).
-        rewrite plus_comm.
+        apply (Nat.add_cancel_l _ _ (lgti l1)).
+        rewrite Nat.add_comm.
         rewrite rightFin_decode_Fin, <- decode_Fin_match', decode_code1_Id, decode_code1_Id, <- decode_Fin_match', H1.
         apply plus_n_Sm. }
       rewrite H4 in H3.
@@ -1549,12 +1563,12 @@ Qed.
       intros H.
       assert (h1 : lgti l1 <= decode_Fin (rewriteFins (iappend_lgti l1 (icons t l2)) (code_Fin1 h))).
       { rewrite <- decode_Fin_match', decode_code1_Id.
-        rewrite H ; apply le_refl. }
+        rewrite H ; apply Nat.le_refl. }
       rewrite (iappend_right _ _ _ h1).
       assert (H2 : 
         rightFin (lgti (icons t l2)) (rewriteFins (iappend_lgti l1 (icons t l2)) (code_Fin1 h)) h1 = first _).
-      { apply decode_Fin_unique, (plus_reg_l _ _ (lgti l1)).
-        rewrite plus_comm.
+      { apply decode_Fin_unique, (Nat.add_cancel_l _ _ (lgti l1)).
+        rewrite Nat.add_comm.
         rewrite rightFin_decode_Fin, <- decode_Fin_match', decode_code1_Id, H.
         apply plus_n_O. }
       rewrite H2.

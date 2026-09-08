@@ -4,12 +4,12 @@
 (**  provides a proof of equivalence between IlistPerm3 and 
      a definition given by Contejean *)
 
-Require Export Arith.
-Require Import Utf8.
-Require Import Setoid.
-Require Import Morphisms.
-Require Import List.
-Require Import Basics.
+From Stdlib Require Export Arith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Morphisms.
+From Stdlib Require Import List.
+From Stdlib Require Import Basics.
 Require Import Fin.
 Require Import Ilist.
 Require Import IlistPerm.
@@ -32,14 +32,14 @@ Proof.
   { apply IlistPerm3nil. }
   assert (h: length l1 < lgti (list2ilist (l1 ++ b :: l2))).
   { cbn.
-    rewrite app_length.
+    rewrite length_app.
     apply lt_plus_S. }
   apply (IlistPerm3_cons _ _ (first _ : Fin (lgti (list2ilist (a :: l)))) (code_Fin1 h)).
   - do 2 rewrite <- (list2ilist_nth2 _ _ b).
     fold (length l).
     rewrite decode_code1_Id.
-    rewrite (app_nth2 _ _ b (le_refl _)).
-    rewrite minus_diag.
+    rewrite (app_nth2 _ _ b (Nat.le_refl _)).
+    rewrite  Nat.sub_diag.
     assumption.
   - assert (H3 : ilist_rel eq (list2ilist l) (extroduce (list2ilist (a :: l)) (first _))).
     { cbn.
@@ -67,9 +67,9 @@ Proof.
         rewrite <- decode_Fin_match'.
         rewrite <- decode_Fin_match', decode_code1_Id in h2.
         rewrite app_nth2, app_nth2 ; try assumption.
-        -- rewrite <- minus_Sn_m ; try assumption.
+        -- rewrite <- Arith_base.minus_Sn_m_stt ; try assumption.
            reflexivity.
-        -- apply (le_trans _ _ _ h2 (le_n_Sn _)).
+        -- apply (Nat.le_trans _ _ _ h2 (Nat.le_succ_diag_r _)).
       * rewrite extroduce_ok2' ; try assumption.
         rewrite <- (list2ilist_nth2 _ _ b).
         rewrite <- decode_Fin_match', weakFin_ok, <- decode_Fin_match'.
