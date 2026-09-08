@@ -166,7 +166,7 @@ Proof.
   apply rem1_count_inf.
 Qed.
 
-(** no longer in standard library *)
+(** no longer in standard library, reproved maybe very differently *)
 Lemma plus_is_O (n m : nat) : n + m = 0 -> n = 0 /\ m = 0.
 Proof.
   induction n.

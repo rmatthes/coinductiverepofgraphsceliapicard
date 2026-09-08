@@ -603,7 +603,7 @@ Set Implicit Arguments.
      reflexivity.
    Qed.
 
-   (** no longer in standard library *)
+   (** no longer in standard library, reproved maybe very differently *)
    Lemma le_lt_or_eq (n m : nat) : n ≤ m → n < m ∨ n = m.
    Proof.
      intro Hyp.

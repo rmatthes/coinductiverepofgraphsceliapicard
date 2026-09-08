@@ -621,7 +621,7 @@ Section ilist_def_tools.
 	
   Section iappend.
 
-    (** no longer in standard library *)
+    (** no longer in standard library, reproved maybe very differently *)
     Lemma plus_lt_reg_l (n m p : nat) : p + n < p + m → n < m.
     Proof.
       intro Hyp.
